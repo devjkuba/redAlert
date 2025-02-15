@@ -1,154 +1,223 @@
-import { useEffect, useState } from 'react';
+'use client'
 
-interface Organization {
-  id: string; 
-  name: string;
-}
+import Link from 'next/link'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
-const Register = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [organization, setOrganization] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [gdprConsent, setGdprConsent] = useState(true);
-  const [dataProtectionConsent, setDataProtectionConsent] = useState(true);
-  const [termsConsent, setTermsConsent] = useState(true);
-  const [message, setMessage] = useState('');
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
+import { PhoneInput } from '@/components/ui/phone-input'
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+// Define validation schema using Zod
+const formSchema = z
+  .object({
+    name: z
+      .string()
+      .min(2, { message: 'Name must be at least 2 characters long' }),
+    email: z.string().email({ message: 'Invalid email address' }),
+    phone: z.string().min(10, { message: 'Phone number must be valid' }),
+    password: z
+      .string()
+      .min(6, { message: 'Password must be at least 6 characters long' })
+      .regex(/[a-zA-Z0-9]/, { message: 'Password must be alphanumeric' }),
+    confirmPassword: z.string(),
+    country: z.enum(['Slovakia', 'Czech Republic'], {
+        message: 'Only Slovakia and Czech Republic are allowed',
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match',
+  })
 
-    if (!gdprConsent || !dataProtectionConsent || !termsConsent) {
-      setMessage('Musíte potvrdit všechny souhlasy.');
-      return;
+export default function RegisterPreview() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      country: 'Slovakia',
+    },
+  })
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      // Assuming an async registration function
+      console.log(values)
+      toast(
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+        </pre>,
+      )
+    } catch (error) {
+      console.error('Form submission error', error)
+      toast.error('Failed to submit the form. Please try again.')
     }
-
-    const res = await fetch('http://localhost:4000/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ firstName, lastName, organization, email, password }),
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      setMessage('Registrace úspěšná!');
-    } else {
-      setMessage(data.message);
-    }
-  };
-
-  useEffect(() => {
-    const fetchOrganizations = async () => {
-      const res = await fetch('http://localhost:4000/api/organizations');
-      const data = await res.json();
-      setOrganizations(data);
-    };
-
-    fetchOrganizations();
-  }, []);
+  }
 
   return (
-    <main className="flex flex-col items-center flex-grow p-4 pt-16 pb-16 overflow-auto">
-      <div className="flex flex-col items-center w-full max-w-md"> 
-      <h1 className="text-2xl font-bold mb-6">Registrace</h1>
-      <form onSubmit={handleRegister} className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
-        <input
-          type="text"
-          placeholder="Jméno"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-          className="border border-gray-300 rounded-lg p-2 mb-4 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Příjmení"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-          className="border border-gray-300 rounded-lg p-2 mb-4 w-full"
-        />
-        <select
-          value={organization}
-          onChange={(e) => setOrganization(e.target.value)}
-          required
-          className="border border-gray-300 rounded-lg p-2 mb-4 w-full"
-        >
-          <option value="">Vyber organizaci</option>
-          {organizations.map((org) => (
-            <option key={org.id} value={org.name}>
-              {org.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="border border-gray-300 rounded-lg p-2 mb-4 w-full"
-        />
-        <input
-          type="password"
-          placeholder="Heslo"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="border border-gray-300 rounded-lg p-2 mb-4 w-full"
-        />
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <Card className="mx-auto max-w-sm">
+        <CardHeader>
+            <div className="flex justify-center mb-4">
+              <img
+                src="../logo.png"
+                alt="Logo"
+                className="h-20"
+              />
+            </div>
+          <CardTitle className="text-2xl">Registrace organizace</CardTitle>
+          <CardDescription>
+            Vytvořte nový účet organizace vyplněním formuláře níže.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid gap-4">
+                {/* Name Field */}
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-1">
+                      <FormLabel htmlFor="name">Jméno</FormLabel>
+                      <FormControl>
+                        <Input id="name" placeholder="Jan" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        {/* GDPR Consent Checkbox */}
-        <div className="flex items-start mb-4">
-          <input
-            type="checkbox"
-            checked={gdprConsent}
-            onChange={(e) => setGdprConsent(e.target.checked)}
-            className="mr-2"
-          />
-          <label className="text-sm text-gray-600">
-            Souhlasím se zpracováním osobních údajů v souladu s <a href="/gdpr-policy" className="text-gray-800 underline">GDPR</a>.
-          </label>
-        </div>
-        
-        {/* Data Protection Consent Checkbox */}
-        <div className="flex items-start mb-4">
-          <input
-            type="checkbox"
-            checked={dataProtectionConsent}
-            onChange={(e) => setDataProtectionConsent(e.target.checked)}
-            className="mr-2"
-          />
-          <label className="text-sm text-gray-600">
-            Potvrzuji, že jsem si přečetl/a <a href="/data-protection" className="text-gray-800 underline">Ochranu osobních údajů</a>.
-          </label>
-        </div>
-        
-        {/* Terms Consent Checkbox */}
-        <div className="flex items-start mb-4">
-          <input
-            type="checkbox"
-            checked={termsConsent}
-            onChange={(e) => setTermsConsent(e.target.checked)}
-            className="mr-2"
-          />
-          <label className="text-sm text-gray-600">
-            Souhlasím s <a href="/terms" className="text-gray-800 underline">podmínkami používání</a>.
-          </label>
-        </div>
+                 {/* Name Field */}
+                 <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-1">
+                      <FormLabel htmlFor="name">Příjmení</FormLabel>
+                      <FormControl>
+                        <Input id="name" placeholder="Novák" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <button type="submit" className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-500 transition-all duration-300 transform hover:scale-105 active:scale-95">
-          Registrovat se
-        </button>
-      </form>
-      {message && <p className="mt-4 text-red-500">{message}</p>}
-      </div>
-    </main>
-  );
-};
+                {/* Email Field */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-1">
+                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          id="email"
+                          placeholder="johndoe@mail.com"
+                          type="email"
+                          autoComplete="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-export default Register;
+                {/* Phone Field */}
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-1">
+                      <FormLabel htmlFor="phone">Telefonní číslo</FormLabel>
+                      <FormControl>
+                        <PhoneInput {...field} defaultCountry={'CZ'} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Password Field */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-1">
+                      <FormLabel htmlFor="password">Heslo</FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          id="password"
+                          placeholder="******"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Confirm Password Field */}
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-1">
+                      <FormLabel htmlFor="confirmPassword">
+                        Potvrďte heslo
+                      </FormLabel>
+                      <FormControl>
+                        <PasswordInput
+                          id="confirmPassword"
+                          placeholder="******"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full">
+                  Registrace
+                </Button>
+              </div>
+            </form>
+          </Form>
+          <div className="mt-4 text-center text-sm">
+            Máte již účet?{' '}
+            <Link href="/login" className="underline">
+              Přihlášení
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
