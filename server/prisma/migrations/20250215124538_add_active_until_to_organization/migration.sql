@@ -1,3 +1,4 @@
+npx shadcn@latest add form
 /*
   Warnings:
 

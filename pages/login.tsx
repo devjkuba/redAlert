@@ -72,7 +72,7 @@ export default function LoginPreview() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <div className="flex justify-center mb-4">
