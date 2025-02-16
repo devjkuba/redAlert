@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
+import { useState } from 'react'
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Neplatná e-mailová adresa' }),
@@ -32,20 +33,29 @@ const formSchema = z.object({
     .string()
     .min(6, { message: 'Heslo musí mít alespoň 6 znaků' })
     .regex(/[a-zA-Z0-9]/, { message: 'Heslo musí být alfanumerické' }),
+    botField: z.string().optional(),
 })
 
 export default function LoginPreview() {
+  const [botField, setBotField] = useState('')
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
+      botField: '',
     },
   })
 
   const router = useRouter()
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (botField) {
+      console.warn('Detekován bot! Přihlášení zablokováno.')
+      return;
+    }
+
     try {
       const res = await fetch('http://localhost:4000/api/login', {
         method: 'POST',
@@ -95,7 +105,7 @@ export default function LoginPreview() {
                   control={form.control}
                   name="email"
                   render={({ field }) => (
-                    <FormItem className="grid gap-2">
+                    <FormItem className="grid gap-1">
                       <FormLabel htmlFor="email">Email</FormLabel>
                       <FormControl>
                         <Input
@@ -114,7 +124,7 @@ export default function LoginPreview() {
                   control={form.control}
                   name="password"
                   render={({ field }) => (
-                    <FormItem className="grid gap-2">
+                    <FormItem className="grid gap-1">
                       <div className="flex justify-between items-center">
                         <FormLabel htmlFor="password">Heslo</FormLabel>
                         <Link
@@ -136,6 +146,16 @@ export default function LoginPreview() {
                     </FormItem>
                   )}
                 />
+                <input
+                  type="text"
+                  name="botField"
+                  value={botField}
+                  onChange={(e) => setBotField(e.target.value)}
+                  style={{ display: 'none' }}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+
                 <Button type="submit" className="w-full">
                   Login
                 </Button>
