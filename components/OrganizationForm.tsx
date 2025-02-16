@@ -59,7 +59,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
         onSubmit={organizationForm.handleSubmit(onSubmit)}
         className="space-y-6"
       >
-        <div className="grid gap-4">
+        <div className="grid gap-2">
           <FormField
             control={organizationForm.control}
             name="name"

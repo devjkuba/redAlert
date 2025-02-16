@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import { PhoneInput } from "./ui/phone-input";
 
 const adminSchema = z
   .object({
@@ -31,13 +33,13 @@ const adminSchema = z
       })
       .min(2, { message: "Příjmení musí mít alespoň 2 znaky" }),
     email: z.string().email({ message: "Neplatná emailová adresa" }),
-    // phone: z
-    //   .string({
-    //     required_error: "Telefonní číslo je povinné",
-    //     invalid_type_error: "Telefon musí být text",
-    //   })
-    //   .min(10, { message: "Telefonní číslo musí mít alespoň 10 znaků" })
-    //   .regex(/^\+?[1-9]\d{1,14}$/, { message: "Neplatné telefonní číslo" }),
+    phone: z
+      .string({
+        required_error: "Telefonní číslo je povinné",
+        invalid_type_error: "Telefon musí být text",
+      })
+      .min(10, { message: "Telefonní číslo musí mít alespoň 10 znaků" })
+      .regex(/^\+?[1-9]\d{1,14}$/, { message: "Neplatné telefonní číslo" }),
     password: z
       .string({
         required_error: "Heslo je povinné",
@@ -71,7 +73,7 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
   return (
     <Form {...adminForm}>
       <form onSubmit={adminForm.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid gap-4">
+        <div className="grid gap-2">
           <FormField
             control={adminForm.control}
             name="firstName"
@@ -124,6 +126,19 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
               </FormItem>
             )}
           />
+            <FormField
+                  control={adminForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-1">
+                      <FormLabel htmlFor="phone">Telefon</FormLabel>
+                      <FormControl>
+                        <PhoneInput {...field} defaultCountry="CZ" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
           <FormField
             control={adminForm.control}
             name="password"
@@ -172,6 +187,12 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
           </Button>
           <Button type="submit">Registrovat</Button>
         </div>
+        <div className="mt-4 text-center text-sm">
+        Už máte účet?{" "}
+        <Link href="/login" className="underline">
+          Přihlašte se
+        </Link>
+      </div>
       </form>
     </Form>
   );
