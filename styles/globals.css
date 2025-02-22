@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* --background: #0a0a0a;
-  --foreground: #171717; */
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
@@ -79,8 +74,6 @@ body {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -88,4 +81,36 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes borderMove {
+  0% {
+    border: 8px solid #db0d5f;
+  }
+  50% {
+    border: 8px solid #da0158;
+  }
+  100% {
+    border: 8px solid #db0d5f;
+  }
+}
+
+@keyframes glowEffect {
+  0% {
+    box-shadow: 0 0 10px 4px #db0d5f, 0 0 15px 8px #da0158;
+  }
+  50% {
+    box-shadow: 0 0 10px 8px #da0158, 0 0 15px 12px #db0d5f;
+  }
+  100% {
+    box-shadow: 0 0 10px 4px #db0d5f, 0 0 15px 8px #da0158;
+  }
+}
+
+.animate-borderMove {
+  animation: borderMove 1.5s infinite alternate, glowEffect 2s infinite alternate;
+  border-radius: 50%; /* Kulatý okraj */
+  background: transparent;
+  border: none;
+  transition: box-shadow 0.3s ease-in-out;
 }
