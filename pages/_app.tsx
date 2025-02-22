@@ -1,8 +1,29 @@
 import Head from 'next/head'
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+
+const checkUserPermissions = (token: string | null) => {
+  return token !== null;
+};
+
+const protectedRoutes = ['/alert', '/dashboard', '/profile']; 
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const { pathname } = router;
+
+    if (protectedRoutes.includes(pathname) && !checkUserPermissions(token)) {
+      router.replace('/login');
+    } else if (checkUserPermissions(token) && pathname === '/') {
+      router.replace('/alert');
+    }
+  }, [router]);
+
   return (
     <>
       <Head>

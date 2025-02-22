@@ -82,8 +82,8 @@ export default function LoginPreview() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="mx-auto max-w-sm">
+    <div className="flex min-h-screen p-4">
+      <Card className="mx-auto max-w-md w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">
               <img
@@ -127,12 +127,12 @@ export default function LoginPreview() {
                     <FormItem className="grid gap-1">
                       <div className="flex justify-between items-center">
                         <FormLabel htmlFor="password">Heslo</FormLabel>
-                        <Link
+                        {/* <Link
                           href="#"
                           className="ml-auto inline-block text-sm underline"
                         >
                           Zapomněli jste heslo?
-                        </Link>
+                        </Link> */}
                       </div>
                       <FormControl>
                         <PasswordInput
@@ -163,7 +163,7 @@ export default function LoginPreview() {
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
-            Nemáte účet? Ozvěte se správci Vaší organizace, pokud není registrována.{' '}
+            Nemáte účet? Ozvěte se správci Vaší organizace, pokud není registrována.<br />
             <Link href="/register" className="underline">
               Zaregistrujte vaši organizaci
             </Link>

@@ -5,14 +5,9 @@ const prisma = new PrismaClient();
 
 export const organizationsHandler = async (req: express.Request, res: express.Response): Promise<void> => {
   if (req.method === 'POST') {
-    const { name, countryId, gps, postalCode, street, city } = req.body;
+    const { name, gps, postalCode, street, city, country } = req.body;
 
-    // Validate countryId and required fields
-    if (!countryId || isNaN(Number(countryId))) {
-      res.status(400).json({ message: 'Country ID must be a valid number.' });
-      return;
-    }
-    if (!name || !gps?.lat || !gps?.lng || !postalCode || !street || !city) {
+    if (!name || !gps?.lat || !gps?.lng || !postalCode || !street || !city || !country) {
       res.status(400).json({ message: 'All fields are required.' });
       return;
     }
@@ -22,12 +17,12 @@ export const organizationsHandler = async (req: express.Request, res: express.Re
       const newOrganization = await prisma.organization.create({
         data: {
           name,
-          countryId: Number(countryId),
           gpsLat: parseFloat(gps.lat),
           gpsLng: parseFloat(gps.lng),
           postalCode,
           street,
           city,
+          country,
         },
       });
 

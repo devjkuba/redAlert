@@ -12,7 +12,7 @@ export const loginHandler = async (req: Request, res: Response): Promise<void> =
 
     if (!email || !password) {
       res.status(400).json({ message: 'Email and password are required' });
-      return; // Make sure to return after sending the response
+      return;
     }
 
     try {
@@ -22,12 +22,10 @@ export const loginHandler = async (req: Request, res: Response): Promise<void> =
 
       if (!user || !bcrypt.compareSync(password, user.password)) {
         res.status(401).json({ message: 'Invalid email or password' });
-        return; // Ensure to return after sending the response
+        return;
       }
 
-      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
-        expiresIn: '1h',
-      });
+      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string);
 
       res.status(200).json({ message: 'Login successful', token });
     } catch (error) {

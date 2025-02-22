@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import LocationSelector from "@/components/ui/location-input";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import getCoordinates from "@/lib/getCoordinates";
 
 const organizationSchema = z.object({
   name: z
@@ -28,35 +31,68 @@ const organizationSchema = z.object({
       invalid_type_error: "Ulice musí být text",
     })
     .min(2, { message: "Ulice je povinná" }),
-  city: z
-    .string({
-      required_error: "Město je povinné",
-      invalid_type_error: "Město musí být text",
-    })
-    .min(2, { message: "Město je povinné" }),
   postalCode: z
     .string({
       required_error: "PSČ je povinné",
       invalid_type_error: "PSČ musí být text",
     })
     .min(4, { message: "PSČ je povinné" }),
+  location: z.tuple([
+      z.string({
+        required_error: 'Country is required',
+      }),
+      z.string().optional(),
+    ]),
 });
 
 interface OrganizationFormProps {
   onSubmit: (data: z.infer<typeof organizationSchema>) => void;
 }
 
-export const OrganizationForm: React.FC<OrganizationFormProps> = ({
+export const OrganizationForm: React.FC<OrganizationFormProps & { defaultValues?: Partial<z.infer<typeof organizationSchema>> }> = ({
   onSubmit,
+  defaultValues,
 }) => {
+  const [countryName, setCountryName] = useState<string>(defaultValues?.location?.[0] || "Czech Republic");
+  const [stateName, setStateName] = useState<string>(defaultValues?.location?.[1] || '');
+
   const organizationForm = useForm<z.infer<typeof organizationSchema>>({
     resolver: zodResolver(organizationSchema),
+    defaultValues,
   });
+
+  useEffect(() => {
+    const storedValues = sessionStorage.getItem('organizationData');
+    if (storedValues) {
+      const parsedValues = JSON.parse(storedValues);
+      organizationForm.reset(parsedValues);
+      setCountryName(parsedValues.location?.[0] || "Czech Republic");
+      setStateName(parsedValues.location?.[1] || '');
+    }
+  }, [organizationForm]);
+
+  const handleSubmit = async (data: z.infer<typeof organizationSchema>) => {
+    const city = stateName || countryName;
+    const coordinates = await getCoordinates(data.street, city);
+
+    if (!coordinates) {
+      alert("Nepodařilo se najít GPS souřadnice pro zadanou adresu.");
+      return;
+    }
+
+    const combinedData = {
+      ...data,
+      gps: coordinates,
+    };
+
+    sessionStorage.setItem("organizationData", JSON.stringify(combinedData));
+    onSubmit(combinedData);
+  };
 
   return (
     <Form {...organizationForm}>
       <form
-        onSubmit={organizationForm.handleSubmit(onSubmit)}
+        onSubmit={organizationForm.handleSubmit(handleSubmit)}
         className="space-y-6"
       >
         <div className="grid gap-2">
@@ -73,7 +109,6 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
               </FormItem>
             )}
           />
-          {/* ... other organization form fields ... */}
           <FormField
             control={organizationForm.control}
             name="street"
@@ -89,12 +124,27 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({
           />
           <FormField
             control={organizationForm.control}
-            name="city"
+            name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Město</FormLabel>
+                <FormLabel>Země</FormLabel>
                 <FormControl>
-                  <Input placeholder="Praha" {...field} />
+                <LocationSelector
+                onCountryChange={(country) => {
+                  setCountryName(country?.name || '')
+                  organizationForm.setValue(field.name, [
+                    country?.name || '',
+                    stateName || '',
+                  ])
+                }}
+                onStateChange={(state) => {
+                  setStateName(state?.name || '')
+                  organizationForm.setValue(field.name, [
+                    countryName || '',
+                    state?.name || '',
+                  ])
+                }}
+              />
                 </FormControl>
                 <FormMessage />
               </FormItem>
