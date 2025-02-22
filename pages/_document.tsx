@@ -5,7 +5,7 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head />
-        <body className="antialiased pt-safe overscroll-none px-safe pb-safe min-h-screen">
+        <body className="antialiased !pt-safe overscroll-none !px-safe pb-safe min-h-screen">
           <Main />
           <NextScript />
         </body>

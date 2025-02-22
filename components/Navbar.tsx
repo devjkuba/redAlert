@@ -17,7 +17,7 @@ export default function Navbar() {
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="bg-transparent text-white">
+        <SheetContent side="left" className="bg-transparent text-white mt-safe mx-safe mb-safe">
           <Link href="#" className="mr-6 hidden lg:flex" prefetch={false}>
             <MountainIcon className="h-6 w-6" />
             <span className="sr-only">Acme Inc</span>
@@ -35,6 +35,10 @@ export default function Navbar() {
             <Link href="#" className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
               Contact
             </Link>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">user.name</span>
+              <span className="truncate text-xs">user.email</span>
+            </div>
           </div>
         </SheetContent>
       </Sheet>

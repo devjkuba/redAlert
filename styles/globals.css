@@ -36,6 +36,14 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -62,6 +70,14 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -88,7 +104,7 @@ body {
     border: 8px solid #db0d5f;
   }
   50% {
-    border: 8px solid #da0158;
+    border: 8px solid #7c0434;
   }
   100% {
     border: 8px solid #db0d5f;
@@ -97,20 +113,24 @@ body {
 
 @keyframes glowEffect {
   0% {
-    box-shadow: 0 0 10px 4px #db0d5f, 0 0 15px 8px #da0158;
+    box-shadow: 0 0 10px 4px #db0d5f, 0 0 75px 8px #7c0434;
   }
   50% {
-    box-shadow: 0 0 10px 8px #da0158, 0 0 15px 12px #db0d5f;
+    box-shadow: 0 0 10px 8px #7c0434, 0 0 55px 12px #db0d5f;
   }
   100% {
-    box-shadow: 0 0 10px 4px #db0d5f, 0 0 15px 8px #da0158;
+    box-shadow: 0 0 10px 4px #db0d5f, 0 0 75px 8px #7c0434;
   }
 }
 
 .animate-borderMove {
-  animation: borderMove 1.5s infinite alternate, glowEffect 2s infinite alternate;
-  border-radius: 50%; /* Kulatý okraj */
+  animation: borderMove 1.5s infinite alternate;
   background: transparent;
-  border: none;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.animate-ActiveMove {
+  animation: borderMove 1.5s infinite alternate, glowEffect 1s infinite alternate; 
+  background: transparent;
   transition: box-shadow 0.3s ease-in-out;
 }

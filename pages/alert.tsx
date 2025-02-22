@@ -21,19 +21,23 @@ export default function Alert() {
         Your browser does not support the video tag.
       </video>
       <main className="relative flex flex-col flex-grow">
-        <div className="absolute top-3 left-1/2 -translate-x-1/2">
-          <img src="/logo-white.png" alt="Logo" className="w-48 h-auto" />
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
+          <img src="/logo-white.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
         <Navbar />
-        <div className="absolute top-[calc(50vh-90px)] left-1/2 -translate-x-1/2 flex justify-center items-center w-full">
+        <div className="border max-w-xs mx-auto mt-6 border-white text-white py-2 px-4 rounded-lg inline-block">
+            <p>GPS: 48.1486° N, 17.1077° E</p>
+          </div>
+        <div className="absolute top-[calc(50vh-100px)] left-1/2 -translate-x-1/2 flex flex-col items-center w-full space-y-4">
           <button
             onClick={handleClick}
-            className="w-[200px] h-[200px] text-white text-xl font-bold flex items-center justify-center 
-          border-8 border-solid border-transparent 
-          bg-transparent animate-borderMove"
+            className={`w-[200px] h-[200px] text-white text-xl font-bold flex items-center justify-center 
+          !border-[15px] border-solid border-transparent rounded-[50%]
+           ${active ? "!bg-[#d62a70] scale-95 animate-ActiveMove" : "scale-100"}  
+          bg-transparent animate-borderMove`}
           >
-            {active ? 'Jsem' : 'PŘIVOLAT'}<br />
-            {active ? 'v bezpečí' : 'POMOC'}
+            {active ? 'POPLACH' : 'PŘIVOLAT'}<br />
+            {active ? 'AKTIVNÍ' : 'POMOC'}
           </button>
         </div>
       </main>
