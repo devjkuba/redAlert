@@ -13,28 +13,53 @@ enum Role {
   USER
 }
 
+model Message {
+  id             Int          @id @default(autoincrement())
+  text           String
+  senderId       Int
+  sender         User         @relation(fields: [senderId], references: [id])
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+}
+
+model Notification {
+  id             Int          @id @default(autoincrement())
+  type           String
+  message        String
+  triggeredById  Int
+  triggeredBy    User         @relation(fields: [triggeredById], references: [id], name: "UserToNotification")
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
-  firstName    String   @default("")
-  lastName     String   @default("")
-  organization Organization? @relation(fields: [organizationId], references: [id])
+  id             Int            @id @default(autoincrement())
+  firstName      String         @default("")
+  lastName       String         @default("")
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
   organizationId Int?
-  email        String   @unique
-  password     String
-  createdAt    DateTime @default(now())
-  role         Role     @default(USER)
-  isActive     Boolean  @default(true) // Určuje, zda má uživatel aktivní profil
+  email          String         @unique
+  password       String
+  createdAt      DateTime       @default(now())
+  role           Role           @default(USER)
+  isActive       Boolean        @default(true) // Určuje, zda má uživatel aktivní profil
+  notifications  Notification[] @relation(name: "UserToNotification")
+  messages       Message[]
 }
 
 model Organization {
-  id          Int      @id @default(autoincrement())
-  name        String
-  country     String
-  gpsLat      Float
-  gpsLng      Float
-  postalCode  String
-  street      String
-  city        String
-  activeUntil DateTime @default(dbgenerated("(CURRENT_DATE + interval '3 months')"))
-  users       User[]   // Vztah k uživatelům
+  id            Int            @id @default(autoincrement())
+  name          String
+  country       String
+  gpsLat        Float
+  gpsLng        Float
+  postalCode    String
+  street        String
+  city          String
+  activeUntil   DateTime       @default(dbgenerated("(CURRENT_DATE + interval '3 months')"))
+  users         User[]
+  notifications Notification[]
+  messages      Message[]
 }

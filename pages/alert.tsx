@@ -12,7 +12,8 @@ export default function Alert() {
       toast.error("Poplach byl aktivován.", {
         duration: 5000, // Délka zobrazení toastu
         classNames: {
-          toast: "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
+          toast:
+            "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
           title: "font-bold text-red-700",
           description: "text-red-600",
           icon: "text-red-500",
@@ -23,7 +24,8 @@ export default function Alert() {
       toast.success("Poplach byl vypnut.", {
         duration: 5000, // Délka zobrazení toastu
         classNames: {
-          toast: "!bg-green-100 border-l-4 !border-green-500 !text-green-700 p-4 shadow-lg rounded-lg",
+          toast:
+            "!bg-green-100 border-l-4 !border-green-500 !text-green-700 p-4 shadow-lg rounded-lg",
           title: "font-bold !text-green-700",
           description: "!text-green-600",
           icon: "!text-green-500",
@@ -44,7 +46,7 @@ export default function Alert() {
         className="absolute left-1/2 top-[100%] md:max-w-[200px] -translate-x-1/2 -translate-y-1/2 scale-[2] filter hue-rotate-[100deg] brightness-[80%] contrast-[120%]"
       >
         <source src="/background.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
+        Vaš prohlížeč nepodporuje video.
       </video>
       <main className="relative flex flex-col flex-grow">
         <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
@@ -55,8 +57,7 @@ export default function Alert() {
         <Toaster
           toastOptions={{
             classNames: {
-              toast:
-                "border-l-4 p-4 shadow-lg rounded-lg",
+              toast: "border-l-4 p-4 shadow-lg rounded-lg",
               title: "font-bold",
               description: "text-red-600",
             },

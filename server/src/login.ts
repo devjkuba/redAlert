@@ -1,10 +1,8 @@
 // server/login.ts
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
+import { prisma } from './prisma';
 
 export const loginHandler = async (req: Request, res: Response): Promise<void> => {
   if (req.method === 'POST') {

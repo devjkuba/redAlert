@@ -1,16 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Copy, Share } from "lucide-react";
+import { getLocation } from "@/hooks/getLocation";
 
 export default function GPSPopover() {
-  const coordinates = "48.1486° N, 17.1077° E";
+  const [coordinates, setCoordinates] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const location = await getLocation();
+      if (location) {
+        setCoordinates(`${location.latitude}° N, ${location.longitude}° E`);
+      }
+    };
+    fetchLocation();
+  }, []);
+
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(coordinates);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (coordinates) {
+      navigator.clipboard.writeText(coordinates);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const shareCoordinates = async () => {
