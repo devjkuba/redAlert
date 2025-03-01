@@ -55,6 +55,7 @@ export default function Alert() {
         <Navbar />
         <GPSPopover />
         <Toaster
+          position="bottom-center"
           toastOptions={{
             classNames: {
               toast: "border-l-4 p-4 shadow-lg rounded-lg",
@@ -63,21 +64,33 @@ export default function Alert() {
             },
           }}
         />
-        <div className="absolute top-[calc(50vh-100px)] md:top-[calc(50vh-30px)] left-1/2 -translate-x-1/2 flex flex-col items-center w-full space-y-4">
-          <button
-            onClick={handleClick}
-            className={`w-[200px] h-[200px] md:w-[150px] md:h-[150px] text-white text-xl font-bold flex items-center justify-center 
-          !border-[15px] border-solid border-transparent rounded-[50%]
-           ${
-             active ? "!bg-[#d62a70] scale-95 animate-ActiveMove" : "scale-100"
-           }  
-          bg-transparent animate-borderMove`}
-          >
-            {active ? "POPLACH" : "PŘIVOLAT"}
-            <br />
-            {active ? "AKTIVNÍ" : "POMOC"}
-          </button>
-        </div>
+<div className="absolute top-[calc(50vh-100px)] md:top-[calc(50vh-30px)] left-1/2 -translate-x-1/2 flex flex-col items-center w-full space-y-4">
+  <div className="relative">
+    {/* Světlý odraz pod tlačítkem */}
+    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[220px] h-[220px] md:w-[170px] md:h-[170px] 
+         bg-[#db0d5f] opacity-40 blur-3xl rounded-full"></div>
+
+    <button
+      onClick={handleClick}
+      className={`relative w-[200px] h-[200px] md:w-[150px] md:h-[150px] text-white text-xl font-bold flex items-center justify-center
+        !border-[15px] border-solid border-transparent rounded-full animate-borderMove 
+        before:absolute before:inset-0 before:rounded-full before:border-[3px] before:border-white/20 before:pointer-events-none
+        after:absolute after:inset-0 after:rounded-full after:border-[2px] after:border-white/10 after:pointer-events-none
+        ${
+          active
+            ? "!bg-[#d62a70] scale-95 animate-ActiveMove shadow-[inset_0_0_15px_rgba(0,0,0,0.6)]"
+            : "scale-100 bg-transparent shadow-[0_4px_20px_rgba(219,13,95,0.5)]"
+        }  
+        transition-all duration-200 active:scale-90 active:shadow-[inset_0_0_10px_rgba(0,0,0,0.8)]`}
+    >
+      {active ? "POPLACH" : "PŘIVOLAT"}
+      <br />
+      {active ? "AKTIVNÍ" : "POMOC"}
+    </button>
+  </div>
+</div>
+
+
       </main>
     </div>
   );

@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Copy, Share } from "lucide-react";
 import { getLocation } from "@/hooks/getLocation";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function GPSPopover() {
   const [coordinates, setCoordinates] = useState<string | null>(null);
@@ -45,17 +50,29 @@ export default function GPSPopover() {
     <Popover>
       <PopoverTrigger asChild>
         <div className="border max-w-xs mx-auto mt-6 md:mt-2 border-white text-white py-2 px-4 rounded-lg inline-block cursor-pointer">
-          <p>GPS: {coordinates}</p>
+        <p>
+            GPS: {coordinates ? (
+              <>{coordinates}</>
+            ) : (
+              <Spinner size="sm" className="bg-white float-right ml-2.5 mt-[5px]" />
+            )}
+          </p>
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-auto">
         <div className="flex flex-col gap-4">
           <h4 className="font-medium leading-none">Sdílení souřadnic</h4>
           <div className="flex gap-2">
-            <Button onClick={shareCoordinates} className="flex items-center gap-2">
+            <Button
+              onClick={shareCoordinates}
+              className="flex items-center gap-2"
+            >
               <Share size={16} /> Sdílet
             </Button>
-            <Button onClick={copyToClipboard} className="flex items-center gap-2">
+            <Button
+              onClick={copyToClipboard}
+              className="flex items-center gap-2"
+            >
               <Copy size={16} /> {copied ? "Zkopírováno!" : "Kopírovat"}
             </Button>
           </div>

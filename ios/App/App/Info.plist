@@ -45,5 +45,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Potřebujeme přístup k vaší poloze, abychom vám poskytli navigaci v reálném čase a služby na základě polohy, i když aplikace běží na pozadí.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Potřebujeme přístup k vaší poloze, když je aplikace otevřená.</string>
 </dict>
 </plist>

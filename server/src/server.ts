@@ -4,6 +4,7 @@ import { organizationsHandler } from './organizations';
 import { loginHandler } from './login';
 import { notificationshandler } from './notifications';
 import { registerHandler } from './register';
+import { userHandler } from './user';
 
 const app = express();
 app.use(cors());
@@ -17,6 +18,7 @@ app.route('/api/notifications')
    .get(notificationshandler)
    .post(notificationshandler);
 
+app.get('/api/user', userHandler);
 app.post('/api/login', loginHandler);
 app.post('/api/register', registerHandler);
 
