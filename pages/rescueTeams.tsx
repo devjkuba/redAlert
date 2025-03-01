@@ -39,7 +39,7 @@ export default function RescueTeams() {
   ];
 
   return (
-    <div className="bg-black min-h-screen relative overflow-hidden">
+    <div className="bg-black min-h-screen relative overflow-hidden !pt-safe !px-safe pb-safe">
       <video
         autoPlay
         loop

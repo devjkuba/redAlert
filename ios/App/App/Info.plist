@@ -49,5 +49,20 @@
 	<string>Potřebujeme přístup k vaší poloze, abychom vám poskytli navigaci v reálném čase a služby na základě polohy, i když aplikace běží na pozadí.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Potřebujeme přístup k vaší poloze, když je aplikace otevřená.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost:4000</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>

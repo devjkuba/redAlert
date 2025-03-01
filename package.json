@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "mobile": "yarn run build && npx cap sync",
     "lint": "next lint"
   },
   "dependencies": {
