@@ -13,7 +13,7 @@ const Home = () => {
     }
   }, [router]);
 
-  return null; // Render nothing while redirecting
+  return null;
 };
 
 export default Home;

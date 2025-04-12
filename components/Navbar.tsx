@@ -1,13 +1,8 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/lJwnQlHSEBA
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- */
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import useUser from "@/hooks/useUser";
-import { Bell, MessageCircle, Shield, FileText, Settings } from "lucide-react";
+import { Bell, MessageCircle, Shield, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
@@ -40,7 +35,7 @@ export default function Navbar() {
               <Bell className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Alert
             </Link>
-            <Link href="#" className={getLinkClassName('#')} prefetch={false}>
+            <Link href="/chat" className={getLinkClassName('#')} prefetch={false}>
               <MessageCircle className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Komunikace
             </Link>
@@ -49,13 +44,17 @@ export default function Navbar() {
               Záchranné složky
             </Link>
             <Link href="#" className={getLinkClassName('#')} prefetch={false}>
-              <FileText className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
-              Dokumenty
-            </Link>
-            <Link href="#" className={getLinkClassName('#')} prefetch={false}>
               <Settings className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Nastavení
             </Link>
+            <Link href="/logout" className={getLinkClassName('/logout')} prefetch={false}>
+              <LogOut className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
+              Odhlásit se
+            </Link>
+            {/* <Link href="#" className={getLinkClassName('#')} prefetch={false}>
+              <FileText className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
+              Dokumenty
+            </Link> */}
           </div>
         </SheetContent>
       </Sheet>
@@ -72,7 +71,7 @@ function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="white"
+      stroke="black"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

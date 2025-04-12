@@ -39,20 +39,13 @@ export default function RescueTeams() {
   ];
 
   return (
-    <div className="bg-black min-h-screen relative overflow-hidden !pt-safe !px-safe pb-safe">
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute left-1/2 top-[100%] md:max-w-[200px] -translate-x-1/2 -translate-y-1/2 scale-[2] filter hue-rotate-[100deg] brightness-[80%] contrast-[120%]"
-      >
-        <source src="/background.mp4" type="video/mp4" />
-        Vaš prohlížeč nepodporuje video.
-      </video>
-      <main className="relative flex flex-col flex-grow">
+    <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
+      <div className="border-0 mx-auto max-w-md w-full">
+
+        <div className="relative overflow-hidden">
+        <main className="relative flex flex-col flex-grow">
         <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
-          <img src="/logo-white.png" alt="Logo" className="w-48 h-auto mb-2" />
+          <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
         <Navbar />
         <Toaster
@@ -66,7 +59,7 @@ export default function RescueTeams() {
           }}
         />
         <div className="flex flex-col items-center w-full space-y-6">
-          <h2 className="text-white text-xl font-semibold mb-4">
+          <h2 className="text-xl font-semibold mb-4">
             Kontakty na záchranné složky
           </h2>
 
@@ -74,15 +67,15 @@ export default function RescueTeams() {
             {emergencyNumbers.map((emergency) => (
               <div
                 key={emergency.id}
-                className="group flex flex-col items-center p-4 border border-gray-700 rounded-md bg-gray-900 hover:bg-gray-800 transition-transform transform hover:scale-105 shadow-md mx-auto w-[80%] max-w-[80%]"
+                className="group flex w-full flex-col items-center p-4 border border-gray-300 rounded-xl transition-transform transform hover:scale-105 mx-auto"
               >
                 <div className="flex items-center w-full">
                   {emergency.icon}
                   <div className="flex flex-col ml-4">
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold">
                       {emergency.label}
                     </span>
-                    <span className="text-3xl font-bold text-gray-300 group-hover:text-blue-400">
+                    <span className="text-3xl font-bold text-gray-600 group-hover:text-blue-400">
                       {emergency.number}
                     </span>
                   </div>
@@ -107,7 +100,9 @@ export default function RescueTeams() {
             ))}
           </div>
         </div>
-      </main>
+        </main>
+        </div>
+      </div>
     </div>
   );
 }

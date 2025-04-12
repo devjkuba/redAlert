@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 const useUser = () => {
-  const [user, setUser] = useState<{ firstName: string; role: string; lastName: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ id: number; firstName: string; role: string; organizationId: number; lastName: string; email: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

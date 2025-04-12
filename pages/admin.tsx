@@ -86,7 +86,7 @@ const Admin = () => {
   };
 
   return (
-    <main className="flex flex-col items-center flex-grow p-4 pt-16 pb-16 overflow-auto">
+    <main className="flex flex-col items-center flex-grow !pt-safe !px-safe pb-safe overflow-auto">
       <div className="flex flex-col items-center w-full max-w-md"> 
 
         {!isAuthenticated ? (

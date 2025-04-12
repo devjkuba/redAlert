@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast, Toaster } from "sonner";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminForm } from "@/components/AdminForm";
 
 export default function Register2() {
@@ -56,9 +56,9 @@ export default function Register2() {
   };
 
   return (
-    <div className="flex min-h-screen p-4">
-      <Card className="mx-auto max-w-md w-full">
-        <CardHeader>
+    <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
+      <div className="border-0 mx-auto max-w-md w-full">
+      <CardHeader>
           <div className="flex justify-center mb-4">
             <img src="../logo.png" alt="Logo" className="h-20" />
           </div>
@@ -68,7 +68,7 @@ export default function Register2() {
             <AdminForm onSubmit={handleAdminSubmit} />
           <Toaster position="bottom-center" />
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }

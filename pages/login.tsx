@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -82,8 +81,8 @@ export default function LoginPreview() {
   }
 
   return (
-    <div className="flex min-h-screen p-4">
-      <Card className="mx-auto max-w-md w-full">
+    <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
+      <div className="border-0 mx-auto max-w-md w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">
               <img
@@ -110,7 +109,7 @@ export default function LoginPreview() {
                       <FormControl>
                         <Input
                           id="email"
-                          placeholder="jannovak@email.cz"
+                          placeholder="jmeno@domena.cz"
                           type="email"
                           autoComplete="email"
                           {...field}
@@ -156,7 +155,7 @@ export default function LoginPreview() {
                   autoComplete="off"
                 />
 
-                <Button type="submit" className="w-full">
+                <Button type="submit">
                   Login
                 </Button>
               </div>
@@ -170,7 +169,7 @@ export default function LoginPreview() {
           </div>
           <Toaster position='bottom-center' />
         </CardContent>
-      </Card>
+      </div>
     </div>
   )
 }

@@ -17,7 +17,7 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
     // Získání uživatele z databáze na základě userId obsaženého v tokenu
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, firstName: true, role: true, lastName: true, email: true }, // Zvolte, jaké informace chcete vrátit
+      select: { id: true, firstName: true, role: true, organizationId: true, lastName: true, email: true }, // Zvolte, jaké informace chcete vrátit
     });
 
     if (!user) {

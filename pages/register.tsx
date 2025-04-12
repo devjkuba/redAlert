@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Toaster } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrganizationForm } from "@/components/OrganizationForm";
 
 export default function Register1() {
@@ -26,8 +26,8 @@ export default function Register1() {
   };
 
   return (
-    <div className="flex min-h-screen p-4">
-      <Card className="mx-auto max-w-md w-full">
+    <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
+      <div className="mx-auto max-w-md w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">
             <img src="../logo.png" alt="Logo" className="h-20" />
@@ -38,7 +38,7 @@ export default function Register1() {
           <OrganizationForm defaultValues={organizationData} onSubmit={handleOrganizationSubmit} />
           <Toaster position="bottom-center" />
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }

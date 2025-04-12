@@ -17,7 +17,7 @@ export default function GPSPopover() {
     const fetchLocation = async () => {
       const location = await getLocation();
       if (location) {
-        setCoordinates(`${location.latitude}° N, ${location.longitude}° E`);
+        setCoordinates(`<span class="text-[10px]">${location.latitude}° N</span> <span class="text-[10px]">${location.longitude}° E</span>`);
       }
     };
     fetchLocation();
@@ -49,10 +49,10 @@ export default function GPSPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="border max-w-xs mx-auto mt-6 md:mt-2 border-white text-white py-2 px-4 rounded-lg inline-block cursor-pointer">
-        <p>
-            GPS: {coordinates ? (
-              <>{coordinates}</>
+        <div className="border border-gray-300 mx-auto border-black py-2 px-4 rounded-lg inline-block cursor-pointer">
+        <p className="flex items-center space-x-2 text-sm">
+         <span className="font-semibold">GPS:</span> {coordinates ? (
+              <span className="text-gray-700 truncate flex flex-col leading-[1.1]" dangerouslySetInnerHTML={{ __html: coordinates }} />
             ) : (
               <Spinner size="sm" className="bg-white float-right ml-2.5 mt-[5px]" />
             )}
