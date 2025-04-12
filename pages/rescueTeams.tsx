@@ -41,8 +41,6 @@ export default function RescueTeams() {
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
       <div className="border-0 mx-auto max-w-md w-full">
-
-        <div className="relative overflow-hidden">
         <main className="relative flex flex-col flex-grow">
         <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
@@ -75,7 +73,7 @@ export default function RescueTeams() {
                     <span className="text-sm font-semibold">
                       {emergency.label}
                     </span>
-                    <span className="text-3xl font-bold text-gray-600 group-hover:text-blue-400">
+                    <span className="text-3xl font-bold text-gray-600">
                       {emergency.number}
                     </span>
                   </div>
@@ -85,14 +83,14 @@ export default function RescueTeams() {
                         href={`sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`}
                         className="group flex items-center text-white p-2 rounded-md bg-yellow-500 hover:bg-yellow-600 transition-colors"
                     >
-                      <MessageCircle className="w-5 h-5 text-white group-hover:text-green-400" />
+                      <MessageCircle className="w-5 h-5 text-white" />
                       <span className="ml-2">SMS</span>
                     </a>
                   <a
                     href={`tel:${emergency.number}`}
                     className="group flex items-center text-white p-2 rounded-md bg-blue-500 hover:bg-blue-600 transition-colors"
                   >
-                    <Phone className="w-5 h-5 text-white group-hover:text-green-400" />
+                    <Phone className="w-5 h-5 text-white" />
                     <span className="ml-2">Zavolat</span>
                   </a>
                 </div>
@@ -101,7 +99,6 @@ export default function RescueTeams() {
           </div>
         </div>
         </main>
-        </div>
       </div>
     </div>
   );
