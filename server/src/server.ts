@@ -9,7 +9,6 @@ import { registerHandler } from './register';
 import { userHandler } from './user';
 import { messagesHandler } from './messages';
 import { prisma } from './prisma';
-import { getUserById } from './getUserById';
 
 const app = express();
 app.use(cors());
@@ -72,7 +71,6 @@ app.route('/api/messages')
    .post(messagesHandler);
 
 app.get('/api/user', userHandler);
-app.get('/api/user/:id', getUserById);
 app.post('/api/login', loginHandler);
 app.post('/api/register', registerHandler);
 

@@ -6,11 +6,18 @@ import Navbar from "@/components/Navbar";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import MessageItem from "@/components/MessageItem";
 
-interface Message {
+export interface Message {
   id: string;
   senderId: string;
   text: string;
+  sender: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    id: number;
+  }
 }
 
 export default function Chat() {
@@ -27,36 +34,33 @@ export default function Chat() {
     });
     setSocket(socketConnection);
 
-    socketConnection.on("messageHistory", (history: Message[]) => {
-      const last100 = history.slice(-100);
-      setMessages(last100);
-      setLoading(false);
-    });
-
     socketConnection.on("newMessage", (message: Message) => {
       setMessages((prev) => [...prev.slice(-99), message]);
     });
 
     const fetchMessages = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:4000/api/messages?organizationId=${user?.organizationId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+      if (user?.organizationId) {
+        try {
+          const response = await fetch(
+            `http://localhost:4000/api/messages?organizationId=${user.organizationId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (response.ok) {
+            console.log(response);
+            const data = await response.json();
+            setMessages(data.reverse());
+            setLoading(false);
+          } else {
+            console.error("Chyba při načítání zpráv.");
           }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setMessages(data.reverse());
-          setLoading(false);
-        } else {
-          console.error("Chyba při načítání zpráv.");
+        } catch (error) {
+          console.error("Chyba při načítání zpráv:", error);
         }
-      } catch (error) {
-        console.error("Chyba při načítání zpráv:", error);
       }
     };
 
@@ -112,15 +116,9 @@ export default function Chat() {
                   />
                 </div>
               ) : (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className="p-2 border rounded-md text-sm even:bg-gray-100"
-                  >
-                    <strong>{msg.senderId}</strong>:{" "}
-                    <span className="break-words">{msg.text}</span>
-                  </div>
-                ))
+                messages.map((msg) => {
+                  return <MessageItem user={user} message={msg} key={msg.id} />;
+                })
               )}
               <div ref={messagesEndRef} />
             </div>

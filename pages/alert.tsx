@@ -7,27 +7,27 @@ import { toast } from "sonner";
 import {
   Flame,
   HeartPulse,
-  Wind,
   DoorOpen,
-  ShieldAlert,
   PlugZap,
   LogOut,
-  UserX,
   AlertTriangle,
   SprayCan,
 } from "lucide-react";
+import { GunIcon } from "@/components/GunIcon";
+import { GasIcon } from "@/components/GasIcon";
+import { FightIcon } from "@/components/FightIcon";
 
 export default function Alert() {
   const alertButtons = [
     { label: "Zdravotní pomoc", icon: HeartPulse },   
     { label: "Požár", icon: Flame },                   
     { label: "Vniknutí", icon: DoorOpen },   
-    { label: "Rvačka", icon: ShieldAlert },                            
+    { label: "Rvačka", icon: FightIcon },                            
     { label: "Evakuace", icon: LogOut },    
     { label: "Vandalismus", icon: SprayCan },           
     { label: "Výpadek proudu", icon: PlugZap },                 
-    { label: "Aktivní útočník", icon: UserX },
-    { label: "Únik plynu", icon: Wind },               
+    { label: "Aktivní útočník", icon: GunIcon },
+    { label: "Únik plynu", icon: GasIcon },               
   ];
 
   const [activeStates, setActiveStates] = useState(
@@ -114,9 +114,9 @@ export default function Alert() {
               key={index}
               onClick={() => toggleAlert(index)}
               className={twMerge(
-                "flex flex-col min-h-[106px] items-center justify-center p-4 rounded-xl border border-gray-300 bg-white shadow transition-all",
+                "flex shadow-lg flex-col min-h-[106px] items-center justify-center p-4 rounded-xl border border-gray-300 transition-all",
                 activeStates[index]
-                  ? "bg-[#d62a70] text-white"
+                  ? "bg-[#d62a70] text-white shadow-none"
                   : "text-[#d62a70]"
               )}
             >
@@ -136,8 +136,8 @@ export default function Alert() {
           <button
             onClick={toggleMainAlert}
             className={twMerge(
-              "flex flex-col items-center justify-center w-[120px] h-[120px] p-4 rounded-xl border border-gray-300 bg-white shadow transition-all",
-              mainActive ? "bg-[#d62a70] !text-white" : "text-[#d62a70]",
+              "flex shadow-lg flex-col items-center justify-center w-[120px] h-[120px] p-4 rounded-xl border border-gray-300 transition-all",
+              mainActive ? "bg-[#d62a70] !text-white shadow-none" : "text-[#d62a70]",
               "transition-colors duration-300"
             )}
           >
