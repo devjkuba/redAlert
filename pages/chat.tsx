@@ -111,8 +111,8 @@ export default function Chat() {
               {loading ? (
                 <div className="flex justify-center items-center">
                   <Spinner
-                    size="sm"
-                    className="bg-white float-right ml-2.5 mt-[5px]"
+                    size="lg"
+                    className="mt-[20px] bg-black"
                   />
                 </div>
               ) : (
