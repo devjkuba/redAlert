@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
 
-interface Region {
-  id: number;
-  name: string;
-}
-
 const Admin = () => {
   const [orgName, setOrgName] = useState("");
   const [gpsCoordinates, setGpsCoordinates] = useState({ lat: "", lng: "" });
@@ -14,26 +9,9 @@ const Admin = () => {
   const [message, setMessage] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
   const [password, setPassword] = useState("");
-  const [regions, setRegions] = useState<Region[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loadingRegions, setLoadingRegions] = useState(true);
 
   useEffect(() => {
-    const fetchRegions = async () => {
-      try {
-        const res = await fetch("http://localhost:4000/api/regions");
-        const data = await res.json();
-        setRegions(data);
-      } catch (error) {
-        console.error("Error fetching regions:", error);
-        setMessage("Failed to load regions.");
-      } finally {
-        setLoadingRegions(false);
-      }
-    };
-
-    fetchRegions();
-
     const storedPassword = sessionStorage.getItem("adminPassword");
     if (storedPassword) {
       setPassword(storedPassword);
@@ -128,23 +106,6 @@ const Admin = () => {
                 required
                 className="border border-gray-300 rounded-lg p-2 mb-4 w-full"
               />
-              <select
-                value={selectedRegion}
-                onChange={(e) => setSelectedRegion(e.target.value)}
-                required
-                className="border border-gray-300 rounded-lg p-2 mb-4 w-full"
-              >
-                <option value="">Vyber kraj</option>
-                {loadingRegions ? (
-                  <option>Loading...</option>
-                ) : (
-                  regions?.map((region) => (
-                    <option key={region.id} value={region.id}>
-                      {region.name}
-                    </option>
-                  ))
-                )}
-              </select>
               <input
                 type="text"
                 placeholder="GPS šířka"

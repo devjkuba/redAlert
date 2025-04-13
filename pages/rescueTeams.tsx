@@ -3,8 +3,11 @@ import { Ambulance, Flame, Shield, Phone, MessageCircle } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import { getLocation } from "@/hooks/getLocation";
+import { Button } from "@/components/ui/button";
+import useDemo from "@/hooks/useDemo";
 
 export default function RescueTeams() {
+  const { isDemoActive } = useDemo();
   const [coordinates, setCoordinates] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,6 +45,11 @@ export default function RescueTeams() {
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
       <div className="border-0 mx-auto max-w-md w-full">
         <main className="relative flex flex-col flex-grow">
+        {isDemoActive && (
+          <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
+            DEMO
+          </div>
+        )}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
@@ -75,20 +83,22 @@ export default function RescueTeams() {
                 </span>
               </div>
               <div className="flex mt-4 space-x-4">
-                <a
-                  href={`sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`}
-                  className="flex items-center p-2 rounded-md bg-yellow-500 hover:bg-yellow-600 transition-colors text-white"
-                >
-                  <MessageCircle className="w-5 h-5 text-white" />
-                  <span className="ml-2">SMS</span>
-                </a>
-                <a
-                  href={`tel:${emergency.number}`}
-                  className="flex items-center p-2 rounded-md bg-blue-500 hover:bg-blue-600 transition-colors text-white"
+                <Button
+                  onClick={() => {
+                    window.location.href = `sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`;
+                  }}
+                  className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white"
+                >  <MessageCircle className="w-5 h-5 text-white" />
+                  <span>SMS</span></Button>
+                <Button
+                  onClick={() => {
+                    window.location.href = `tel:${emergency.number}`;
+                  }}
+                  className="flex items-center bg-sky-500 hover:bg-sky-600 text-white"
                 >
                   <Phone className="w-5 h-5 text-white" />
-                  <span className="ml-2">Zavolat</span>
-                </a>
+                  <span>Zavolat</span>
+                </Button>
               </div>
             </div>
           ))}

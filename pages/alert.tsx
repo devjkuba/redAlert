@@ -4,38 +4,68 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  Flame,
-  HeartPulse,
-  DoorOpen,
-  PlugZap,
-  LogOut,
-  AlertTriangle,
-  SprayCan,
-} from "lucide-react";
+import { Flame, HeartPulse, DoorOpen, PlugZap, LogOut, AlertTriangle, SprayCan } from "lucide-react";
 import { GunIcon } from "@/components/GunIcon";
 import { GasIcon } from "@/components/GasIcon";
 import { FightIcon } from "@/components/FightIcon";
+import useUser from "@/hooks/useUser";
+import useDemo from "@/hooks/useDemo";
+
+const createNotification = async (
+  type: string,
+  message: string,
+  triggeredById: number,
+  organizationId: number,
+  isDemo: boolean = false
+) => {
+  if (isDemo) return; 
+
+  try {
+    const response = await fetch('http://localhost:4000/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type,
+        message,
+        triggeredById,
+        organizationId,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error creating notification');
+    }
+    return;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Error:', error.message); // Log message for debugging
+      toast.error('Chyba při vytváření notifikace.');
+    } else {
+      toast.error('An unexpected error occurred.');
+    }
+  }
+};
 
 export default function Alert() {
+  const { user } = useUser();
+  const { isDemoActive } = useDemo();
+
   const alertButtons = [
-    { label: "Zdravotní pomoc", icon: HeartPulse },   
-    { label: "Požár", icon: Flame },                   
-    { label: "Vniknutí", icon: DoorOpen },   
-    { label: "Rvačka", icon: FightIcon },                            
-    { label: "Evakuace", icon: LogOut },    
-    { label: "Vandalismus", icon: SprayCan },           
-    { label: "Výpadek proudu", icon: PlugZap },                 
+    { label: "Zdravotní pomoc", icon: HeartPulse },
+    { label: "Požár", icon: Flame },
+    { label: "Vniknutí", icon: DoorOpen },
+    { label: "Rvačka", icon: FightIcon },
+    { label: "Evakuace", icon: LogOut },
+    { label: "Vandalismus", icon: SprayCan },
+    { label: "Výpadek proudu", icon: PlugZap },
     { label: "Aktivní útočník", icon: GunIcon },
-    { label: "Únik plynu", icon: GasIcon },               
+    { label: "Únik plynu", icon: GasIcon },
   ];
 
-  const [activeStates, setActiveStates] = useState(
-    alertButtons.map(() => false)
-  );
+  const [activeStates, setActiveStates] = useState(alertButtons.map(() => false));
   const [mainActive, setMainActive] = useState(false);
 
-  const toggleAlert = (index: number) => {
+  const toggleAlert = async (index: number) => {
     const updatedStates = [...activeStates];
     updatedStates[index] = !updatedStates[index];
     setActiveStates(updatedStates);
@@ -53,6 +83,7 @@ export default function Alert() {
           closeButton: "text-red-500 hover:text-red-700",
         },
       });
+      await createNotification(alert.label, `Poplach ${alert.label} aktivován.`, Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     } else {
       toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
         duration: 5000,
@@ -65,10 +96,11 @@ export default function Alert() {
           closeButton: "!text-green-500 !hover:text-green-700",
         },
       });
+      await createNotification(alert.label, `Poplach ${alert.label} deaktivován.`, Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     }
   };
 
-  const toggleMainAlert = () => {
+  const toggleMainAlert = async () => {
     setMainActive((prev) => !prev);
     const toastMessage = mainActive
       ? "Hlavní poplach byl deaktivován."
@@ -88,11 +120,19 @@ export default function Alert() {
           : "text-red-500 hover:text-red-700",
       },
     });
+
+    // Send main alert notification
+    await createNotification(mainActive ? 'Deaktivace poplachu' : 'Aktivace poplachu', toastMessage, Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
   };
 
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
       <main className="relative overflow-hidden flex flex-col flex-grow">
+        {isDemoActive && (
+          <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
+            DEMO
+          </div>
+        )}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>

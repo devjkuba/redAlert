@@ -8,7 +8,7 @@ const checkUserPermissions = (token: string | null) => {
   return token !== null;
 };
 
-const protectedRoutes = ['/alert', '/rescueTeams', '/profile', '/logout']; 
+const protectedRoutes = ['/alert', '/rescueTeams', '/profile', '/settings', '/logout']; 
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();

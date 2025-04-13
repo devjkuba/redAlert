@@ -1,4 +1,4 @@
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import useUser from "@/hooks/useUser";
@@ -26,6 +26,8 @@ export default function Navbar() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="bg-transparent text-white mt-safe mx-safe mb-safe">
+          <SheetTitle className="sr-only">Navigace</SheetTitle>
+          <SheetDescription className="sr-only">Postranní navigační panel s odkazy na různé sekce aplikace.</SheetDescription>
           <div className="grid gap-2 py-6">
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
               <span className="truncate font-semibold">{user.user?.firstName} {user.user?.lastName}</span>
@@ -43,7 +45,7 @@ export default function Navbar() {
               <Shield className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Záchranné složky
             </Link>
-            <Link href="#" className={getLinkClassName('#')} prefetch={false}>
+            <Link href="/settings" className={getLinkClassName('/settings')} prefetch={false}>
               <Settings className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Nastavení
             </Link>

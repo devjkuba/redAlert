@@ -49,7 +49,7 @@ export default function GPSPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="border border-gray-300 mx-auto border-black py-2 px-4 rounded-lg inline-block cursor-pointer">
+        <div className="border border-gray-300 mx-auto shadow-lg border-black py-2 px-4 rounded-lg inline-block cursor-pointer">
         <p className="flex items-center space-x-2 text-sm">
          <span className="font-semibold">GPS:</span> {coordinates ? (
               <span className="text-gray-700 truncate flex flex-col leading-[1.1]" dangerouslySetInnerHTML={{ __html: coordinates }} />

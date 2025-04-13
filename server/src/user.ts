@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { prisma } from './prisma'; // nebo cesta k vašemu Prisma klientovi
+import { prisma } from './prisma';
+
+interface JwtPayload {
+  userId: number;
+}
 
 export const userHandler = async (req: Request, res: Response): Promise<void> => {
-  const token = req.headers.authorization?.split(' ')[1]; // Extrahování tokenu z Authorization headeru
+  const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
     res.status(401).json({ message: 'Token not provided' });
@@ -11,13 +15,18 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
   }
 
   try {
-    // Verifikace tokenu
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
-    
-    // Získání uživatele z databáze na základě userId obsaženého v tokenu
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: { id: true, firstName: true, role: true, organizationId: true, lastName: true, email: true }, // Zvolte, jaké informace chcete vrátit
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        organizationId: true,
+      },
     });
 
     if (!user) {
@@ -25,7 +34,6 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    // Odeslání informací o uživateli
     res.status(200).json(user);
   } catch (error) {
     console.error('Error verifying token:', error);

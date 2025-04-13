@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MessageItem from "@/components/MessageItem";
+import useDemo from "@/hooks/useDemo";
 
 export interface Message {
   id: string;
@@ -22,6 +23,7 @@ export interface Message {
 
 export default function Chat() {
   const { user } = useUser();
+  const { isDemoActive } = useDemo();
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -91,6 +93,11 @@ export default function Chat() {
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
       <main className="relative overflow-hidden flex flex-col flex-grow">
+        {isDemoActive && (
+          <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
+            DEMO
+          </div>
+        )}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
