@@ -80,8 +80,8 @@ export default function RescueTeams() {
           </Breadcrumb>
           <div className="w-full px-4 mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {emergencyNumbers.map((emergency) => (
-              <Card key={emergency.id}>
-                <CardHeader className="flex flex-row items-center justify-between">
+              <Card key={emergency.id} className="shadow-lg border border-gray-300 rounded-xl">
+                <CardHeader className="flex flex-row items-center justify-between pb-0">
                   <CardTitle className="text-lg">{emergency.label}</CardTitle>
                   {emergency.icon}
                 </CardHeader>

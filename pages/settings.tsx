@@ -3,8 +3,14 @@ import useUser from "@/hooks/useUser";
 import { Button } from "@/components/ui/button"; // Pokud používáš komponenty jako shadcn/ui
 import useDemo from "@/hooks/useDemo";
 import Link from "next/link";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+} from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Settings() {
   const { user } = useUser();
@@ -31,13 +37,14 @@ export default function Settings() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="w-full max-w-4xl px-4 space-y-6 mt-4">
-          <Card>
+          <Card className="shadow-lg border border-gray-300 rounded-xl">
             <CardHeader>
               <CardTitle>Demo režim</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-start gap-4">
               <p className="text-sm text-gray-700">
-                Demo režim je <strong>{isDemoActive ? "aktivní" : "neaktivní"}</strong>
+                Demo režim je{" "}
+                <strong>{isDemoActive ? "aktivní" : "neaktivní"}</strong>
               </p>
               <Button
                 onClick={toggleDemo}
@@ -49,17 +56,27 @@ export default function Settings() {
           </Card>
 
           {/* Sekce: Admin notifikace */}
-          {isAdmin && (
-            <Card>
+          {isAdmin ? (
+            <Card className="shadow-lg border border-gray-300 rounded-xl">
               <CardHeader>
                 <CardTitle>Administrace</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col">
                 <Link href="/settings/notifications">
                   <Button>Notifikace</Button>
                 </Link>
+                <Link href="/settings/user-registration">
+                  <Button className="mt-4">Registrace uživatele</Button>
+                </Link>
+                <Link href="/settings/users">
+                  <Button className="mt-4">Správa uživatelů</Button>
+                </Link>
               </CardContent>
             </Card>
+          ) : (
+            <div className="flex justify-center items-center">
+              <Spinner size="lg" className="mt-[20px] bg-black" />
+            </div>
           )}
         </div>
       </main>

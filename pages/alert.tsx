@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge"; // Přidejte import knihovny
 import GPSPopover from "@/components/GPSPopover";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Flame, HeartPulse, DoorOpen, PlugZap, LogOut, AlertTriangle, SprayCan } from "lucide-react";
 import { GunIcon } from "@/components/GunIcon";
@@ -10,6 +10,7 @@ import { GasIcon } from "@/components/GasIcon";
 import { FightIcon } from "@/components/FightIcon";
 import useUser from "@/hooks/useUser";
 import useDemo from "@/hooks/useDemo";
+import { getNotifications, Notification } from "@/lib/getNotifications";
 
 const createNotification = async (
   type: string,
@@ -48,24 +49,60 @@ const createNotification = async (
   }
 };
 
+
+const alertButtons = [
+  { label: "Zdravotní pomoc", icon: HeartPulse },
+  { label: "Požár", icon: Flame },
+  { label: "Vniknutí", icon: DoorOpen },
+  { label: "Rvačka", icon: FightIcon },
+  { label: "Evakuace", icon: LogOut },
+  { label: "Vandalismus", icon: SprayCan },
+  { label: "Výpadek proudu", icon: PlugZap },
+  { label: "Aktivní útočník", icon: GunIcon },
+  { label: "Únik plynu", icon: GasIcon },
+];
+
 export default function Alert() {
   const { user } = useUser();
   const { isDemoActive } = useDemo();
 
-  const alertButtons = [
-    { label: "Zdravotní pomoc", icon: HeartPulse },
-    { label: "Požár", icon: Flame },
-    { label: "Vniknutí", icon: DoorOpen },
-    { label: "Rvačka", icon: FightIcon },
-    { label: "Evakuace", icon: LogOut },
-    { label: "Vandalismus", icon: SprayCan },
-    { label: "Výpadek proudu", icon: PlugZap },
-    { label: "Aktivní útočník", icon: GunIcon },
-    { label: "Únik plynu", icon: GasIcon },
-  ];
-
   const [activeStates, setActiveStates] = useState(alertButtons.map(() => false));
   const [mainActive, setMainActive] = useState(false);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const notifications = await getNotifications(Number(user?.organizationId));
+        const latestNotifications = notifications.reduce<{ [key: string]: Notification }>((acc: { [x: string]: Notification; }, notification: Notification) => {
+          if (!acc[notification.type]) {
+            acc[notification.type] = notification;
+          }
+          return acc;
+        }, {});
+        
+        // Nastavení stavu tlačítek na základě poslední přidané notifikace pro každý typ
+        const updatedStates = alertButtons.map(({ label }) =>
+          latestNotifications[label]?.status === "ACTIVE" // Zkontrolujeme status poslední notifikace pro daný typ
+        );
+
+        setMainActive(latestNotifications["Hlavní poplach"]?.status === "ACTIVE");
+        
+        setActiveStates(updatedStates);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error('Error:', error.message); 
+          toast.error('Chyba při vytváření notifikace.');
+        } else {
+          console.error('An unexpected error occurred.');
+          toast.error('An unexpected error occurred.');
+        }
+      }
+    };
+
+    if (user?.organizationId) {
+      fetchNotifications();
+    }
+  }, [user?.organizationId]);
 
   const toggleAlert = async (index: number) => {
     const updatedStates = [...activeStates];
@@ -85,7 +122,7 @@ export default function Alert() {
           closeButton: "text-red-500 hover:text-red-700",
         },
       });
-      await createNotification(alert.label, `Poplach ${alert.label} aktivován.`, "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(alert.label, `${alert.label} aktivován.`, "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     } else {
       toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
         duration: 5000,
@@ -98,7 +135,7 @@ export default function Alert() {
           closeButton: "!text-green-500 !hover:text-green-700",
         },
       });
-      await createNotification(alert.label, `Poplach ${alert.label} deaktivován.`, "INACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(alert.label, `${alert.label} deaktivován.`, "INACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     }
   };
 
@@ -124,7 +161,7 @@ export default function Alert() {
     });
 
     // Send main alert notification
-    await createNotification(mainActive ? 'Deaktivace poplachu' : 'Aktivace poplachu', toastMessage, mainActive ? "INACTIVE" : "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+    await createNotification('Hlavní poplach', toastMessage, mainActive ? "INACTIVE" : "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
   };
 
   return (

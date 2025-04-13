@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from './prisma';
 
-export const getUsersByOrganizationHandler = async (req: Request, res: Response): Promise<void> => {
+export const usersHandler = async (req: Request, res: Response): Promise<void> => {
   if (req.method !== 'GET') {
     res.status(405).json({ message: 'Method not allowed' });
     return;
@@ -26,6 +26,7 @@ export const getUsersByOrganizationHandler = async (req: Request, res: Response)
         firstName: true,
         lastName: true,
         email: true,
+        createdAt: true,
         role: true,
         isActive: true,
       },

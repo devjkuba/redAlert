@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
 import useUser from "@/hooks/useUser";
-import { getNotifications, Notification } from "@/lib/getNotifications";
 import Navbar from "@/components/Navbar";
 import useDemo from "@/hooks/useDemo";
 import {
@@ -17,33 +15,15 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useUsers } from "@/hooks/useUsers";
+import { Button } from "@/components/ui/button"; // Předpokládám, že máte tlačítka v UI komponentách
+import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
 
-export default function AdminNotifications() {
+export default function AdminUsers() {
   const { user } = useUser();
-  const [notifications, setNotifications] = useState<Notification[]>([]); // Ukládáme notifikace
-  const [loading, setLoading] = useState<boolean>(true); 
-  const [error, setError] = useState<string | null>(null); // Stav pro chyby
+  const { users, loading, error } = useUsers(Number(user?.organizationId));
   const { isDemoActive } = useDemo();
-
-  // Získání notifikací pro administrátora
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      if (user?.role !== "ADMIN") return; // Pokud uživatel není admin, nic nezobrazujeme
-      try {
-        const data = await getNotifications(user.organizationId!); // Získej notifikace na základě organizace
-        setNotifications(data);
-      } catch {
-        setError("Došlo k chybě při načítání notifikací.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNotifications();
-  }, [user?.organizationId, user?.role]);
-
-  console.log(notifications);
 
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
@@ -64,46 +44,58 @@ export default function AdminNotifications() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink>Notifikace</BreadcrumbLink>
+              <BreadcrumbLink>Uživatelé</BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
         <div className="w-full max-w-4xl px-4">
-          {!notifications.length && loading && (
+          {loading && (
             <div className="flex justify-center items-center">
               <Spinner size="lg" className="mt-[20px] bg-black" />
             </div>
           )}
           {error && <p className="text-red-500">{error}</p>}
-          {!loading && !error && notifications && notifications.length === 0 ? (
+          {!loading && !error && users && users.length === 0 ? (
             <p className="text-center text-gray-500">
-              Žádné notifikace k zobrazení.
+              Žádní uživatelé k zobrazení.
             </p>
           ) : (
-            <Table className="table-fixed">
+            <Table className="table-fixed animate-fade-in delay-500">
               <TableHeader>
                 <TableRow>
-                  <TableCell className="p-1">Datum vytvoření</TableCell>
-                  <TableCell className="p-1">Typ</TableCell>
-                  <TableCell className="p-1">Zpráva</TableCell>
-                  <TableCell className="p-1">Aktivováno uživatelem</TableCell>
+                  <TableCell className="p-1">Jméno</TableCell>
+                  <TableCell className="p-1">Email</TableCell>
+                  <TableCell className="p-1 w-12">Role</TableCell>
+                  <TableCell className="p-1">Datum registrace</TableCell>
+                  <TableCell className="p-1">Akce</TableCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {notifications.map((notification) => (
-                  <TableRow key={notification.id}>
+                {users.map((user) => (
+                  <TableRow key={user.id}>
                     <TableCell className="text-xs p-1">
-                      {new Date(notification.createdAt).toLocaleString()}
+                      {user.firstName} {user.lastName}
+                    </TableCell>
+                    <TableCell
+                      className="text-xs p-1 w-32 truncate hover:overflow-visible hover:whitespace-normal hover:bg-white hover:z-10"
+                      title={user.email}
+                    >
+                      <span className="truncate" title={user.email}>
+                        {user.email}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-xs p-1 !w-10">
+                      {user.role}
                     </TableCell>
                     <TableCell className="text-xs p-1">
-                      {notification.type}
+                      {new Date(user.createdAt).toLocaleString()}
                     </TableCell>
                     <TableCell className="text-xs p-1">
-                      {notification.message}
-                    </TableCell>
-                    <TableCell className="text-xs p-1">
-                      {notification.triggeredBy.firstName}{" "}
-                      {notification.triggeredBy.lastName}
+                      <Link href={`/users/edit/${user.id}`}>
+                        <Button variant="outline" size="sm">
+                          Editovat
+                        </Button>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}
