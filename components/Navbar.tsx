@@ -37,7 +37,7 @@ export default function Navbar() {
             </Link>
             <Link href="/chat" className={getLinkClassName('#')} prefetch={false}>
               <MessageCircle className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
-              Komunikace
+              Chat
             </Link>
             <Link href="/rescueTeams" className={getLinkClassName('/rescueTeams')} prefetch={false}>
               <Shield className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />

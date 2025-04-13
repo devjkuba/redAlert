@@ -62,41 +62,37 @@ export default function RescueTeams() {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {emergencyNumbers.map((emergency) => (
-              <div
-                key={emergency.id}
-                className="group flex w-full flex-col items-center p-4 border border-gray-300 rounded-xl transition-transform transform hover:scale-105 mx-auto"
-              >
-                <div className="flex items-center w-full">
-                  {emergency.icon}
-                  <div className="flex flex-col ml-4">
-                    <span className="text-sm font-semibold">
-                      {emergency.label}
-                    </span>
-                    <span className="text-3xl font-bold text-gray-600">
-                      {emergency.number}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex mt-4 space-x-4">
-                    <a
-                        href={`sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`}
-                        className="group flex items-center text-white p-2 rounded-md bg-yellow-500 hover:bg-yellow-600 transition-colors"
-                    >
-                      <MessageCircle className="w-5 h-5 text-white" />
-                      <span className="ml-2">SMS</span>
-                    </a>
-                  <a
-                    href={`tel:${emergency.number}`}
-                    className="group flex items-center text-white p-2 rounded-md bg-blue-500 hover:bg-blue-600 transition-colors"
-                  >
-                    <Phone className="w-5 h-5 text-white" />
-                    <span className="ml-2">Zavolat</span>
-                  </a>
-                </div>
+          {emergencyNumbers.map((emergency) => (
+            <div
+              key={emergency.id}
+              className="flex flex-col items-center p-4 border border-gray-300 rounded-xl transition-transform transform hover:scale-105"
+            >
+              {emergency.icon}
+              <div className="flex flex-col mt-4 text-center">
+                <span className="text-sm font-semibold">{emergency.label}</span>
+                <span className="text-3xl font-bold text-gray-600">
+                  {emergency.number}
+                </span>
               </div>
-            ))}
-          </div>
+              <div className="flex mt-4 space-x-4">
+                <a
+                  href={`sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`}
+                  className="flex items-center p-2 rounded-md bg-yellow-500 hover:bg-yellow-600 transition-colors text-white"
+                >
+                  <MessageCircle className="w-5 h-5 text-white" />
+                  <span className="ml-2">SMS</span>
+                </a>
+                <a
+                  href={`tel:${emergency.number}`}
+                  className="flex items-center p-2 rounded-md bg-blue-500 hover:bg-blue-600 transition-colors text-white"
+                >
+                  <Phone className="w-5 h-5 text-white" />
+                  <span className="ml-2">Zavolat</span>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
         </div>
         </main>
       </div>
