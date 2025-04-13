@@ -14,6 +14,7 @@ import useDemo from "@/hooks/useDemo";
 const createNotification = async (
   type: string,
   message: string,
+  status: string,
   triggeredById: number,
   organizationId: number,
   isDemo: boolean = false
@@ -27,6 +28,7 @@ const createNotification = async (
       body: JSON.stringify({
         type,
         message,
+        status,
         triggeredById,
         organizationId,
       }),
@@ -83,7 +85,7 @@ export default function Alert() {
           closeButton: "text-red-500 hover:text-red-700",
         },
       });
-      await createNotification(alert.label, `Poplach ${alert.label} aktivován.`, Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(alert.label, `Poplach ${alert.label} aktivován.`, "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     } else {
       toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
         duration: 5000,
@@ -96,7 +98,7 @@ export default function Alert() {
           closeButton: "!text-green-500 !hover:text-green-700",
         },
       });
-      await createNotification(alert.label, `Poplach ${alert.label} deaktivován.`, Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(alert.label, `Poplach ${alert.label} deaktivován.`, "INACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     }
   };
 
@@ -122,7 +124,7 @@ export default function Alert() {
     });
 
     // Send main alert notification
-    await createNotification(mainActive ? 'Deaktivace poplachu' : 'Aktivace poplachu', toastMessage, Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+    await createNotification(mainActive ? 'Deaktivace poplachu' : 'Aktivace poplachu', toastMessage, mainActive ? "INACTIVE" : "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
   };
 
   return (
@@ -133,7 +135,7 @@ export default function Alert() {
             DEMO
           </div>
         )}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center">
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
         <Navbar />

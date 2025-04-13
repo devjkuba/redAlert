@@ -5,6 +5,13 @@ import { useEffect, useState } from "react";
 import { getLocation } from "@/hooks/getLocation";
 import { Button } from "@/components/ui/button";
 import useDemo from "@/hooks/useDemo";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+} from "@/components/ui/breadcrumb";
 
 export default function RescueTeams() {
   const { isDemoActive } = useDemo();
@@ -45,65 +52,72 @@ export default function RescueTeams() {
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
       <div className="border-0 mx-auto max-w-md w-full">
         <main className="relative flex flex-col flex-grow">
-        {isDemoActive && (
-          <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
-            DEMO
-          </div>
-        )}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 text-center">
-          <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
-        </div>
-        <Navbar />
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            classNames: {
-              toast: "border-l-4 p-4 shadow-lg rounded-lg",
-              title: "font-bold",
-              description: "text-red-600",
-            },
-          }}
-        />
-        <div className="flex flex-col items-center w-full space-y-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Kontakty na záchranné složky
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {emergencyNumbers.map((emergency) => (
-            <div
-              key={emergency.id}
-              className="flex flex-col items-center p-4 border border-gray-300 rounded-xl transition-transform transform hover:scale-105"
-            >
-              {emergency.icon}
-              <div className="flex flex-col mt-4 text-center">
-                <span className="text-sm font-semibold">{emergency.label}</span>
-                <span className="text-3xl font-bold text-gray-600">
-                  {emergency.number}
-                </span>
-              </div>
-              <div className="flex mt-4 space-x-4">
-                <Button
-                  onClick={() => {
-                    window.location.href = `sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`;
-                  }}
-                  className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white"
-                >  <MessageCircle className="w-5 h-5 text-white" />
-                  <span>SMS</span></Button>
-                <Button
-                  onClick={() => {
-                    window.location.href = `tel:${emergency.number}`;
-                  }}
-                  className="flex items-center bg-sky-500 hover:bg-sky-600 text-white"
-                >
-                  <Phone className="w-5 h-5 text-white" />
-                  <span>Zavolat</span>
-                </Button>
-              </div>
+          {isDemoActive && (
+            <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
+              DEMO
             </div>
-          ))}
-        </div>
-        </div>
+          )}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center">
+            <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
+          </div>
+          <Navbar />
+          <Toaster
+            position="bottom-center"
+            toastOptions={{
+              classNames: {
+                toast: "border-l-4 p-4 shadow-lg rounded-lg",
+                title: "font-bold",
+                description: "text-red-600",
+              },
+            }}
+          />
+          <Breadcrumb className="w-full max-w-4xl px-4 py-2">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink>Záchranné složky</BreadcrumbLink>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="w-full px-4 mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {emergencyNumbers.map((emergency) => (
+              <Card key={emergency.id}>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="text-lg">{emergency.label}</CardTitle>
+                  {emergency.icon}
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between w-full px-2">
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-6 h-6 text-sky-600" />
+                      <span className="text-3xl font-semibold text-gray-900">
+                        {emergency.number}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-4 px-2">
+                    <Button
+                      onClick={() => {
+                        window.location.href = `sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`;
+                      }}
+                      className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white"
+                    >
+                      <MessageCircle className="w-5 h-5 mr-2" />
+                      <span>SMS</span>
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        window.location.href = `tel:${emergency.number}`;
+                      }}
+                      className="flex items-center bg-sky-500 hover:bg-sky-600 text-white"
+                    >
+                      <Phone className="w-5 h-5 mr-2" />
+                      <span>Zavolat</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </main>
       </div>
     </div>

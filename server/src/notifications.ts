@@ -25,8 +25,8 @@ export const notificationshandler = async (req: Request, res: Response): Promise
       break;
 
     case 'POST':
-      const { type, message, triggeredById, organizationId } = req.body;
-      if (!type || !message || !triggeredById || !organizationId) {
+      const { type, message, triggeredById, organizationId, status } = req.body;
+      if (!type || !message || !triggeredById || !organizationId || !status) {
         res.status(400).json({ error: 'Missing fields' });
         return;
       }
@@ -36,6 +36,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           data: {
             type,
             message,
+            status,
             triggeredById: Number(triggeredById),
             organizationId: Number(organizationId),
           },

@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum NotificationStatus {
+  ACTIVE
+  INACTIVE
+}
+
 enum Role {
   SUPERADMIN
   ADMIN
@@ -27,6 +32,7 @@ model Notification {
   id             Int          @id @default(autoincrement())
   type           String
   message        String
+  status         NotificationStatus @default(INACTIVE)
   triggeredById  Int
   triggeredBy    User         @relation(fields: [triggeredById], references: [id], name: "UserToNotification")
   organizationId Int
