@@ -2,7 +2,7 @@
   "name": "your-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node dist/server.ts",
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "prisma": "prisma",
