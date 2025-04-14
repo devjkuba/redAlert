@@ -31,7 +31,7 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const socketConnection = io("http://localhost:4000", {
+    const socketConnection = io(`${process.env.NEXT_PUBLIC_API}`, {
       withCredentials: true,
     });
     setSocket(socketConnection);
@@ -44,7 +44,7 @@ export default function Chat() {
       if (user?.organizationId) {
         try {
           const response = await fetch(
-            `http://localhost:4000/api/messages?organizationId=${user.organizationId}`,
+            `${process.env.NEXT_PUBLIC_API}api/messages?organizationId=${user.organizationId}`,
             {
               method: "GET",
               headers: {

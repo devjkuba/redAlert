@@ -23,7 +23,7 @@ const createNotification = async (
   if (isDemo) return; 
 
   try {
-    const response = await fetch('http://localhost:4000/api/notifications', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/notifications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

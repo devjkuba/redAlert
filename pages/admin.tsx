@@ -41,7 +41,7 @@ const Admin = () => {
       city,
     };
 
-    const res = await fetch("http://localhost:4000/api/organizations", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/organizations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
