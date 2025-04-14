@@ -60,7 +60,7 @@ export default function AdminUsers() {
               Žádní uživatelé k zobrazení.
             </p>
           ) : (
-            <Table className="table-fixed animate-fade-in delay-500">
+            <Table className="table-fixed">
               <TableHeader>
                 <TableRow>
                   <TableCell className="p-1">Jméno</TableCell>

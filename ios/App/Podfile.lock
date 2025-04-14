@@ -30,12 +30,12 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/push-notifications"
 
 SPEC CHECKSUMS:
-  Capacitor: 1f3c7b9802d958cd8c4eb63895fff85dff2e1eea
+  Capacitor: 05d35014f4425b0740fc8776481f6a369ad071bf
   CapacitorCordova: b33e7f4aa4ed105dd43283acdd940964374a87d9
-  CapacitorGeolocation: 8f8ac02ceaeb203a4762f8dc4ff5119e3f7fa50a
-  CapacitorPushNotifications: c4feed483e03825369c278f5bab75100fb3f94a0
+  CapacitorGeolocation: c0755715aaadf5c86dc0053e1127b368444c914b
+  CapacitorPushNotifications: 2e0132cd2f1a5d696bcbfc3725c2b6ffcb9275d4
   IONGeolocationLib: 81f33f88d025846946de2cf63b0c7628e7c6bc9d
 
 PODFILE CHECKSUM: 1a0ba5076f7b8c603d8a96f582d456cdcd105c0a
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
