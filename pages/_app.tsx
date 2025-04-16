@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Footer from '@/components/Footer';
 
 const checkUserPermissions = (token: string | null) => {
   return token !== null;
@@ -30,6 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
       <Component {...pageProps} />
+      <Footer />
     </>
   );
 }

@@ -4,6 +4,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
+    "deploy": "yarn run build && rsync -avz dist/ node@77.93.220.205:/home/cds",
     "build": "tsc",
     "prisma": "prisma",
     "prisma:studio": "npx prisma studio",
