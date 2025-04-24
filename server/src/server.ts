@@ -77,7 +77,7 @@ app.post('/api/login', loginHandler);
 app.post('/api/register', registerHandler);
 
 // Nastavení portu a spuštění serveru
-const PORT = process.env.PORT || 7000;
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
