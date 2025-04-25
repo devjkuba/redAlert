@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "127640247459",
+    "project_id": "red-alert-f2847",
+    "storage_bucket": "red-alert-f2847.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127640247459:android:61e4cd43d670d0fd973316",
+        "android_client_info": {
+          "package_name": "cz.cyberdev.redalert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4n1dPXv8Z1KfnlD_Q3eaWbBkVQkEoVIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

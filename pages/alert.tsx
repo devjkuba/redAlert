@@ -63,7 +63,7 @@ const alertButtons = [
 ];
 
 export default function Alert() {
-  const { user } = useUser();
+  const { data: user } = useUser();
   const { isDemoActive } = useDemo();
 
   const [activeStates, setActiveStates] = useState(alertButtons.map(() => false));

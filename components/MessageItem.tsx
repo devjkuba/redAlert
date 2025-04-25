@@ -1,3 +1,4 @@
+import { User } from "@/hooks/useUser";
 import { Message } from "@/pages/chat";
 
 export default function MessageItem({
@@ -5,14 +6,7 @@ export default function MessageItem({
   user,
 }: {
   readonly message: Message;
-  readonly user: {
-    readonly id: number;
-    readonly firstName: string;
-    readonly role: string;
-    readonly organizationId: number;
-    readonly lastName: string;
-    readonly email: string;
-  } | null;
+  readonly user: User | null | undefined;
 }) {
   return (
     <div className="p-2 border rounded-md text-sm even:bg-gray-100">

@@ -16,7 +16,8 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         const notifications = await prisma.notification.findMany({
           where: { organizationId: Number(orgId) },
           include: { triggeredBy: true },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: 'desc' },
+          take: 100,
         });
         res.status(200).json(notifications);
       } catch {

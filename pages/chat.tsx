@@ -22,7 +22,7 @@ export interface Message {
 }
 
 export default function Chat() {
-  const { user } = useUser();
+  const { data: user } = useUser();
   const { isDemoActive } = useDemo();
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState<string>("");
@@ -53,7 +53,6 @@ export default function Chat() {
             }
           );
           if (response.ok) {
-            console.log(response);
             const data = await response.json();
             setMessages(data.reverse());
             setLoading(false);

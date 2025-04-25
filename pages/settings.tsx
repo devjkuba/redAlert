@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function Settings() {
-  const { user } = useUser();
+  const { data: user } = useUser();
   const isAdmin = user?.role === "ADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
 

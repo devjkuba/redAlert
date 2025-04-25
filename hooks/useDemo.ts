@@ -14,7 +14,6 @@ export default function useDemo() {
     const newValue = !isDemoActive;
     localStorage.setItem("demo", String(newValue));
     setIsDemoActive(newValue);
-    window.location.reload(); // nebo použij router.reload() pro Next.js
   };
 
   return { isDemoActive, toggleDemo };

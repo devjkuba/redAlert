@@ -1,37 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query'
 
-const useUser = () => {
-  const [user, setUser] = useState<{ id: number; firstName: string; role: string; organizationId: number; lastName: string; email: string } | null>(null);
-  const [loading, setLoading] = useState(true);
+export type User = {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  role: string
+  organizationId: number
+}
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+const fetchUser = async (): Promise<User | null> => {
+  const token = localStorage.getItem('token')
+  if (!token) return null
 
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/user`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          console.error('Failed to fetch user data');
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
 
-    fetchUser();
-  }, []);
+  if (!res.ok) throw new Error('Failed to fetch user data')
+  return res.json()
+}
 
-  return { user, loading };
-};
-
+export const useUser = () =>
+  useQuery<User | null>({
+    queryKey: ['user'],
+    queryFn: fetchUser,
+    enabled: typeof window !== 'undefined', // jen client-side
+    staleTime: 1000 * 60 * 60, // cache na 1 hour
+    retry: false,
+  })
 export default useUser;

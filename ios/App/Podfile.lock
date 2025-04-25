@@ -5,7 +5,7 @@ PODS:
   - CapacitorGeolocation (7.1.1):
     - Capacitor
     - IONGeolocationLib (~> 1.0)
-  - CapacitorPushNotifications (7.0.0):
+  - CapacitorPushNotifications (7.0.1):
     - Capacitor
   - IONGeolocationLib (1.0.0)
 
@@ -33,7 +33,7 @@ SPEC CHECKSUMS:
   Capacitor: 05d35014f4425b0740fc8776481f6a369ad071bf
   CapacitorCordova: b33e7f4aa4ed105dd43283acdd940964374a87d9
   CapacitorGeolocation: c0755715aaadf5c86dc0053e1127b368444c914b
-  CapacitorPushNotifications: 2e0132cd2f1a5d696bcbfc3725c2b6ffcb9275d4
+  CapacitorPushNotifications: 6a2794788c583dd89215f1805ca4bced1b13dbdf
   IONGeolocationLib: 81f33f88d025846946de2cf63b0c7628e7c6bc9d
 
 PODFILE CHECKSUM: 1a0ba5076f7b8c603d8a96f582d456cdcd105c0a

@@ -6,7 +6,7 @@ import { Bell, MessageCircle, Shield, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
-  const user = useUser();
+  const { data: user } = useUser();
   const router = useRouter();
 
   const getLinkClassName = (href: string) => {
@@ -30,8 +30,8 @@ export default function Navbar() {
           <SheetDescription className="sr-only">Postranní navigační panel s odkazy na různé sekce aplikace.</SheetDescription>
           <div className="grid gap-2 py-6">
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
-              <span className="truncate font-semibold">{user.user?.firstName} {user.user?.lastName}</span>
-              <span className="truncate text-xs">{user.user?.email}</span>
+              <span className="truncate font-semibold">{user?.firstName} {user?.lastName}</span>
+              <span className="truncate text-xs">{user?.email}</span>
             </div>
             <Link href="/alert" className={getLinkClassName('/alert')} prefetch={false}>
               <Bell className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />

@@ -1,10 +1,13 @@
 {
-  "appId": "com.example.app",
+  "appId": "cz.cyberdev.redalert",
   "appName": "Red Alert",
   "webDir": "out",
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 0
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
     }
   }
 }

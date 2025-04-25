@@ -20,7 +20,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 export default function AdminNotifications() {
-  const { user } = useUser();
+  const { data: user } = useUser();
   const [notifications, setNotifications] = useState<Notification[]>([]); // Ukládáme notifikace
   const [loading, setLoading] = useState<boolean>(true); 
   const [error, setError] = useState<string | null>(null); // Stav pro chyby

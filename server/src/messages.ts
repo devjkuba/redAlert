@@ -17,6 +17,7 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
           where: { organizationId: Number(organizationId) },
           include: { sender: true, organization: true },
           orderBy: { createdAt: 'desc' },
+          take: 100,
         });
         res.status(200).json(messages);
       } catch (error: unknown) {
