@@ -42,6 +42,13 @@ export const notificationshandler = async (req: Request, res: Response): Promise
             organizationId: Number(organizationId),
           },
         });
+        await prisma.message.create({
+          data: {
+            text: message,
+            senderId: Number(triggeredById),
+            organizationId: Number(organizationId),
+          },
+        });
         res.status(201).json({ message: 'Notification created successfully' });
       } catch {
         res.status(500).json({ error: 'Error creating notification' });
