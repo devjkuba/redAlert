@@ -1,0 +1,11 @@
+{
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "login_button": "Log in",
+    "login_success": "Login successful!",
+    "login_failed": "Login failed.",
+    "register_prompt": "Don't have an account? Contact your organization’s admin.",
+    "register_link": "Register your organization",
+    "language_label": "Language selection:"
+  }

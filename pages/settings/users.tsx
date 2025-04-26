@@ -21,7 +21,7 @@ import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function AdminUsers() {
-  const { user } = useUser();
+  const { data: user } = useUser();
   const { users, loading, error } = useUsers(Number(user?.organizationId));
   const { isDemoActive } = useDemo();
 

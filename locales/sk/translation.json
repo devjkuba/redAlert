@@ -1,0 +1,11 @@
+{
+    "login": "Prihlásenie",
+    "email": "Email",
+    "password": "Heslo",
+    "login_button": "Prihlásiť sa",
+    "login_success": "Prihlásenie úspešné!",
+    "login_failed": "Prihlásenie zlyhalo.",
+    "register_prompt": "Nemáte účet? Kontaktujte správcu vašej organizácie.",
+    "register_link": "Zaregistrujte vašu organizáciu",
+    "language_label": "Výber jazyka:"
+  }

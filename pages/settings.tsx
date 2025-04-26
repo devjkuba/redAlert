@@ -11,11 +11,14 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { useTranslation } from "react-i18next";
 
 export default function Settings() {
   const { data: user } = useUser();
   const isAdmin = user?.role === "ADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
+  const { t } = useTranslation();
 
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
@@ -37,6 +40,10 @@ export default function Settings() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="w-full max-w-4xl px-4 space-y-6 mt-4">
+        <div className="flex items-center gap-2 text-sm">
+              <span>{t("language_label")}</span>
+              <LanguageDropdown />
+            </div>
           <Card className="shadow-lg border border-gray-300 rounded-xl">
             <CardHeader>
               <CardTitle>Demo režim</CardTitle>

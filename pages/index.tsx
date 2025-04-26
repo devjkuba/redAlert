@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import '@/lib/i18n';
 
 const Home = () => {
   const router = useRouter();

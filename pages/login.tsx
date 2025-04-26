@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/router'
-import { toast, Toaster } from 'sonner'
+import Link from "next/link";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
+import { toast, Toaster } from "sonner";
 
 import {
   Form,
@@ -14,69 +14,72 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import {
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/ui/password-input'
-import { useState } from 'react'
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { useState } from "react";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'Neplatná e-mailová adresa' }),
+  email: z.string().email({ message: "Neplatná e-mailová adresa" }),
   password: z
     .string()
-    .min(6, { message: 'Heslo musí mít alespoň 6 znaků' })
-    .regex(/[a-zA-Z0-9]/, { message: 'Heslo musí být alfanumerické' }),
-    botField: z.string().optional(),
-})
+    .min(6, { message: "Heslo musí mít alespoň 6 znaků" })
+    .regex(/[a-zA-Z0-9]/, { message: "Heslo musí být alfanumerické" }),
+  botField: z.string().optional(),
+});
 
 export default function LoginPreview() {
-  const [botField, setBotField] = useState('')
+  const { t } = useTranslation();
+  const [botField, setBotField] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      botField: '',
+      email: "",
+      password: "",
+      botField: "",
     },
-  })
+  });
 
-  const router = useRouter()
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (botField) {
-      console.warn('Detekován bot! Přihlášení zablokováno.')
+      console.warn("Detekován bot! Přihlášení zablokováno.");
       return;
     }
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
       if (res.ok) {
-        toast.success('Přihlášení úspěšné!')
-        localStorage.setItem('token', data.token)
-        router.push('/alert')
+        toast.success("Přihlášení úspěšné!");
+        localStorage.setItem("token", data.token);
+        router.push("/alert");
       } else if (res.status === 401) {
-        toast.error('Neplatné přihlašovací údaje. Zkuste to znovu.')
+        toast.error("Neplatné přihlašovací údaje. Zkuste to znovu.");
       } else {
-        toast.error(data.message || 'Přihlášení se nezdařilo.')
+        toast.error(data.message || "Přihlášení se nezdařilo.");
       }
     } catch (error) {
-      console.error('Form submission error', error)
-      toast.error('Chyba při odesílání formuláře. Zkuste to znovu.')
+      console.error("Form submission error", error);
+      toast.error("Chyba při odesílání formuláře. Zkuste to znovu.");
     }
   }
 
@@ -85,15 +88,11 @@ export default function LoginPreview() {
       <div className="border-0 mx-auto max-w-md w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">
-              <img
-                src="../logo.png"
-                alt="Logo"
-                className="h-20"
-              />
-            </div>
+            <img src="../logo.png" alt="Logo" className="h-20" />
+          </div>
           <CardTitle className="text-2xl">Přihlášení</CardTitle>
           <CardDescription>
-          Zadejte svůj e-mail a&nbsp;heslo pro přihlášení k&nbsp;vašemu účtu.
+            Zadejte svůj e-mail a&nbsp;heslo pro přihlášení k&nbsp;vašemu účtu.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -150,26 +149,29 @@ export default function LoginPreview() {
                   name="botField"
                   value={botField}
                   onChange={(e) => setBotField(e.target.value)}
-                  style={{ display: 'none' }}
+                  style={{ display: "none" }}
                   tabIndex={-1}
                   autoComplete="off"
                 />
 
-                <Button type="submit">
-                  Login
-                </Button>
+                <Button type="submit">{t("login")}</Button>
               </div>
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">
-            Nemáte účet? Ozvěte se správci Vaší organizace, pokud není registrována.<br />
+            {t("register_prompt")}
+            <br />
             <Link href="/register" className="underline">
               Zaregistrujte vaši organizaci
             </Link>
           </div>
-          <Toaster position='bottom-center' />
+          <div className="mt-8 flex items-center gap-2 text-sm">
+            <span>{t("language_label")}</span>
+            <LanguageDropdown />
+          </div>
+          <Toaster position="bottom-center" />
         </CardContent>
       </div>
     </div>
-  )
+  );
 }

@@ -1,0 +1,11 @@
+{
+    "login": "Přihlášení",
+    "email": "Email",
+    "password": "Heslo",
+    "login_button": "Přihlásit se",
+    "login_success": "Přihlášení úspěšné!",
+    "login_failed": "Přihlášení se nezdařilo.",
+    "register_prompt": "Nemáte účet? Ozvěte se správci Vaší organizace, pokud není registrována.",
+    "register_link": "Zaregistrujte vaši organizaci",
+    "language_label": "Výběr jazyka:"
+  }
