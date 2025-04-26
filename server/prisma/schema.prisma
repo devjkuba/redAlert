@@ -18,9 +18,15 @@ enum Role {
   USER
 }
 
+enum MessageType {
+  TEXT
+  ALARM
+}
+
 model Message {
   id             Int          @id @default(autoincrement())
   text           String
+  type           MessageType  @default(TEXT)
   senderId       Int
   sender         User         @relation(fields: [senderId], references: [id])
   organizationId Int

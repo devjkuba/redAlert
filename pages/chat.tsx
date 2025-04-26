@@ -13,6 +13,7 @@ export interface Message {
   id: string;
   senderId: string;
   text: string;
+  type: "TEXT" | "ALARM";
   sender: {
     firstName: string;
     lastName: string;

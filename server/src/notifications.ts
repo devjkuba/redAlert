@@ -45,6 +45,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         await prisma.message.create({
           data: {
             text: message,
+            type: 'ALARM',
             senderId: Number(triggeredById),
             organizationId: Number(organizationId),
           },
