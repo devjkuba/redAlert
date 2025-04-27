@@ -182,7 +182,7 @@ export default function Alert() {
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
       <main className="relative overflow-hidden flex flex-col flex-grow">
         {isDemoActive && (
-          <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
+          <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
             DEMO
           </div>
         )}
@@ -209,8 +209,8 @@ export default function Alert() {
               className={twMerge(
                 "flex shadow-lg flex-col min-h-[106px] items-center justify-center p-4 rounded-xl border border-gray-300 transition-all",
                 activeStates[index]
-                  ? "bg-[#d62a70] text-white shadow-none"
-                  : "text-[#d62a70]"
+                  ? "bg-[#982121] text-white shadow-none"
+                  : "text-[#982121]"
               )}
             >
               <Icon className="w-6 h-6 mb-2" />
@@ -230,7 +230,7 @@ export default function Alert() {
             onClick={toggleMainAlert}
             className={twMerge(
               "flex shadow-lg flex-col items-center justify-center w-[120px] h-[120px] p-4 rounded-xl border border-gray-300 transition-all",
-              mainActive ? "bg-[#d62a70] !text-white shadow-none" : "text-[#d62a70]",
+              mainActive ? "bg-[#982121] !text-white shadow-none" : "text-[#982121]",
               "transition-colors duration-300"
             )}
           >
