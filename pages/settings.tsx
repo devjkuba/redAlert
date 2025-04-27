@@ -21,7 +21,7 @@ export default function Settings() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
+    <div className="flex min-h-screen !pt-safe !px-safe pb-safe mx-auto max-w-4xl w-full">
       <main className="relative overflow-hidden flex flex-col flex-grow items-center justify-start">
         {isDemoActive && (
           <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">

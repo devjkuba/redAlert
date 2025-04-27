@@ -179,7 +179,7 @@ export default function Alert() {
   };
 
   return (
-    <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
+    <div className="flex min-h-screen !pt-safe !px-safe pb-safe border-0 mx-auto max-w-4xl w-full">
       <main className="relative overflow-hidden flex flex-col flex-grow">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
