@@ -15,7 +15,15 @@ import { isAdmin } from './middlewares/isAdmin';
 import { isUser } from './middlewares/isUser';
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "capacitor://localhost",
+    "https://redalert.onrender.com",
+    "https://redalert.cyberdev.cz",
+  ],
+  credentials: true,
+}));
 app.use(express.json());
 
 // Vytvoření HTTP serveru pro Express
@@ -24,7 +32,7 @@ const server = http.createServer(app);
 // Vytvoření WebSocket serveru s použitím Socket.io
 const io = new Server(server, {
   cors: {
-    origin: ["https://localhost", "http://localhost:3000", "capacitor://localhost", "https://redalert.onrender.com"], // Odkud mohou pocházet připojení (frontend URL)
+    origin: ["http://localhost:3000", "capacitor://localhost", "https://redalert.onrender.com", "https://redalert.cyberdev.cz"], // Odkud mohou pocházet připojení (frontend URL)
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],  // Specifikujte hlavičky, které jsou povolené
     credentials: true, // Umožní přenos cookies (pokud používáte autentizaci na serveru)
