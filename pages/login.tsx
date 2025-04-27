@@ -86,7 +86,7 @@ export default function LoginPreview() {
 
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
-      <div className="border-0 mx-auto max-w-md w-full">
+      <div className="border-0 mx-auto max-w-sm w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">
             <img src="../logo.png" alt="Logo" className="h-20" />

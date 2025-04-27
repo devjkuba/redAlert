@@ -120,7 +120,7 @@ export default function Chat() {
           }}
         />
         <div className="flex flex-col flex-grow items-center">
-          <div className="flex flex-col w-full max-w-lg overflow-scroll h-[calc(100vh_-_109px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
+          <div className="flex flex-col w-full max-w-3xl overflow-scroll h-[calc(100vh_-_109px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
             <div className="flex-1 overflow-y-auto space-y-3 px-4 py-2 shadow-inner shadow-gray-300">
               {loading ? (
                 <div className="flex justify-center items-center">

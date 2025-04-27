@@ -50,7 +50,7 @@ export default function RescueTeams() {
 
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe">
-      <div className="border-0 mx-auto max-w-md w-full">
+      <div className="border-0 mx-auto max-w-3xl w-full">
         <main className="relative flex flex-col flex-grow">
           {isDemoActive && (
             <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
