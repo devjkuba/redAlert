@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useAuthToken from "./useAuthToken";
 
 interface User {
   id: number;
@@ -11,6 +12,7 @@ interface User {
 }
 
 export const useUsers = (organizationId: number) => {
+  const token = useAuthToken();
   const [users, setUsers] = useState<User[]>([]); // Stav pro seznam uživatelů
   const [loading, setLoading] = useState<boolean>(true); // Stav pro načítání
   const [error, setError] = useState<string | null>(null); // Stav pro chyby
@@ -19,8 +21,16 @@ export const useUsers = (organizationId: number) => {
     const fetchUsers = async () => {
       setError(null); // Resetování chybového stavu před načítáním
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/users?organizationId=${organizationId}`);
-        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/users?organizationId=${organizationId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response.status === 401) {
+          window.location.href = '/login';
+        }
+
         if (!response.ok) {
           throw new Error('Chyba při načítání uživatelů');
         }

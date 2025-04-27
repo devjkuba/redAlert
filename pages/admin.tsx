@@ -1,7 +1,9 @@
+import useAuthToken from "@/hooks/useAuthToken";
 import { useEffect, useState } from "react";
 
 const Admin = () => {
   const [orgName, setOrgName] = useState("");
+  const token = useAuthToken();
   const [gpsCoordinates, setGpsCoordinates] = useState({ lat: "", lng: "" });
   const [postalCode, setPostalCode] = useState("");
   const [street, setStreet] = useState("");
@@ -45,6 +47,7 @@ const Admin = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(organizationData),
     });

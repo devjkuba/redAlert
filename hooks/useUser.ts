@@ -19,6 +19,10 @@ const fetchUser = async (): Promise<User | null> => {
     },
   })
 
+  if (res.status === 401) {
+    window.location.href = '/login';
+  }
+
   if (!res.ok) throw new Error('Failed to fetch user data')
   return res.json()
 }

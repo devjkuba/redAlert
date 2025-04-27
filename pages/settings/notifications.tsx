@@ -18,9 +18,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Spinner } from "@/components/ui/spinner";
+import useAuthToken from "@/hooks/useAuthToken";
 
 export default function AdminNotifications() {
   const { data: user } = useUser();
+  const token = useAuthToken();
   const [notifications, setNotifications] = useState<Notification[]>([]); // Ukládáme notifikace
   const [loading, setLoading] = useState<boolean>(true); 
   const [error, setError] = useState<string | null>(null); // Stav pro chyby
@@ -31,10 +33,13 @@ export default function AdminNotifications() {
     const fetchNotifications = async () => {
       if (user?.role !== "ADMIN") return; // Pokud uživatel není admin, nic nezobrazujeme
       try {
-        const data = await getNotifications(user.organizationId!); // Získej notifikace na základě organizace
+        const data = await getNotifications(token, user.organizationId!); // Získej notifikace na základě organizace
         setNotifications(data);
-      } catch {
+      } catch(error) {
         setError("Došlo k chybě při načítání notifikací.");
+        if ((error as { response?: { status?: number } })?.response?.status === 401) {
+          window.location.href = '/login';
+        }
       } finally {
         setLoading(false);
       }

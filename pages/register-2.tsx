@@ -39,6 +39,7 @@ export default function Register2() {
 
       if (response.ok) {
         const result = await response.json();
+        console.log(result);
         const { token } = result; 
         localStorage.setItem('token', token);
 

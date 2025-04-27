@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MessageItem from "@/components/MessageItem";
 import useDemo from "@/hooks/useDemo";
+import useAuthToken from "@/hooks/useAuthToken";
 
 export interface Message {
   id: string;
@@ -24,6 +25,7 @@ export interface Message {
 
 export default function Chat() {
   const { data: user } = useUser();
+  const token = useAuthToken();
   const { isDemoActive } = useDemo();
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState<string>("");
@@ -50,9 +52,14 @@ export default function Chat() {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`,
               },
             }
           );
+          if (response.status === 401) {
+            window.location.href = '/login';
+          }
+
           if (response.ok) {
             const data = await response.json();
             setMessages(data.reverse());

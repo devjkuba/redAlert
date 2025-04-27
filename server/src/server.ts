@@ -10,6 +10,9 @@ import { userHandler } from './user';
 import { messagesHandler } from './messages';
 import { prisma } from './prisma';
 import { usersHandler } from './users';
+import { userUpdateHandler } from './userUpdate';
+import { isAdmin } from './middlewares/isAdmin';
+import { isUser } from './middlewares/isUser';
 
 const app = express();
 app.use(cors());
@@ -60,21 +63,25 @@ io.on('connection', (socket) => {
 
 // Definice API rout pro Express
 app.route('/api/organizations')
-   .post(organizationsHandler)
-   .get(organizationsHandler); 
+   .post(isUser, organizationsHandler)
+   .get(isUser, organizationsHandler);
 
 app.route('/api/notifications')
-   .get(notificationshandler)
-   .post(notificationshandler);
+   .get(isUser, notificationshandler)
+   .post(isUser, notificationshandler);
 
 app.route('/api/messages')
-   .get(messagesHandler)
-   .post(messagesHandler);
+   .get(isUser, messagesHandler)
+   .post(isUser, messagesHandler);
 
-app.get('/api/user', userHandler);
-app.get('/api/users', usersHandler);
+app.get('/api/user', isUser, userHandler);
+app.get('/api/users', isUser, usersHandler);
+
 app.post('/api/login', loginHandler);
 app.post('/api/register', registerHandler);
+
+app.route('/api/users/:id')
+   .put(isAdmin, userUpdateHandler);
 
 // Nastavení portu a spuštění serveru
 const PORT = process.env.PORT || 4000;

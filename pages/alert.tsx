@@ -11,8 +11,10 @@ import { FightIcon } from "@/components/FightIcon";
 import useUser from "@/hooks/useUser";
 import useDemo from "@/hooks/useDemo";
 import { getNotifications, Notification } from "@/lib/getNotifications";
+import useAuthToken from "@/hooks/useAuthToken";
 
 const createNotification = async (
+  token: string | null,
   type: string,
   message: string,
   status: string,
@@ -25,7 +27,8 @@ const createNotification = async (
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/notifications`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`,
+      },
       body: JSON.stringify({
         type,
         message,
@@ -34,6 +37,10 @@ const createNotification = async (
         organizationId,
       }),
     });
+
+    if (response.status === 401) {
+      window.location.href = '/login';
+    }
 
     if (!response.ok) {
       throw new Error('Error creating notification');
@@ -65,6 +72,7 @@ const alertButtons = [
 export default function Alert() {
   const { data: user } = useUser();
   const { isDemoActive } = useDemo();
+  const token = useAuthToken();
 
   const [activeStates, setActiveStates] = useState(alertButtons.map(() => false));
   const [mainActive, setMainActive] = useState(false);
@@ -72,7 +80,7 @@ export default function Alert() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const notifications = await getNotifications(Number(user?.organizationId));
+        const notifications = await getNotifications(token, Number(user?.organizationId));
         const latestNotifications = notifications.reduce<{ [key: string]: Notification }>((acc: { [x: string]: Notification; }, notification: Notification) => {
           if (!acc[notification.type]) {
             acc[notification.type] = notification;
@@ -92,6 +100,12 @@ export default function Alert() {
         if (error instanceof Error) {
           console.error('Error:', error.message); 
           toast.error('Chyba při vytváření notifikace.');
+
+          console.log(error)
+
+          if ((error as { response?: { status?: number } })?.response?.status === 401) {
+            window.location.href = '/login';
+          }
         } else {
           console.error('An unexpected error occurred.');
           toast.error('An unexpected error occurred.');
@@ -122,7 +136,7 @@ export default function Alert() {
           closeButton: "text-red-500 hover:text-red-700",
         },
       });
-      await createNotification(alert.label, `${alert.label} aktivován.`, "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(token, alert.label, `${alert.label} aktivován.`, "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     } else {
       toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
         duration: 5000,
@@ -135,15 +149,15 @@ export default function Alert() {
           closeButton: "!text-green-500 !hover:text-green-700",
         },
       });
-      await createNotification(alert.label, `${alert.label} deaktivován.`, "INACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(token, alert.label, `${alert.label} deaktivován.`, "INACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
     }
   };
 
   const toggleMainAlert = async () => {
     setMainActive((prev) => !prev);
     const toastMessage = mainActive
-      ? "Hlavní poplach byl deaktivován."
-      : "Hlavní poplach byl aktivován.";
+      ? "Hlavní poplach deaktivován."
+      : "Hlavní poplach aktivován.";
     const toastType = mainActive ? toast.success : toast.error;
     toastType(toastMessage, {
       duration: 5000,
@@ -161,7 +175,7 @@ export default function Alert() {
     });
 
     // Send main alert notification
-    await createNotification('Hlavní poplach', toastMessage, mainActive ? "INACTIVE" : "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+    await createNotification(token, 'Hlavní poplach', toastMessage, mainActive ? "INACTIVE" : "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
   };
 
   return (

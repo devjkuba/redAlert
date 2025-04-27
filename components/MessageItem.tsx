@@ -10,7 +10,7 @@ export default function MessageItem({
   readonly user: User | null | undefined;
 }) {
   return (
-    <div className={cn("p-2 border rounded-md text-sm even:bg-gray-100", message.type === "ALARM" && "bg-red-100")}>
+    <div className={cn("p-2 border rounded-md text-sm", message.type === "ALARM" ? "bg-red-100" : "even:bg-gray-100")}>
       <strong>
         {message.sender
           ? `${message.sender.firstName} ${message.sender.lastName.charAt(0)}.`
