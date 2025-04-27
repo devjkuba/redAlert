@@ -2,7 +2,7 @@
     "name": "Red Alert",
     "short_name": "Aplikace",
     "description": "Aplikace pro okamžité varování v případě hrozeb, jako jsou útoky, požáry nebo jiné krizové situace.",
-    "start_url": "/",
+    "start_url": "https://redalert.cyberdev.cz/",
     "background_color": "#ffffff",
     "theme_color": "#982121",
     "display": "standalone",
