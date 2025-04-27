@@ -85,6 +85,10 @@ export default function App({ Component, pageProps }: AppProps) {
             name="viewport"
             content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
+          <link rel="apple-touch-icon" href="/logo.png" />
+          <link rel="apple-touch-icon" sizes="152x152" href="/logo.png" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+          <link rel="apple-touch-icon" sizes="167x167" href="/logo.png" />
         </Head>
         <Component {...pageProps} />
         <Footer />
