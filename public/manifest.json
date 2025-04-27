@@ -1,0 +1,21 @@
+{
+    "name": "Red Alert",
+    "short_name": "Aplikace",
+    "description": "Aplikace pro okamžité varování v případě hrozeb, jako jsou útoky, požáry nebo jiné krizové situace.",
+    "start_url": "/",
+    "background_color": "#ffffff",
+    "theme_color": "#982121",
+    "display": "standalone",
+    "icons": [
+      {
+        "src": "/logo.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/logo.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
