@@ -31,8 +31,8 @@ export const useUser = () =>
   useQuery<User | null>({
     queryKey: ['user'],
     queryFn: fetchUser,
-    enabled: typeof window !== 'undefined', // jen client-side
-    staleTime: 1000 * 60 * 60, // cache na 1 hour
-    retry: false,
+    enabled: typeof window !== 'undefined',
+    staleTime: 1000 * 60 * 60,
+    retry: true,
   })
 export default useUser;
