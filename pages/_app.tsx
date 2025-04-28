@@ -40,6 +40,14 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router]);
 
   useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.log('Service Worker registration failed', err));
+    }
+  }, []);
+
+  useEffect(() => {
     const setupPush = async () => {
       if (
         (window as { Capacitor?: typeof Capacitor }).Capacitor &&
@@ -85,6 +93,8 @@ export default function App({ Component, pageProps }: AppProps) {
             name="viewport"
             content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
+          <link rel="manifest" href="/manifest.json" />
+          <link rel="icon" href="/logo.png" />
           <link rel="apple-touch-icon" href="/logo.png" />
           <link rel="apple-touch-icon" sizes="152x152" href="/logo.png" />
           <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
