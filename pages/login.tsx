@@ -25,7 +25,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
@@ -166,10 +165,10 @@ export default function LoginPreview() {
               Zaregistrujte vaši organizaci
             </Link>
           </div>
-          <div className="mt-8 flex items-center gap-2 text-sm">
+          {/* <div className="mt-8 flex items-center gap-2 text-sm">
             <span>{t("language_label")}</span>
             <LanguageDropdown />
-          </div>
+          </div> */}
           <Toaster position="bottom-center" />
         </CardContent>
       </div>

@@ -23,10 +23,16 @@ enum MessageType {
   ALARM
 }
 
+enum AlarmAction {
+  ON
+  OFF
+}
+
 model Message {
   id             Int          @id @default(autoincrement())
   text           String
   type           MessageType  @default(TEXT)
+  alarmAction    AlarmAction?
   senderId       Int
   sender         User         @relation(fields: [senderId], references: [id])
   organizationId Int

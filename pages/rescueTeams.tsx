@@ -52,7 +52,7 @@ export default function RescueTeams() {
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe mx-auto max-w-4xl w-full">
         <main className="relative flex flex-col flex-grow">
           {isDemoActive && (
-            <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
+            <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
               DEMO
             </div>
           )}
@@ -96,7 +96,13 @@ export default function RescueTeams() {
                   <div className="flex flex-row gap-4 px-2">
                     <Button
                       onClick={() => {
-                        window.location.href = `sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`;
+                        if (!isDemoActive) {
+                          window.location.href = `sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`;
+                        } else {
+                          window.alert(
+                            "Demo režim je aktivní. Nelze vytvořit sms."
+                          );
+                        }
                       }}
                       className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white"
                     >
@@ -105,7 +111,13 @@ export default function RescueTeams() {
                     </Button>
                     <Button
                       onClick={() => {
-                        window.location.href = `tel:${emergency.number}`;
+                        if (!isDemoActive) {
+                          window.location.href = `tel:${emergency.number}`;
+                        } else {
+                          window.alert(
+                            "Demo režim je aktivní. Nelze provést hovor."
+                          );
+                        }
                       }}
                       className="flex items-center bg-sky-500 hover:bg-sky-600 text-white"
                     >

@@ -12,8 +12,8 @@ export const LanguageDropdown = () => {
 
   const languages = [
     { code: 'cs', label: 'Čeština', flag: '🇨🇿' },
-    { code: 'en', label: 'English', flag: '🇬🇧' },
-    { code: 'sk', label: 'Slovenčina', flag: '🇸🇰' },
+    // { code: 'en', label: 'English', flag: '🇬🇧' },
+    // { code: 'sk', label: 'Slovenčina', flag: '🇸🇰' },
   ];
 
   const currentLang = i18n.language;

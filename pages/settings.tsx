@@ -11,20 +11,17 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
-import { useTranslation } from "react-i18next";
 
 export default function Settings() {
   const { data: user } = useUser();
   const isAdmin = user?.role === "ADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
-  const { t } = useTranslation();
 
   return (
     <div className="flex min-h-screen !pt-safe !px-safe pb-safe mx-auto max-w-4xl w-full">
       <main className="relative overflow-hidden flex flex-col flex-grow items-center justify-start">
         {isDemoActive && (
-          <div className="absolute bg-[#d62a70] text-white font-sm w-full text-center font-bold text-sm">
+          <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
             DEMO
           </div>
         )}
@@ -40,10 +37,10 @@ export default function Settings() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="w-full max-w-4xl px-4 space-y-6 mt-4">
-        <div className="flex items-center gap-2 text-sm">
+        {/* <div className="flex items-center gap-2 text-sm">
               <span>{t("language_label")}</span>
               <LanguageDropdown />
-            </div>
+            </div> */}
           <Card className="shadow-lg border border-gray-300 rounded-xl">
             <CardHeader>
               <CardTitle>Demo režim</CardTitle>
@@ -55,7 +52,7 @@ export default function Settings() {
               </p>
               <Button
                 onClick={toggleDemo}
-                className={isDemoActive ? "bg-[#d62a70] hover:bg-red-600" : ""}
+                className={isDemoActive ? "bg-[#982121] hover:bg-red-600" : ""}
               >
                 {isDemoActive ? "Deaktivovat demo" : "Aktivovat demo"}
               </Button>
