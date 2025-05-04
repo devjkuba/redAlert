@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function EditUser() {
   const router = useRouter();
@@ -54,14 +56,20 @@ export default function EditUser() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await fetch(`${process.env.NEXT_PUBLIC_API}api/users/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/users/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ firstName, lastName, email, password }),
+      body: JSON.stringify({ firstName, lastName, email, role, password }),
     });
+  
+    if (res.ok) {
+      toast.success("Uživatel byl úspěšně uložen.");
+    } else {
+      toast.error("Chyba při ukládání uživatele.");
+    }
   };
 
   return (
@@ -76,6 +84,7 @@ export default function EditUser() {
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
         <Navbar />
+        <Toaster position="bottom-center" />
         <Breadcrumb className="w-full max-w-4xl px-4 py-2">
           <BreadcrumbList>
             <BreadcrumbItem>
