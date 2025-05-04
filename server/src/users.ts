@@ -21,6 +21,9 @@ export const usersHandler = async (req: Request, res: Response): Promise<void> =
       where: {
         organizationId,
       },
+      orderBy: {
+        id: 'asc',
+      },
       select: {
         id: true,
         firstName: true,
