@@ -30,7 +30,7 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
     }
 
     case 'POST': {
-      const { text, senderId, organizationId } = req.body;
+      const { text, status, senderId, organizationId } = req.body;
       if (!text || !senderId || !organizationId) {
         res.status(400).json({ error: 'Missing required fields' });
         return;
@@ -41,6 +41,7 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
           data: {
             text,
             senderId: Number(senderId),
+            status,
             organizationId: Number(organizationId),
           },
         });

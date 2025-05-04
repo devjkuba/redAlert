@@ -46,6 +46,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           data: {
             text: message,
             type: 'ALARM',
+            status,
             senderId: Number(triggeredById),
             organizationId: Number(organizationId),
           },
