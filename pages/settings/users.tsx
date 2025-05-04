@@ -91,7 +91,7 @@ export default function AdminUsers() {
                       {new Date(user.createdAt).toLocaleString()}
                     </TableCell>
                     <TableCell className="text-xs p-1">
-                      <Link href={`/users/edit/${user.id}`}>
+                      <Link href={`/settings/edit/${user.id}`}>
                         <Button variant="outline" size="sm">
                           Editovat
                         </Button>

@@ -21,6 +21,7 @@ const protectedRoutes = [
   "/settings",
   "settings/notifications",
   "settings/users",
+  "settings/edit/[id]",
   "/logout",
 ];
 

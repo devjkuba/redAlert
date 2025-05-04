@@ -10,7 +10,7 @@ export const userUpdateHandler = async (req: Request, res: Response) => {
     return;
   }
 
-  const { firstName, lastName, password } = req.body;
+  const { firstName, lastName, password, email } = req.body;
 
   if (!firstName || !lastName) {
     res.status(400).json({ message: 'First name and last name are required' });
@@ -21,6 +21,7 @@ export const userUpdateHandler = async (req: Request, res: Response) => {
     const dataToUpdate = {
       firstName,
       lastName,
+      email,
       password,
     };
 

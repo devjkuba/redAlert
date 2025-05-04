@@ -13,6 +13,7 @@ import { usersHandler } from './users';
 import { userUpdateHandler } from './userUpdate';
 import { isAdmin } from './middlewares/isAdmin';
 import { isUser } from './middlewares/isUser';
+import { userGetHandler } from './userGetHandler';
 
 const app = express();
 app.use(cors({
@@ -89,7 +90,8 @@ app.post('/api/login', loginHandler);
 app.post('/api/register', registerHandler);
 
 app.route('/api/users/:id')
-   .put(isAdmin, userUpdateHandler);
+  .get(isAdmin, userGetHandler)  
+  .put(isAdmin, userUpdateHandler);
 
 // Nastavení portu a spuštění serveru
 const PORT = process.env.PORT || 4000;
