@@ -1,8 +1,17 @@
 import { Request, Response } from 'express';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
+import { Role } from '@prisma/client';
 
-export const userUpdateHandler = async (req: Request, res: Response) => {
+interface UserUpdateData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: Role;
+  password?: string;
+}
+
+export const userUpdateHandler = async (req: Request, res: Response): Promise<void> => {
   const userId = Number(req.params.id);
 
   if (isNaN(userId)) {
@@ -10,22 +19,32 @@ export const userUpdateHandler = async (req: Request, res: Response) => {
     return;
   }
 
-  const { firstName, lastName, password, email } = req.body;
+  const { firstName, lastName, password, email, role } = req.body;
 
-  if (!firstName || !lastName) {
-    res.status(400).json({ message: 'First name and last name are required' });
+  if (!firstName || !lastName || !email || !role) {
+    res.status(400).json({ message: 'First name, last name, role and email are required' });
+    return;
+  }
+
+  const allowedRoles: Role[] = ['ADMIN', 'USER'];
+  if (!allowedRoles.includes(role)) {
+    res.status(400).json({ message: 'Role must be either ADMIN or USER' });
     return;
   }
 
   try {
-    const dataToUpdate = {
+    const dataToUpdate: UserUpdateData = {
       firstName,
       lastName,
       email,
-      password,
+      role,
     };
 
-    if (password) {
+    if (password && password.trim() !== '') {
+      if (password.length < 6) {
+        res.status(400).json({ message: 'Password must be at least 6 characters long' });
+        return;
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       dataToUpdate.password = hashedPassword;
     }

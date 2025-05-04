@@ -82,7 +82,7 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
                 <FormLabel>Jméno</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Jan"
+                    placeholder="Jméno"
                     {...field}
                     autoComplete=""
                     value={field.value || ""}
@@ -100,7 +100,7 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
                 <FormLabel>Příjmení</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Novák"
+                    placeholder="Příjmení"
                     {...field}
                     value={field.value || ""}
                   />
@@ -117,7 +117,7 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="email@firma.cz"
+                    placeholder="jmeno@domena.cz"
                     {...field}
                     value={field.value || ""}
                   />

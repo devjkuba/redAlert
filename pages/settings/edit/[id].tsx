@@ -12,6 +12,13 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function EditUser() {
   const router = useRouter();
@@ -21,18 +28,28 @@ export default function EditUser() {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     if (id) {
-      fetch(`${process.env.NEXT_PUBLIC_API}api/users/${id}`)
+      fetch(`${process.env.NEXT_PUBLIC_API}api/users/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
           setFirstName(data.firstName);
           setLastName(data.lastName);
+          setEmail(data.email);
+          setRole(data.role);
         });
     }
-  }, [id]);
+  }, [id, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +60,7 @@ export default function EditUser() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ firstName, lastName, password }),
+      body: JSON.stringify({ firstName, lastName, email, password }),
     });
   };
 
@@ -66,24 +83,51 @@ export default function EditUser() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink>Uživatelé</BreadcrumbLink>
+              <BreadcrumbLink href="/settings/users">Uživatelé</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/settings/edit/${id}`}>
+                Editace uživatele
+              </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
         <div className="w-full max-w-4xl px-4 pb-7">
           <div className="max-w-md mx-auto mt-10">
-            <h1 className="text-2xl font-bold mb-4">Editace uživatele</h1>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Input
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Jméno"
+                required
               />
               <Input
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Příjmení"
+                required
               />
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="email"
+                type="email"
+                required
+              />
+              <Select
+                value={role}
+                onValueChange={(value) => setRole(value)}
+                required
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Vyberte roli" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ADMIN">ADMIN</SelectItem>
+                  <SelectItem value="USER">USER</SelectItem>
+                </SelectContent>
+              </Select>
               <Input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
