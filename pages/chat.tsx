@@ -15,6 +15,7 @@ export interface Message {
   senderId: string;
   text: string;
   status: string;
+  createdAt: Date;
   type: "TEXT" | "ALARM";
   sender: {
     firstName: string;

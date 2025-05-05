@@ -65,6 +65,26 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('sendNotification', async (notification) => {
+    try {
+      const savedNotification = await prisma.notification.create({
+        data: {
+          message: notification.message,
+          type: notification.type,
+          triggeredBy: notification.triggeredBy || 'system',
+          organization: notification.organization || 'defaultOrganization',
+          ...(notification.userId ? { userId: notification.userId } : {}),
+        },
+      });
+
+      io.emit('newNotification', savedNotification);
+
+      console.log('Notification saved and sent:', savedNotification);
+    } catch (error) {
+      console.error('Error saving notification:', error);
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('A user disconnected');
   });
