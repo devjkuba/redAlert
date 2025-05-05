@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
       const savedNotification = await prisma.notification.create({
         data: {
           message: notification.message,
-          type: notification.type,
+          type: notification.type || '',
           triggeredBy: notification.triggeredBy || 'system',
           organization: notification.organization || 'defaultOrganization',
           ...(notification.userId ? { userId: notification.userId } : {}),
