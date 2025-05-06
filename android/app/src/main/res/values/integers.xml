@@ -1,0 +1,3 @@
+<resources>
+    <integer name="notification_priority">1</integer> <!-- 1 = PRIORITY_DEFAULT -->
+</resources>

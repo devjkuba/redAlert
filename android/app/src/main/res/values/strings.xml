@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Red Alert</string>
     <string name="title_activity_main">Red Alert</string>
-    <string name="package_name">com.example.app</string>
-    <string name="custom_url_scheme">com.example.app</string>
+    <string name="package_name">cz.cyberdev.redalert</string>
+    <string name="custom_url_scheme">cz.cyberdev.redalert</string>
+    <string name="notification_channel_id">default_channel</string>
 </resources>

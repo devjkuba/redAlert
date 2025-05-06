@@ -1,4 +1,4 @@
-package com.example.app;
+package cz.cyberdev.redalert;
 
 import com.getcapacitor.BridgeActivity;
 
