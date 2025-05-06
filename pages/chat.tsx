@@ -80,7 +80,7 @@ export default function Chat() {
     return () => {
       socketConnection.disconnect();
     };
-  }, [user?.organizationId]);
+  }, [token, user?.organizationId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

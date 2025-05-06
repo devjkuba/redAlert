@@ -15,6 +15,7 @@ import { isAdmin } from './middlewares/isAdmin';
 import { isUser } from './middlewares/isUser';
 import { userGetHandler } from './userGetHandler';
 import { userDeleteHandler } from './userDeleteHandler';
+import { registerUserHandler } from './registerUser';
 
 const app = express();
 app.use(cors({
@@ -114,6 +115,8 @@ app.route('/api/users/:id')
   .get(isAdmin, userGetHandler)  
   .delete(isAdmin, userDeleteHandler)
   .put(isAdmin, userUpdateHandler);
+
+app.post('/api/register-user', isAdmin, registerUserHandler);
 
 // Nastavení portu a spuštění serveru
 const PORT = process.env.PORT || 4000;
