@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  overscroll-behavior: none;
+  overflow: hidden;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
