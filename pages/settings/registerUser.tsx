@@ -17,6 +17,7 @@ import useAuthToken from "@/hooks/useAuthToken";
 import useDemo from "@/hooks/useDemo";
 import useUser from "@/hooks/useUser";
 import router from "next/router";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 const registerUserSchema = z
   .object({
@@ -116,9 +117,20 @@ export default function RegisterUser() {
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
         <Navbar />
+        <Breadcrumb className="w-full max-w-4xl px-4 py-2">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/settings">Nastavení</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink>Registrace uživatele</BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <Toaster position="bottom-center" />
         <div className="w-full max-w-4xl px-4 pb-7">
-          <div className="max-w-md mx-auto mt-10">
+          <div className="max-w-md mx-auto mt-4">
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="flex flex-col gap-4"

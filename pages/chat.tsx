@@ -100,7 +100,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex min-h-screen !pt-safe !px-safe pb-safe border-0 mx-auto max-w-4xl w-full">
+    <div className="flex min-h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !pt-safe !px-safe pb-safe border-0 mx-auto max-w-4xl w-full">
       <main className="relative overflow-hidden flex flex-col flex-grow">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
