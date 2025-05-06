@@ -103,39 +103,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
-@keyframes borderMove {
-  0% {
-    border: 8px solid #db0d5f;
-  }
-  50% {
-    border: 8px solid #7c0434;
-  }
-  100% {
-    border: 8px solid #db0d5f;
-  }
-}
-
-@keyframes glowEffect {
-  0% {
-    box-shadow: 0 0 10px 4px #db0d5f, 0 0 75px 8px #7c0434;
-  }
-  50% {
-    box-shadow: 0 0 10px 8px #7c0434, 0 0 55px 12px #db0d5f;
-  }
-  100% {
-    box-shadow: 0 0 10px 4px #db0d5f, 0 0 75px 8px #7c0434;
-  }
-}
-
-.animate-borderMove {
-  animation: borderMove 1.5s infinite alternate;
-  background: transparent;
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.animate-ActiveMove {
-  animation: borderMove 1.5s infinite alternate, glowEffect 1s infinite alternate; 
-  background: transparent;
-  transition: box-shadow 0.3s ease-in-out;
-}
