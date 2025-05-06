@@ -14,6 +14,7 @@ import { userUpdateHandler } from './userUpdate';
 import { isAdmin } from './middlewares/isAdmin';
 import { isUser } from './middlewares/isUser';
 import { userGetHandler } from './userGetHandler';
+import { userDeleteHandler } from './userDeleteHandler';
 
 const app = express();
 app.use(cors({
@@ -111,6 +112,7 @@ app.post('/api/register', registerHandler);
 
 app.route('/api/users/:id')
   .get(isAdmin, userGetHandler)  
+  .delete(isAdmin, userDeleteHandler)
   .put(isAdmin, userUpdateHandler);
 
 // Nastavení portu a spuštění serveru

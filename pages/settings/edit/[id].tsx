@@ -24,7 +24,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 export default function EditUser() {
   const router = useRouter();
-  const { id } = router.query;
+  const rawId = router.query.id;
+  const id = Array.isArray(rawId) ? rawId[0] : rawId;
   const token = useAuthToken();
   const { isDemoActive } = useDemo();
 
@@ -48,7 +49,7 @@ export default function EditUser() {
           setFirstName(data.firstName);
           setLastName(data.lastName);
           setEmail(data.email);
-          setRole(data.role);
+          setRole(["ADMIN", "USER"].includes(data.role) ? data.role : "");
         });
     }
   }, [id, token]);
@@ -62,13 +63,48 @@ export default function EditUser() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ firstName, lastName, email, role, password }),
+      body: JSON.stringify(
+        password.trim()
+          ? { firstName, lastName, email, role, password }
+          : { firstName, lastName, email, role }
+      ),
     });
-  
+
     if (res.ok) {
       toast.success("Uživatel byl úspěšně uložen.");
     } else {
       toast.error("Chyba při ukládání uživatele.");
+    }
+  };
+
+  const handleDelete = async () => {
+    const userId = Array.isArray(id) ? id[0] : id;
+    if (!userId) return;
+
+    if (!confirm("Opravdu chcete tohoto uživatele smazat?")) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API}api/users/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Uživatel byl úspěšně smazán.");
+        router.push("/settings/users");
+      } else {
+        toast.error(data.message || "Chyba při mazání uživatele.");
+      }
+    } catch (error) {
+      console.error("Error during user deletion:", error);
+      toast.error("Nastala chyba při mazání.");
     }
   };
 
@@ -144,6 +180,13 @@ export default function EditUser() {
                 type="password"
               />
               <Button type="submit">Uložit</Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+              >
+                Smazat uživatele
+              </Button>
             </form>
           </div>
         </div>
