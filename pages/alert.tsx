@@ -139,14 +139,27 @@ export default function Alert() {
             closeButton: "text-blue-500 hover:text-blue-700",
           },
         });
+  
+        const index = alertButtons.findIndex((btn) => btn.label === notification.type);
+        if (index !== -1) {
+          setActiveStates((prev) => {
+            const newStates = [...prev];
+            newStates[index] = notification.status === "ACTIVE";
+            return newStates;
+          });
+        }
+  
+        if (notification.type === "Hlavní poplach") {
+          setMainActive(notification.status === "ACTIVE");
+        }
       }
     });
   
     return () => {
       socket.off('newNotification');
-      socket.disconnect();
     };
   }, [user?.organizationId]);
+  
 
   const toggleAlert = async (index: number) => {
     const updatedStates = [...activeStates];
