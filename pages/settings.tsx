@@ -69,7 +69,7 @@ export default function Settings() {
                 <Link href="/settings/notifications">
                   <Button>Notifikace</Button>
                 </Link>
-                <Link href="/settings/user-registration">
+                <Link href="/settings/registerUser">
                   <Button className="mt-4">Registrace uživatele</Button>
                 </Link>
                 <Link href="/settings/users">
