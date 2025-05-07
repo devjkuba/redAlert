@@ -35,7 +35,7 @@ const server = http.createServer(app);
 // Vytvoření WebSocket serveru s použitím Socket.io
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "capacitor://localhost", "https://redalert.onrender.com", "https://redalert.cyberdev.cz"], // Odkud mohou pocházet připojení (frontend URL)
+    origin: ["http://localhost:3000", "https://localhost", "capacitor://localhost", "https://redalert.onrender.com", "https://redalert.cyberdev.cz"], // Odkud mohou pocházet připojení (frontend URL)
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],  // Specifikujte hlavičky, které jsou povolené
     credentials: true, // Umožní přenos cookies (pokud používáte autentizaci na serveru)
