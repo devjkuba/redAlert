@@ -22,11 +22,15 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "capacitor://localhost",
+    "https://localhost",
+    "https://colossal-matelda-devjkuba-aa63c9cd.koyeb.app",
     "https://redalert.onrender.com",
     "https://redalert.cyberdev.cz",
   ],
   credentials: true,
 }));
+app.options('*', cors());
+
 app.use(express.json());
 
 // Vytvoření HTTP serveru pro Express
