@@ -57,6 +57,9 @@ io.on('connection', (socket) => {
           senderId: message.senderId,
           organizationId: message.organizationId,
         },
+        include: {
+          sender: true, 
+        },
       });
 
       // Odeslání uložené zprávy všem připojeným uživatelům
