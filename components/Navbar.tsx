@@ -53,10 +53,6 @@ export default function Navbar() {
               <LogOut className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Odhlásit se
             </Link>
-            {/* <Link href="#" className={getLinkClassName('#')} prefetch={false}>
-              <FileText className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
-              Dokumenty
-            </Link> */}
           </div>
         </SheetContent>
       </Sheet>

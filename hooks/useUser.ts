@@ -7,6 +7,17 @@ export type User = {
   email: string
   role: string
   organizationId: number
+  organization: {
+    id: number
+    name: string
+    country: string
+    city: string
+    street: string
+    postalCode: string
+    gpsLat: number
+    gpsLng: number
+    activeUntil: Date | null
+  }
 }
 
 const fetchUser = async (): Promise<User | null> => {

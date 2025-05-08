@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Neplatná e-mailová adresa" }),
@@ -39,6 +40,7 @@ const formSchema = z.object({
 export default function LoginPreview() {
   const { t } = useTranslation();
   const [botField, setBotField] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,6 +58,8 @@ export default function LoginPreview() {
       console.warn("Detekován bot! Přihlášení zablokováno.");
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/login`, {
@@ -80,6 +84,8 @@ export default function LoginPreview() {
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Chyba při odesílání formuláře. Zkuste to znovu.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -96,81 +102,92 @@ export default function LoginPreview() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem className="grid gap-1">
-                      <FormLabel htmlFor="email">Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          id="email"
-                          placeholder="jmeno@domena.cz"
-                          type="email"
-                          autoComplete="email"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem className="grid gap-1">
-                      <div className="flex justify-between items-center">
-                        <FormLabel htmlFor="password">Heslo</FormLabel>
-                        {/* <Link
+          {isLoading ? (
+            <div className="flex justify-center items-center mt-8">
+              <Spinner size="lg" className="bg-black" />
+            </div>
+          ) : (
+            <>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8"
+                >
+                  <div className="grid gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem className="grid gap-1">
+                          <FormLabel htmlFor="email">Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              id="email"
+                              placeholder="jmeno@domena.cz"
+                              type="email"
+                              autoComplete="email"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem className="grid gap-1">
+                          <div className="flex justify-between items-center">
+                            <FormLabel htmlFor="password">Heslo</FormLabel>
+                            {/* <Link
                           href="#"
                           className="ml-auto inline-block text-sm underline"
                         >
                           Zapomněli jste heslo?
                         </Link> */}
-                      </div>
-                      <FormControl>
-                        <PasswordInput
-                          id="password"
-                          placeholder="******"
-                          autoComplete="current-password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <input
-                  type="text"
-                  name="botField"
-                  value={botField}
-                  onChange={(e) => setBotField(e.target.value)}
-                  style={{ display: "none" }}
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
+                          </div>
+                          <FormControl>
+                            <PasswordInput
+                              id="password"
+                              placeholder="******"
+                              autoComplete="current-password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <input
+                      type="text"
+                      name="botField"
+                      value={botField}
+                      onChange={(e) => setBotField(e.target.value)}
+                      style={{ display: "none" }}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
 
-                <Button type="submit">{t("login")}</Button>
+                    <Button type="submit">{t("login")}</Button>
+                  </div>
+                </form>
+              </Form>
+              <div className="mt-4 text-center text-sm">
+                {t("register_prompt")}
+                <br />
+                <Link href="/register" className="underline">
+                  Zaregistrujte vaši organizaci
+                </Link>
               </div>
-            </form>
-          </Form>
-          <div className="mt-4 text-center text-sm">
-            {t("register_prompt")}
-            <br />
-            <Link href="/register" className="underline">
-              Zaregistrujte vaši organizaci
-            </Link>
-          </div>
-          {/* <div className="mt-8 flex items-center gap-2 text-sm">
+              {/* <div className="mt-8 flex items-center gap-2 text-sm">
             <span>{t("language_label")}</span>
             <LanguageDropdown />
           </div> */}
-          <Toaster position="bottom-center" />
+            </>
+          )}
         </CardContent>
+        <Toaster position="bottom-center" />
       </div>
     </div>
   );

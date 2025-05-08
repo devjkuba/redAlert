@@ -26,6 +26,19 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
         email: true,
         role: true,
         organizationId: true,
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            country: true,
+            city: true,
+            street: true,
+            postalCode: true,
+            gpsLat: true,
+            gpsLng: true,
+            activeUntil: true,
+          },
+        },
       },
     });
 
