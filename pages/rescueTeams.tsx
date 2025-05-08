@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-import { Ambulance, Flame, Shield, Phone, MessageCircle } from "lucide-react";
+import { Ambulance, Flame, Shield, Phone, MessageCircle, PhoneCall } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import { getLocation } from "@/hooks/getLocation";
@@ -49,6 +49,13 @@ export default function RescueTeams() {
       hasSms: true,
       id: 3,
     },
+    {
+      icon: <PhoneCall className="text-purple-600 w-8 h-8" />,
+      label: "Tísňová linka",
+      number: "112",
+      hasSms: true,
+      id: 4,
+    },
   ];
 
   return (
@@ -80,7 +87,7 @@ export default function RescueTeams() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <div className="w-full px-4 mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="w-full px-4 py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-auto overscroll-none max-h-[calc(100vh_-_145px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
             {emergencyNumbers.map((emergency) => (
               <Card key={emergency.id} className="shadow-lg border border-gray-300 rounded-xl">
                 <CardHeader className="flex flex-row items-center justify-between pb-0">
