@@ -56,12 +56,6 @@ io.on('connection', (socket) => {
           text: message.text,
           senderId: message.senderId,
           organizationId: message.organizationId,
-          sender: {
-            connect: { id: message.senderId },
-          },
-          organization: {
-            connect: { id: message.organizationId },
-          },
         },
       });
 

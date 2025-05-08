@@ -10,7 +10,6 @@ export const getLocation = async (): Promise<{ latitude: number; longitude: numb
                 longitude: position.coords.longitude,
             };
         } else {
-            console.log('Checking geolocation availability...');
             if (navigator.geolocation) {
                 return new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition((position) => {

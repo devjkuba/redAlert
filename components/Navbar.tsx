@@ -9,8 +9,6 @@ export default function Navbar() {
   const { data: user } = useUser();
   const router = useRouter();
 
-  console.log(user);
-
   const getLinkClassName = (href: string) => {
     const isActive = router.pathname === href;
     return `flex w-full items-center gap-4 py-2 text-lg font-bold rounded-md transition-all duration-300 ease-in-out ${
