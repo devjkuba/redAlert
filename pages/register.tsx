@@ -26,7 +26,7 @@ export default function Register1() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !pt-safe !px-safe pb-safe">
+    <div className="flex min-h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe mb-safe">
       <div className="mx-auto max-w-md w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">

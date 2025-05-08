@@ -26,7 +26,7 @@ export default function AdminUsers() {
   const { isDemoActive } = useDemo();
 
   return (
-    <div className="flex min-h-screen !pt-safe !px-safe pb-safe border-0 mx-auto max-w-4xl w-full">
+    <div className="flex min-h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe mb-safe border-0 mx-auto max-w-4xl w-full">
       <main className="relative overflow-hidden flex flex-col flex-grow items-center justify-start">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">

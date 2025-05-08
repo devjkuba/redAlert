@@ -32,24 +32,27 @@ export default function RescueTeams() {
       icon: <Shield className="text-blue-500 w-8 h-8" />,
       label: "Policie ČR",
       number: "158",
+      hasSms: true,
       id: 1,
     },
     {
       icon: <Ambulance className="text-red-500 w-10 h-10" />,
       label: "Zdravotnická záchranná služba",
       number: "155",
+      hasSms: false,
       id: 2,
     },
     {
       icon: <Flame className="text-yellow-500 w-10 h-10" />,
       label: "Hasičský záchranný sbor ČR",
       number: "150",
+      hasSms: true,
       id: 3,
     },
   ];
 
   return (
-    <div className="flex min-h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !pt-safe !px-safe pb-safe mx-auto max-w-4xl w-full">
+    <div className="flex min-h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe mb-safe mx-auto max-w-4xl w-full">
         <main className="relative flex flex-col flex-grow">
           {isDemoActive && (
             <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
@@ -94,7 +97,7 @@ export default function RescueTeams() {
                     </div>
                   </div>
                   <div className="flex flex-row gap-4 px-2">
-                    <Button
+                    {emergency.hasSms && <Button
                       onClick={() => {
                         if (!isDemoActive) {
                           window.location.href = `sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`;
@@ -108,7 +111,7 @@ export default function RescueTeams() {
                     >
                       <MessageCircle className="w-5 h-5 mr-2" />
                       <span>SMS</span>
-                    </Button>
+                    </Button>}
                     <Button
                       onClick={() => {
                         if (!isDemoActive) {

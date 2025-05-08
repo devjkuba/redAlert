@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from './prisma';
+import { sendEmail } from './mailer';
 
 export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
   const { method } = req;
@@ -51,6 +52,32 @@ export const notificationshandler = async (req: Request, res: Response): Promise
             organizationId: Number(organizationId),
           },
         });
+
+        const users = await prisma.user.findMany({
+          where: {
+            organizationId: Number(organizationId),
+            isActive: true,
+            email: {
+              not: undefined,
+            },
+          },
+          select: {
+            email: true,
+          },
+        });
+
+        const emailPromises = users.map((user) => {
+          if (!user.email) return Promise.resolve();
+
+          return sendEmail({
+            to: user.email,
+            subject: `Nová notifikace: ${type}`,
+            text: message,
+          });
+        });
+
+        await Promise.all(emailPromises);
+
         res.status(201).json({ message: 'Notification created successfully' });
       } catch {
         res.status(500).json({ error: 'Error creating notification' });
