@@ -36,7 +36,7 @@ export default function Settings() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="w-full max-w-4xl px-4 space-y-6 py-4 overflow-auto overscroll-none">
+        <div className="w-full max-w-4xl px-4 space-y-6 py-4 overflow-auto overscroll-none max-h-[calc(100vh_-_145px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
         {/* <div className="flex items-center gap-2 text-sm">
               <span>{t("language_label")}</span>
               <LanguageDropdown />

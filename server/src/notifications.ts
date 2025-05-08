@@ -6,7 +6,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
   const { method } = req;
 
   switch (method) {
-    case 'GET':
+    case 'GET': {
       const { orgId } = req.query;
       if (!orgId) {
         res.status(400).json({ error: 'Missing organization ID' });
@@ -25,6 +25,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         res.status(500).json({ error: 'Error fetching notifications' });
       }
       break;
+    }
 
     case 'POST': {
       const { type, message, triggeredById, organizationId, status } = req.body;
@@ -58,6 +59,11 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           },
         });
 
+        const sender = await prisma.user.findUnique({
+          where: { id: Number(triggeredById) },
+          select: { firstName: true, lastName: true },
+        });
+
         const users = await prisma.user.findMany({
           where: {
             organizationId: Number(organizationId),
@@ -79,7 +85,9 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           return sendEmail({
             to: user.email,
             subject: `Nová notifikace: ${type}`,
-            text: message + `\n\nOdesílatel: ${user.firstName} ${user.lastName} \n\nOrganizace: ${organization?.name ?? ''}`,
+            text: message + '\nOdesílatel: ' + 
+                  (sender ? sender.firstName + ' ' + sender.lastName : '') + 
+                  '\nOrganizace: ' + (organization?.name ?? ''),
           });
         });
 
