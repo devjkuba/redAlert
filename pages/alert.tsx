@@ -4,7 +4,15 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Flame, HeartPulse, DoorOpen, PlugZap, LogOut, AlertTriangle, SprayCan } from "lucide-react";
+import {
+  Flame,
+  HeartPulse,
+  DoorOpen,
+  PlugZap,
+  LogOut,
+  AlertTriangle,
+  SprayCan,
+} from "lucide-react";
 import { GunIcon } from "@/components/GunIcon";
 import { GasIcon } from "@/components/GasIcon";
 import { FightIcon } from "@/components/FightIcon";
@@ -27,42 +35,46 @@ const createNotification = async (
   organizationId: number,
   isDemo: boolean = false
 ) => {
-  if (isDemo) return; 
+  if (isDemo) return;
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/notifications`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        type,
-        message,
-        status,
-        triggeredById,
-        organizationId,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API}api/notifications`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type,
+          message,
+          status,
+          triggeredById,
+          organizationId,
+        }),
+      }
+    );
 
     if (response.status === 401) {
-      window.location.href = '/login';
+      window.location.href = "/login";
     }
 
     if (!response.ok) {
-      throw new Error('Error creating notification');
+      throw new Error("Error creating notification");
     }
     const savedNotification = await response.json();
-    socket.emit('sendNotification', savedNotification);
+    socket.emit("sendNotification", savedNotification);
     return;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error('Error:', error.message); // Log message for debugging
-      toast.error('Chyba při vytváření notifikace.');
+      console.error("Error:", error.message); // Log message for debugging
+      toast.error("Chyba při vytváření notifikace.");
     } else {
-      toast.error('An unexpected error occurred.');
+      toast.error("An unexpected error occurred.");
     }
   }
 };
-
 
 const alertButtons = [
   { label: "Zdravotní pomoc", icon: HeartPulse },
@@ -81,39 +93,51 @@ export default function Alert() {
   const { isDemoActive } = useDemo();
   const token = useAuthToken();
 
-  const [activeStates, setActiveStates] = useState(alertButtons.map(() => false));
+  const [activeStates, setActiveStates] = useState(
+    alertButtons.map(() => false)
+  );
   const [mainActive, setMainActive] = useState(false);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const notifications = await getNotifications(token, Number(user?.organizationId));
-        const latestNotifications = notifications.reduce<{ [key: string]: Notification }>((acc: { [x: string]: Notification; }, notification: Notification) => {
+        const notifications = await getNotifications(
+          token,
+          Number(user?.organizationId)
+        );
+        const latestNotifications = notifications.reduce<{
+          [key: string]: Notification;
+        }>((acc: { [x: string]: Notification }, notification: Notification) => {
           if (!acc[notification.type]) {
             acc[notification.type] = notification;
           }
           return acc;
         }, {});
-        
+
         // Nastavení stavu tlačítek na základě poslední přidané notifikace pro každý typ
-        const updatedStates = alertButtons.map(({ label }) =>
-          latestNotifications[label]?.status === "ACTIVE" // Zkontrolujeme status poslední notifikace pro daný typ
+        const updatedStates = alertButtons.map(
+          ({ label }) => latestNotifications[label]?.status === "ACTIVE" // Zkontrolujeme status poslední notifikace pro daný typ
         );
 
-        setMainActive(latestNotifications["Hlavní poplach"]?.status === "ACTIVE");
-        
+        setMainActive(
+          latestNotifications["Hlavní poplach"]?.status === "ACTIVE"
+        );
+
         setActiveStates(updatedStates);
       } catch (error: unknown) {
         if (error instanceof Error) {
-          console.error('Error:', error.message); 
-          toast.error('Chyba při vytváření notifikace.');
+          console.error("Error:", error.message);
+          toast.error("Chyba při vytváření notifikace.");
 
-          if ((error as { response?: { status?: number } })?.response?.status === 401) {
-            window.location.href = '/login';
+          if (
+            (error as { response?: { status?: number } })?.response?.status ===
+            401
+          ) {
+            window.location.href = "/login";
           }
         } else {
-          console.error('An unexpected error occurred.');
-          toast.error('An unexpected error occurred.');
+          console.error("An unexpected error occurred.");
+          toast.error("An unexpected error occurred.");
         }
       }
     };
@@ -124,8 +148,10 @@ export default function Alert() {
   }, [token, user?.organizationId]);
 
   useEffect(() => {
-    socket.on('newNotification', (notification: Notification) => {
-      if (Number(notification.organizationId) === Number(user?.organizationId)) {
+    socket.on("newNotification", (notification: Notification) => {
+      if (
+        Number(notification.organizationId) === Number(user?.organizationId)
+      ) {
         toast(`${notification.message}`, {
           duration: 5000,
           classNames: {
@@ -137,8 +163,10 @@ export default function Alert() {
             closeButton: "text-blue-500 hover:text-blue-700",
           },
         });
-  
-        const index = alertButtons.findIndex((btn) => btn.label === notification.type);
+
+        const index = alertButtons.findIndex(
+          (btn) => btn.label === notification.type
+        );
         if (index !== -1) {
           setActiveStates((prev) => {
             const newStates = [...prev];
@@ -146,18 +174,17 @@ export default function Alert() {
             return newStates;
           });
         }
-  
+
         if (notification.type === "Hlavní poplach") {
           setMainActive(notification.status === "ACTIVE");
         }
       }
     });
-  
+
     return () => {
-      socket.off('newNotification');
+      socket.off("newNotification");
     };
   }, [user?.organizationId]);
-  
 
   const toggleAlert = async (index: number) => {
     const updatedStates = [...activeStates];
@@ -177,7 +204,15 @@ export default function Alert() {
           closeButton: "text-red-500 hover:text-red-700",
         },
       });
-      await createNotification(token, alert.label, `${alert.label} aktivován.`, "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(
+        token,
+        alert.label,
+        `${alert.label} aktivován.`,
+        "ACTIVE",
+        Number(user?.id),
+        Number(user?.organizationId),
+        isDemoActive
+      ); // replace with actual user and organization IDs
     } else {
       toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
         duration: 5000,
@@ -190,7 +225,15 @@ export default function Alert() {
           closeButton: "!text-green-500 !hover:text-green-700",
         },
       });
-      await createNotification(token, alert.label, `${alert.label} deaktivován.`, "INACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+      await createNotification(
+        token,
+        alert.label,
+        `${alert.label} deaktivován.`,
+        "INACTIVE",
+        Number(user?.id),
+        Number(user?.organizationId),
+        isDemoActive
+      ); // replace with actual user and organization IDs
     }
   };
 
@@ -216,7 +259,15 @@ export default function Alert() {
     });
 
     // Send main alert notification
-    await createNotification(token, 'Hlavní poplach', toastMessage, mainActive ? "INACTIVE" : "ACTIVE", Number(user?.id), Number(user?.organizationId), isDemoActive); // replace with actual user and organization IDs
+    await createNotification(
+      token,
+      "Hlavní poplach",
+      toastMessage,
+      mainActive ? "INACTIVE" : "ACTIVE",
+      Number(user?.id),
+      Number(user?.organizationId),
+      isDemoActive
+    ); // replace with actual user and organization IDs
   };
 
   return (
@@ -231,55 +282,59 @@ export default function Alert() {
           <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
         </div>
         <Navbar />
-        <GPSPopover />
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            classNames: {
-              toast: "border-l-4 p-4 shadow-lg rounded-lg",
-              title: "font-bold",
-              description: "text-red-600",
-            },
-          }}
-        />
-        <div className="mt-6 grid grid-cols-3 gap-4 px-4">
-          {alertButtons.map(({ label, icon: Icon }, index) => (
-            <button
-              key={index}
-              onClick={() => toggleAlert(index)}
-              className={twMerge(
-                "flex shadow-lg flex-col min-h-[106px] items-center justify-center p-4 rounded-xl border border-gray-300 transition-all",
-                activeStates[index]
-                  ? "bg-[#982121] text-white shadow-none"
-                  : "text-[#982121]"
-              )}
-            >
-              <Icon className="w-6 h-6 mb-2" />
-              <span
+        <div className="w-full max-w-4xl text-center px-4 space-y-6 overflow-auto overscroll-none max-h-[calc(100vh_-_100px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
+          <GPSPopover />
+          <div className="mt-6 grid grid-cols-3 gap-4 px-4">
+            {alertButtons.map(({ label, icon: Icon }, index) => (
+              <button
+                key={index}
+                onClick={() => toggleAlert(index)}
                 className={twMerge(
-                  "text-sm text-center text-gray-700 font-medium",
-                  activeStates[index] && "text-white"
+                  "flex shadow-lg flex-col min-h-[106px] items-center justify-center p-4 rounded-xl border border-gray-300 transition-all",
+                  activeStates[index]
+                    ? "bg-[#982121] text-white shadow-none"
+                    : "text-[#982121]"
                 )}
               >
-                {label}
+                <Icon className="w-6 h-6 mb-2" />
+                <span
+                  className={twMerge(
+                    "text-sm text-center text-gray-700 font-medium",
+                    activeStates[index] && "text-white"
+                  )}
+                >
+                  {label}
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={toggleMainAlert}
+              className={twMerge(
+                "flex shadow-lg flex-col items-center justify-center w-[120px] h-[120px] p-4 rounded-xl border border-gray-300 transition-all",
+                mainActive
+                  ? "bg-[#982121] !text-white shadow-none"
+                  : "text-[#982121]",
+                "transition-colors duration-300"
+              )}
+            >
+              <AlertTriangle className="w-6 h-6 mb-2" />
+              <span className="text-sm text-center font-semibold">
+                {mainActive ? "Poplach aktivní" : "Aktivovat poplach"}
               </span>
             </button>
-          ))}
-        </div>
-        <div className="mt-8 flex justify-center">
-          <button
-            onClick={toggleMainAlert}
-            className={twMerge(
-              "flex shadow-lg flex-col items-center justify-center w-[120px] h-[120px] p-4 rounded-xl border border-gray-300 transition-all",
-              mainActive ? "bg-[#982121] !text-white shadow-none" : "text-[#982121]",
-              "transition-colors duration-300"
-            )}
-          >
-            <AlertTriangle className="w-6 h-6 mb-2" />
-            <span className="text-sm text-center font-semibold">
-              {mainActive ? "Poplach aktivní" : "Aktivovat poplach"}
-            </span>
-          </button>
+          </div>
+          <Toaster
+            position="bottom-center"
+            toastOptions={{
+              classNames: {
+                toast: "border-l-4 p-4 shadow-lg rounded-lg",
+                title: "font-bold",
+                description: "text-red-600",
+              },
+            }}
+          />
         </div>
       </main>
     </div>
