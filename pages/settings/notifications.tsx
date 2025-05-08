@@ -48,8 +48,6 @@ export default function AdminNotifications() {
     fetchNotifications();
   }, [user?.organizationId, user?.role]);
 
-  console.log(notifications);
-
   return (
     <div className="flex min-h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe mb-safe border-0 mx-auto max-w-4xl w-full">
       <main className="relative overflow-hidden flex flex-col flex-grow items-center justify-start">

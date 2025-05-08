@@ -73,7 +73,6 @@ export default function LoginPreview() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Přihlášení úspěšné!");
-        console.log(data);
         localStorage.setItem("token", data.token);
         router.push("/alert");
       } else if (res.status === 401) {

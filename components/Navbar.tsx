@@ -9,6 +9,8 @@ export default function Navbar() {
   const { data: user } = useUser();
   const router = useRouter();
 
+  console.log(user);
+
   const getLinkClassName = (href: string) => {
     const isActive = router.pathname === href;
     return `flex w-full items-center gap-4 py-2 text-lg font-bold rounded-md transition-all duration-300 ease-in-out ${
@@ -32,6 +34,7 @@ export default function Navbar() {
             <div className="grid flex-1 text-left text-sm leading-tight ml-3">
               <span className="truncate font-semibold">{user?.firstName} {user?.lastName}</span>
               <span className="truncate text-xs">{user?.email}</span>
+              <span className="truncate font-semibold">{user?.organization.name}</span>
             </div>
             <Link href="/alert" className={getLinkClassName('/alert')} prefetch={false}>
               <Bell className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />

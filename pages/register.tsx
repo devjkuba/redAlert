@@ -17,8 +17,6 @@ export default function Register1() {
     }
   }, []);
 
-  console.log(organizationData);
-
   const handleOrganizationSubmit = (data: Record<string, unknown>) => {
     sessionStorage.setItem("organizationData", JSON.stringify(data));
     setOrganizationData(data);
