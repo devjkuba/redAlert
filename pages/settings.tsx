@@ -43,6 +43,31 @@ export default function Settings() {
             </div> */}
           <Card className="shadow-lg border border-gray-300 rounded-xl">
             <CardHeader>
+              <CardTitle>Uživatelské nastavení</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-start gap-4">
+              <p className="text-sm text-gray-700">
+                Jste přihlášen jako{" "}
+                <strong>{user?.email}</strong>
+                <br />  
+                Role: <strong>{user?.role}</strong>
+              </p>
+              <p className="text-xs"><strong>{user?.organization.name}</strong><br />
+              {user?.organization.street}<br />
+              <span>{user?.organization.city}</span><br />
+              {user?.organization.postalCode}<br />
+              <span>{user?.organization.country}</span></p>
+              {/* <p className="text-sm text-gray-700">
+              {/* <Link href="/settings/profile">
+                <Button>Upravit profil</Button>
+              </Link>
+              <Link href="/settings/changePassword">
+                <Button className="mt-4">Změnit heslo</Button>  
+              </Link> */}
+          </CardContent>
+          </Card>
+          <Card className="shadow-lg border border-gray-300 rounded-xl">
+            <CardHeader>
               <CardTitle>Demo režim</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-start gap-4">
