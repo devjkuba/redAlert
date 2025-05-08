@@ -7,8 +7,8 @@ type Location = {
 
 const geoOptions = {
   enableHighAccuracy: true,
-  timeout: 10000,      // 10 sekund
-  maximumAge: 0        // žádná cache
+  timeout: 10000,
+  maximumAge: 0  
 };
 
 export const getLocation = async (): Promise<Location | null> => {
@@ -42,7 +42,7 @@ export const getLocation = async (): Promise<Location | null> => {
           },
           (error) => {
             console.error("Geolocation error:", error);
-            reject(null);
+            reject(new Error("Geolocation error"));
           },
           geoOptions
         );
@@ -81,8 +81,10 @@ export const watchLocation = async (
         }
       });
 
-      return async () => {
-        await Geolocation.clearWatch({ id: watchId });
+      return () => {
+        Geolocation.clearWatch({ id: watchId }).catch((error) => {
+          console.error("Error clearing watch:", error);
+        });
       };
     } else if ("geolocation" in navigator) {
       const watchId = navigator.geolocation.watchPosition(
