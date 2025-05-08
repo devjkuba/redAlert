@@ -284,7 +284,7 @@ export default function Alert() {
         <Navbar />
         <div className="w-full max-w-4xl text-center px-4 space-y-6 overflow-auto overscroll-none max-h-[calc(100vh_-_100px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
           <GPSPopover />
-          <div className="mt-6 grid grid-cols-3 gap-4 px-4">
+          <div className="mt-6 grid grid-cols-3 gap-4">
             {alertButtons.map(({ label, icon: Icon }, index) => (
               <button
                 key={index}
