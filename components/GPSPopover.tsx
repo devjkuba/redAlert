@@ -1,6 +1,4 @@
-import {
-  useQuery,
-} from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import {
   Popover,
   PopoverTrigger,
@@ -8,33 +6,53 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Copy, Share, RefreshCw } from "lucide-react";
-import { getLocation } from "@/hooks/getLocation";
+import { getLocation, watchLocation } from "@/hooks/getLocation";
 import { Spinner } from "@/components/ui/spinner";
-import { useState } from "react";
 
 export default function GPSPopover() {
+  const [coordinates, setCoordinates] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const {
-    data: coordinates,
-    isLoading,
-    refetch,
-  } = useQuery<string | null, Error>({
-    queryKey: ["gps-location"],
-    queryFn: async () => {
+  useEffect(() => {
+    let stopWatching: (() => void) | null = null;
+
+    const initLocation = async () => {
+      setLoading(true);
       const location = await getLocation();
       if (location) {
-        return `<span class="text-[10px]">${location.latitude}° N</span> <span class="text-[10px]">${location.longitude}° E</span>`;
+        setCoordinates(
+          `<span class="text-[10px]">${location.latitude}° N</span> <span class="text-[10px]">${location.longitude}° E</span>`
+        );
       }
-      return null;
-    },
-    refetchInterval: 60000,
-    staleTime: 59900,
-  });
+      setLoading(false);
+    };
+
+    initLocation();
+
+    const startWatching = async () => {
+      stopWatching = await watchLocation(
+        (loc) => {
+          setCoordinates(
+            `<span class="text-[10px]">${loc.latitude}° N</span> <span class="text-[10px]">${loc.longitude}° E</span>`
+          );
+        },
+        (error) => {
+          console.error("Chyba při sledování polohy:", error);
+        }
+      );
+    };
+
+    startWatching();
+
+    return () => {
+      stopWatching?.();
+    };
+  }, []);
 
   const copyToClipboard = () => {
     if (coordinates) {
-      navigator.clipboard.writeText(coordinates);
+      navigator.clipboard.writeText(coordinates.replace(/<[^>]+>/g, ""));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -55,25 +73,38 @@ export default function GPSPopover() {
     }
   };
 
+  const refreshCoordinates = async () => {
+    setLoading(true);
+    const location = await getLocation();
+    if (location) {
+      setCoordinates(
+        `<span class="text-[10px]">${location.latitude}° N</span> <span class="text-[10px]">${location.longitude}° E</span>`
+      );
+    }
+    setLoading(false);
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <div className="border border-gray-300 mx-auto shadow-lg border-black py-2 px-4 rounded-lg inline-block cursor-pointer">
           <p className="flex items-center space-x-2 text-sm">
-          <span className="font-semibold">GPS:</span>{" "}
+            <span className="font-semibold">GPS:</span>
             {(() => {
-              if (isLoading) {
-                return <Spinner size="sm" className="bg-black float-right ml-2.5 mt-[5px]" />;
-              }
-              if (coordinates) {
-                return (
+              let content;
+              if (loading) {
+                content = <Spinner size="sm" className="bg-black float-right ml-2.5 mt-[5px]" />;
+              } else if (coordinates) {
+                content = (
                   <span
                     className="text-gray-700 truncate flex flex-col leading-[1.1]"
                     dangerouslySetInnerHTML={{ __html: coordinates }}
                   />
                 );
+              } else {
+                content = <span className="text-gray-500 text-xs">Neznámé souřadnice</span>;
               }
-              return <span className="text-gray-500 text-xs">Neznámé souřadnice</span>;
+              return content;
             })()}
           </p>
         </div>
@@ -97,7 +128,7 @@ export default function GPSPopover() {
               <Copy size={16} /> {copied ? "Zkopírováno!" : "Kopírovat"}
             </Button>
             <Button
-              onClick={() => refetch()}
+              onClick={refreshCoordinates}
               variant="outline"
               className="flex items-center gap-2"
             >
