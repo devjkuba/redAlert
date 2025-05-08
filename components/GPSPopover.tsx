@@ -5,7 +5,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Copy, Share, RefreshCw } from "lucide-react";
+import { Copy, Share } from "lucide-react";
 import { getLocation, watchLocation } from "@/hooks/getLocation";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -73,17 +73,6 @@ export default function GPSPopover() {
     }
   };
 
-  const refreshCoordinates = async () => {
-    setLoading(true);
-    const location = await getLocation();
-    if (location) {
-      setCoordinates(
-        `<span class="text-[10px]">${location.latitude}° N</span> <span class="text-[10px]">${location.longitude}° E</span>`
-      );
-    }
-    setLoading(false);
-  };
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -126,13 +115,6 @@ export default function GPSPopover() {
               disabled={!coordinates}
             >
               <Copy size={16} /> {copied ? "Zkopírováno!" : "Kopírovat"}
-            </Button>
-            <Button
-              onClick={refreshCoordinates}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <RefreshCw size={16} /> Obnovit
             </Button>
           </div>
         </div>

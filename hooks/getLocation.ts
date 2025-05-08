@@ -1,63 +1,76 @@
 import { Capacitor } from "@capacitor/core";
 
-export const getLocation = async (): Promise<{
+type Location = {
   latitude: number;
   longitude: number;
-} | null> => {
+};
+
+const geoOptions = {
+  enableHighAccuracy: true,
+  timeout: 10000,      // 10 sekund
+  maximumAge: 0        // žádná cache
+};
+
+export const getLocation = async (): Promise<Location | null> => {
   try {
-    if (
-      (window as { Capacitor?: typeof Capacitor }).Capacitor &&
-      (Capacitor.getPlatform() === "ios" ||
-        Capacitor.getPlatform() === "android")
-    ) {
+    const isNative = Capacitor.isNativePlatform();
+
+    if (isNative) {
       const { Geolocation } = await import("@capacitor/geolocation");
-      const position = await Geolocation.getCurrentPosition();
+      const position = await Geolocation.getCurrentPosition(geoOptions);
       return {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       };
-    } else {
-      if (navigator.geolocation) {
-        return new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              resolve({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              });
-            },
-            (error) => {
-              console.error("Geolocation error:", error);
-              reject(null);
-            }
-          );
-        });
-      } else {
-        console.log("Geolocation not supported in this browser.");
+    } else if ("geolocation" in navigator) {
+      const permissionStatus = await navigator.permissions
+        .query({ name: "geolocation" as PermissionName })
+        .catch(() => null);
+
+      if (permissionStatus?.state === "denied") {
+        console.warn("Permission for geolocation was denied.");
         return null;
       }
+
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          },
+          (error) => {
+            console.error("Geolocation error:", error);
+            reject(null);
+          },
+          geoOptions
+        );
+      });
+    } else {
+      console.warn("Geolocation not supported in this environment.");
+      return null;
     }
-  } catch (error) {
-    console.error("Error getting location:", error);
+  } catch (error: unknown) {
+    console.error("Unexpected error while getting location:", error);
     return null;
   }
 };
 
 export const watchLocation = async (
-  onUpdate: (location: { latitude: number; longitude: number }) => void,
-  onError?: (error: any) => void
+  onUpdate: (location: Location) => void,
+  onError?: (error: unknown) => void
 ): Promise<() => void> => {
   try {
-    if (
-      (window as { Capacitor?: typeof Capacitor }).Capacitor &&
-      (Capacitor.getPlatform() === "ios" ||
-        Capacitor.getPlatform() === "android")
-    ) {
+    const isNative = Capacitor.isNativePlatform();
+
+    if (isNative) {
       const { Geolocation } = await import("@capacitor/geolocation");
-      const watchId = await Geolocation.watchPosition({}, (position, err) => {
-        if (err) {
-          console.error("Geolocation watch error:", err);
-          onError?.(err);
+
+      const watchId = await Geolocation.watchPosition(geoOptions, (position, error) => {
+        if (error) {
+          console.error("Capacitor Geolocation watch error:", error);
+          onError?.(error);
           return;
         }
         if (position) {
@@ -71,7 +84,7 @@ export const watchLocation = async (
       return async () => {
         await Geolocation.clearWatch({ id: watchId });
       };
-    } else if (navigator.geolocation) {
+    } else if ("geolocation" in navigator) {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
           onUpdate({
@@ -80,20 +93,21 @@ export const watchLocation = async (
           });
         },
         (error) => {
-          console.error("Geolocation watch error:", error);
+          console.error("Browser geolocation watch error:", error);
           onError?.(error);
-        }
+        },
+        geoOptions
       );
 
       return () => {
         navigator.geolocation.clearWatch(watchId);
       };
     } else {
-      console.log("Geolocation not supported in this browser.");
+      console.warn("Geolocation not supported in this environment.");
       return () => {};
     }
-  } catch (error) {
-    console.error("Error watching location:", error);
+  } catch (error: unknown) {
+    console.error("Unexpected error while watching location:", error);
     onError?.(error);
     return () => {};
   }
