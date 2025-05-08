@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/router"
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
@@ -44,13 +45,26 @@ const BreadcrumbLink = React.forwardRef<
   React.ComponentPropsWithoutRef<"a"> & {
     asChild?: boolean
   }
->(({ asChild, className, ...props }, ref) => {
+>(({ asChild, className, href, onClick, ...props }, ref) => {
+  const router = useRouter()
   const Comp = asChild ? Slot : "a"
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    if (onClick) onClick(e)
+    if (e.defaultPrevented) return
+
+    if (href && typeof href === "string" && href.startsWith("/")) {
+      e.preventDefault()
+      router.push(href)
+    }
+  }
 
   return (
     <Comp
       ref={ref}
       className={cn("transition-colors hover:text-foreground", className)}
+      href={href}
+      onClick={handleClick}
       {...props}
     />
   )
