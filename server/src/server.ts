@@ -48,9 +48,6 @@ const io = new Server(server, {
 
 // Socket.io logika pro připojení a chat
 io.on('connection', (socket) => {
-  console.log('A user connected');
-
-  // Posílání zpráv mezi klienty a ukládání zpráv do databáze
   socket.on('sendMessage', async (message) => {
     try {
       // Uložení zprávy do databáze
@@ -58,7 +55,12 @@ io.on('connection', (socket) => {
         data: {
           text: message.text,
           senderId: message.senderId,
-          organizationId: message.organizationId,
+          sender: {
+            connect: { id: message.senderId },
+          },
+          organization: {
+            connect: { id: message.organizationId },
+          },
         },
       });
 

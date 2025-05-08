@@ -26,7 +26,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
       }
       break;
 
-    case 'POST':
+    case 'POST': {
       const { type, message, triggeredById, organizationId, status } = req.body;
       if (!type || !message || !triggeredById || !organizationId || !status) {
         res.status(400).json({ error: 'Missing fields' });
@@ -34,6 +34,11 @@ export const notificationshandler = async (req: Request, res: Response): Promise
       }
 
       try {
+        const organization = await prisma.organization.findUnique({
+          where: { id: Number(organizationId) },
+          select: { name: true },
+        });
+
         await prisma.notification.create({
           data: {
             type,
@@ -63,6 +68,8 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           },
           select: {
             email: true,
+            firstName: true,
+            lastName: true,
           },
         });
 
@@ -72,7 +79,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           return sendEmail({
             to: user.email,
             subject: `Nová notifikace: ${type}`,
-            text: message,
+            text: message + `\n\nOdesílatel: ${user.firstName} ${user.lastName} \n\nOrganizace: ${organization?.name ?? ''}`,
           });
         });
 
@@ -83,6 +90,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         res.status(500).json({ error: 'Error creating notification' });
       }
       break;
+    }
 
     default:
       res.status(405).json({ error: 'Method not allowed' });
