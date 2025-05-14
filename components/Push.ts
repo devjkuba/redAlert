@@ -1,4 +1,4 @@
-const PUBLIC_VAPID_KEY = process.env.NEXT_PUBLIC_KEY ?? '';
+const PUBLIC_VAPID_KEY = process.env.NEXT_PRIVATE_KEY ?? '';
 
 const subscribeToPush = async (userId: number, token: string) => {
     const registration = await navigator.serviceWorker.ready;
