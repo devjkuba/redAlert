@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import subscribeToPush from "@/components/Push";
 import {
   Flame,
   HeartPulse,
@@ -97,6 +98,12 @@ export default function Alert() {
     alertButtons.map(() => false)
   );
   const [mainActive, setMainActive] = useState(false);
+
+  useEffect(() => {
+    if (user?.id && token) {
+      subscribeToPush(user?.id, token);
+    }
+  }, [token, user?.id]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
