@@ -138,7 +138,7 @@ export default function Alert() {
 
           if (
             (error as { response?: { status?: number } })?.response?.status ===
-            401
+              401
           ) {
             window.location.href = "/login";
           }

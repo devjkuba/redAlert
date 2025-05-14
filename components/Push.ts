@@ -1,10 +1,10 @@
-const PUBLIC_VAPID_KEY = urlBase64ToUint8Array(process.env.NEXT_PUBLIC_KEY);
+const PUBLIC_VAPID_KEY = process.env.NEXT_PUBLIC_KEY;
 
 const subscribeToPush = async (userId: number, token: string) => {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: PUBLIC_VAPID_KEY,
+      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
     });
   
     await fetch('/api/push/subscribe', {
@@ -26,19 +26,13 @@ const subscribeToPush = async (userId: number, token: string) => {
     if (!base64String) {
       throw new Error("Base64 string is required");
     }
-    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
       .replace(/-/g, '+')
       .replace(/_/g, '/');
   
     const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-  
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-  
-    return outputArray;
+    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
   }
 
   export default subscribeToPush;
