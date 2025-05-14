@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import http from 'http';
-import webpush from 'web-push';
 import { organizationsHandler } from './organizations';
 import { loginHandler } from './login';
 import { notificationshandler } from './notifications';
@@ -18,17 +17,6 @@ import { userGetHandler } from './userGetHandler';
 import { userDeleteHandler } from './userDeleteHandler';
 import { registerUserHandler } from './registerUser';
 import { pushSubscribeHandler } from './pushSubscribeHandler';
-
-const vapidKeys = {
-  publicKey: process.env.PUBLIC_KEY ?? '',
-  privateKey: process.env.PRIVATE_KEY ?? '',
-};
-
-webpush.setVapidDetails(
-  'mailto:redalert@cyberdev.cz',
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
-);
 
 const app = express();
 app.use(cors({
