@@ -7,7 +7,7 @@ const subscribeToPush = async (userId: number, token: string) => {
       applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
     });
   
-    await fetch('/api/push/subscribe', {
+    await fetch(`${process.env.NEXT_PUBLIC_API}api/push/subscribe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
