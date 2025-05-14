@@ -16,7 +16,7 @@ self.addEventListener('install', () => {
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: "icons/icon-96.webp",
-      sound: "mp3/siren.mp3", 
+      sound: "/mp3/siren.mp3", 
       vibrate: [700, 200, 700, 200, 700] 
     });
   });
