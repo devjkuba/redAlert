@@ -15,8 +15,13 @@ self.addEventListener('install', () => {
     const data = event.data.json();
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "icons/icon-96.webp",
-      sound: "sms-received1", 
-      vibrate: [700, 200, 700, 200, 700] 
+      icon: "/icons/icon-96.webp",
+      sound: "/mp3/siren.mp3", 
+      vibrate: [700, 200, 700, 200, 700],
+      requireInteraction: true,
+      actions: [
+        { action: 'view', title: 'Zobrazit' },
+        { action: 'dismiss', title: 'Zavřít' }
+      ]
     });
   });
