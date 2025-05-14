@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from './prisma';
+import webpush from 'web-push';
 import { sendEmail } from './mailer';
 
 export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
@@ -92,6 +93,34 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         });
 
         await Promise.all(emailPromises);
+
+        const subscriptions = await prisma.pushSubscription.findMany({
+          where: {
+            user: {
+              organizationId: Number(organizationId),
+              isActive: true,
+            },
+          },
+        });
+        
+        const payload = JSON.stringify({
+          title: `Notifikace: ${type}`,
+          body: message,
+        });
+        
+        const pushPromises = subscriptions.map((sub) =>
+          webpush.sendNotification({
+            endpoint: sub.endpoint,
+            keys: {
+              auth: sub.keysAuth,
+              p256dh: sub.keysP256dh,
+            },
+          }, payload).catch(err => {
+            console.error('Push error:', err);
+          })
+        );
+        
+        await Promise.all(pushPromises);
 
         res.status(201).json({ message: 'Notification created successfully' });
       } catch {
