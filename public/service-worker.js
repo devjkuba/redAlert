@@ -13,8 +13,17 @@ self.addEventListener('install', () => {
 
   self.addEventListener('push', event => {
     if (!event.data) return;
-  
-    const data = event.data.json();
+
+    let data;
+    try {
+      data = event.data.json();
+    } catch (err) {
+      console.error('Push data is not valid JSON', err);
+      data = {
+        title: 'Nová notifikace',
+        body: event.data.text(),
+      };
+    }
   
     const options = {
       body: data.body,
