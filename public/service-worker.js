@@ -25,10 +25,19 @@ self.addEventListener('install', () => {
       actions: [
         { action: 'view', title: 'Zobrazit' },
         { action: 'dismiss', title: 'Zavřít' }
-      ]
+      ],
+      data: {
+        url: data.url || '/'
+      }
     };
   
     event.waitUntil(
       self.registration.showNotification(data.title, options)
     );
+  });
+
+  self.addEventListener('notificationclick', function (event) {
+    event.notification.close();
+    const urlToOpen = event.notification.data?.url ?? '/';
+    event.waitUntil(clients.openWindow(urlToOpen));
   });

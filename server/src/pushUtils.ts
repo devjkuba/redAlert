@@ -15,7 +15,8 @@ webpush.setVapidDetails(
 export async function sendWebPushToOrg(
   organizationId: number,
   title: string,
-  body: string
+  body: string,
+  url?: string
 ) {
   const subscriptions = await prisma.pushSubscription.findMany({
     where: {
@@ -26,7 +27,7 @@ export async function sendWebPushToOrg(
     },
   });
 
-  const payload = JSON.stringify({ title, body });
+  const payload = JSON.stringify({ title, body, url });
 
   const pushPromises = subscriptions.map((sub) =>
     webpush
@@ -40,8 +41,11 @@ export async function sendWebPushToOrg(
         },
         payload
       )
-      .catch((err) => {
+      .catch(async (err) => {
         console.error("WebPush error for user:", sub.userId, err);
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          await prisma.pushSubscription.delete({ where: { id: sub.id } });
+        }
       })
   );
 

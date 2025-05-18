@@ -60,7 +60,8 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
         await sendWebPushToOrg(
           orgId,
           `Nová zpráva od ${fullName}`,
-          text
+          text,
+          `/chat`,
         );
 
         res.status(201).json({ message: 'Message created successfully', data: message });
