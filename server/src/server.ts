@@ -17,6 +17,7 @@ import { userGetHandler } from './userGetHandler';
 import { userDeleteHandler } from './userDeleteHandler';
 import { registerUserHandler } from './registerUser';
 import { pushSubscribeHandler } from './pushSubscribeHandler';
+import { sendWebPushToOrg } from './pushUtils';
 
 const app = express();
 app.use(cors({
@@ -71,6 +72,13 @@ io.on('connection', (socket) => {
 
       // Odeslání uložené zprávy všem připojeným uživatelům
       io.emit('newMessage', savedMessage);
+
+      await sendWebPushToOrg(
+        message.organizationId,
+        `Nová zpráva`,
+        message.text,
+        `/chat`,
+      );
 
       console.log('Message saved and sent:', savedMessage);
     } catch (error) {
