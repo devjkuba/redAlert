@@ -119,9 +119,8 @@ export default function Alert() {
           return acc;
         }, {});
 
-        // Nastavení stavu tlačítek na základě poslední přidané notifikace pro každý typ
         const updatedStates = alertButtons.map(
-          ({ label }) => latestNotifications[label]?.status === "ACTIVE" // Zkontrolujeme status poslední notifikace pro daný typ
+          ({ label }) => latestNotifications[label]?.status === "ACTIVE"
         );
 
         setMainActive(
@@ -249,7 +248,7 @@ export default function Alert() {
         Number(user?.id),
         Number(user?.organizationId),
         isDemoActive
-      ); // replace with actual user and organization IDs
+      );
     }
   };
 
@@ -274,7 +273,6 @@ export default function Alert() {
       },
     });
 
-    // Send main alert notification
     await createNotification(
       token,
       "Hlavní poplach",
@@ -283,7 +281,7 @@ export default function Alert() {
       Number(user?.id),
       Number(user?.organizationId),
       isDemoActive
-    ); // replace with actual user and organization IDs
+    );
   };
 
   return (

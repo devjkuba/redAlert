@@ -1,20 +1,8 @@
 import { Request, Response } from 'express';
 import { prisma } from './prisma';
 import { io } from './server';
-import webpush from 'web-push';
 import { sendEmail } from './mailer';
 import { sendWebPushToOrg } from './pushUtils';
-
-const vapidKeys = {
-  publicKey: process.env.PUBLIC_KEY ?? '',
-  privateKey: process.env.PRIVATE_KEY ?? '',
-};
-
-webpush.setVapidDetails(
-  'mailto:redalert@cyberdev.cz',
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
-);
 
 export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
   const { method } = req;

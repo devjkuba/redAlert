@@ -2,12 +2,12 @@ import { prisma } from "./prisma";
 import webpush from "web-push";
 
 const vapidKeys = {
-  publicKey: process.env.PUBLIC_KEY ?? "",
-  privateKey: process.env.PRIVATE_KEY ?? "",
+  publicKey: process.env.PUBLIC_KEY ?? '',
+  privateKey: process.env.PRIVATE_KEY ?? '',
 };
 
 webpush.setVapidDetails(
-  "mailto:redalert@cyberdev.cz",
+  'mailto:redalert@cyberdev.cz',
   vapidKeys.publicKey,
   vapidKeys.privateKey
 );
