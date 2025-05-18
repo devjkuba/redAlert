@@ -95,8 +95,8 @@ export default function App({ Component, pageProps }: AppProps) {
             content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
           />
           <link rel="manifest" href="/manifest.json" />
-          <link rel="icon" href="/icon.svg" />
-          <link rel="apple-touch-icon" href="icon.svg" />
+          <link rel="icon" href="/icons/icon-48.webp" />
+          <link rel="apple-touch-icon" href="/icons/icon-192.webp" />
 
         </Head>
         <Component {...pageProps} />

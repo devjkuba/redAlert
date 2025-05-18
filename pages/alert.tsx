@@ -67,7 +67,7 @@ const createNotification = async (
     return;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error("Error:", error.message); // Log message for debugging
+      console.error("Error:", error.message);
       toast.error("Chyba při vytváření notifikace.");
     } else {
       toast.error("An unexpected error occurred.");
