@@ -50,16 +50,9 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
           },
         });
 
-        const sender = await prisma.user.findUnique({
-          where: { id: sId },
-          select: { firstName: true, lastName: true },
-        });
-
-        const fullName = sender ? `${sender.firstName} ${sender.lastName}` : 'Neznámý odesílatel';
-
         await sendWebPushToOrg(
           orgId,
-          `Nová zpráva od ${fullName}`,
+          `Nová zpráva`,
           text,
           `/chat`,
         );
