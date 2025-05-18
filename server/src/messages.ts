@@ -53,7 +53,7 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
         await sendWebPushToOrg(
           orgId,
           `Nová zpráva`,
-          text,
+          JSON.stringify(text),
           `/chat`,
         );
 
