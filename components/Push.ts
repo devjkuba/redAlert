@@ -7,7 +7,11 @@ const subscribeToPush = async (userId: number, token: string) => {
       applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
     });
 
-    const subscriptionJson = subscription.toJSON();
+    const rawKey = subscription.getKey('p256dh');
+    const rawAuth = subscription.getKey('auth');
+
+    const p256dh = rawKey ? btoa(String.fromCharCode(...new Uint8Array(rawKey))) : '';
+    const auth = rawAuth ? btoa(String.fromCharCode(...new Uint8Array(rawAuth))) : '';
   
     await fetch(`${process.env.NEXT_PUBLIC_API}api/push/subscribe`, {
       method: 'POST',
@@ -19,8 +23,8 @@ const subscribeToPush = async (userId: number, token: string) => {
         userId,
         endpoint: subscription.endpoint,
         keys: {
-          auth: subscriptionJson.keys?.auth ?? '',
-          p256dh: subscriptionJson.keys?.p256dh ?? '',
+          p256dh,
+          auth,
         },
       }),
       credentials: 'include',
