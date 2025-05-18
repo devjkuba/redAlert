@@ -55,9 +55,11 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
           select: { firstName: true, lastName: true },
         });
 
+        const fullName = sender ? `${sender.firstName} ${sender.lastName}` : 'Neznámý odesílatel';
+
         await sendWebPushToOrg(
           orgId,
-          `Nová zpráva od ${sender?.firstName} ${sender?.lastName}`,
+          `Nová zpráva od ${fullName}`,
           text
         );
 
