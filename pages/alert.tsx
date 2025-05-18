@@ -168,11 +168,11 @@ export default function Alert() {
         duration: 5000,
         classNames: {
           toast:
-            "!bg-blue-100 border-l-4 !border-blue-500 !text-blue-700 p-4 shadow-lg rounded-lg",
-          title: "font-bold text-blue-700",
-          description: "text-blue-600",
-          icon: "text-blue-500",
-          closeButton: "text-blue-500 hover:text-blue-700",
+            "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
+          title: "font-bold text-red-700",
+          description: "text-red-600",
+          icon: "text-red-500",
+          closeButton: "text-red-500 hover:text-red-700",
         },
       });
   
