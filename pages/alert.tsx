@@ -153,43 +153,54 @@ export default function Alert() {
   }, [token, user?.organizationId]);
 
   useEffect(() => {
-    socket.on("newNotification", (notification: Notification) => {
+    if (!user?.organizationId) return;
+  
+    socket.emit("joinOrganization", user.organizationId);
+  
+    const handleNotification = (notification: Notification) => {
       if (
-        Number(notification.organizationId) === Number(user?.organizationId)
+        Number(notification.organizationId) !== Number(user?.organizationId)
       ) {
-        toast(`${notification.message}`, {
-          duration: 5000,
-          classNames: {
-            toast:
-              "!bg-blue-100 border-l-4 !border-blue-500 !text-blue-700 p-4 shadow-lg rounded-lg",
-            title: "font-bold text-blue-700",
-            description: "text-blue-600",
-            icon: "text-blue-500",
-            closeButton: "text-blue-500 hover:text-blue-700",
-          },
-        });
-
-        const index = alertButtons.findIndex(
-          (btn) => btn.label === notification.type
-        );
-        if (index !== -1) {
-          setActiveStates((prev) => {
-            const newStates = [...prev];
-            newStates[index] = notification.status === "ACTIVE";
-            return newStates;
-          });
-        }
-
-        if (notification.type === "Hlavní poplach") {
-          setMainActive(notification.status === "ACTIVE");
-        }
+        return;
       }
-    });
-
+  
+      toast(`${notification.message}`, {
+        duration: 5000,
+        classNames: {
+          toast:
+            "!bg-blue-100 border-l-4 !border-blue-500 !text-blue-700 p-4 shadow-lg rounded-lg",
+          title: "font-bold text-blue-700",
+          description: "text-blue-600",
+          icon: "text-blue-500",
+          closeButton: "text-blue-500 hover:text-blue-700",
+        },
+      });
+  
+      if (notification.type === "Hlavní poplach") {
+        setMainActive(notification.status === "ACTIVE");
+        return;
+      }
+  
+      const index = alertButtons.findIndex(
+        (btn) => btn.label === notification.type
+      );
+  
+      if (index !== -1) {
+        setActiveStates((prev) => {
+          const newStates = [...prev];
+          newStates[index] = notification.status === "ACTIVE";
+          return newStates;
+        });
+      }
+    };
+  
+    socket.on("newNotification", handleNotification);
+  
     return () => {
-      socket.off("newNotification");
+      socket.off("newNotification", handleNotification);
     };
   }, [user?.organizationId]);
+  
 
   const toggleAlert = async (index: number) => {
     const updatedStates = [...activeStates];
