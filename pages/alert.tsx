@@ -163,17 +163,28 @@ export default function Alert() {
         return;
       }
   
-      toast(`${notification.message}`, {
-        duration: 5000,
-        classNames: {
+      if (user?.id !== notification.triggeredById) {
+        const classNames = notification.status !== "ACTIVE" ? {
+          toast:
+            "!bg-green-100 border-l-4 !border-green-500 !text-green-700 p-4 shadow-lg rounded-lg",
+          title: "font-bold !text-green-700",
+          description: "!text-green-600",
+          icon: "!text-green-500",
+          closeButton: "!text-green-500 !hover:text-green-700",
+        } : {
           toast:
             "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
           title: "font-bold text-red-700",
           description: "text-red-600",
           icon: "text-red-500",
           closeButton: "text-red-500 hover:text-red-700",
-        },
-      });
+        };
+
+        toast(`${notification.message}`, {
+          duration: 5000,
+          classNames,
+        });
+      }
   
       if (notification.type === "Hlavní poplach") {
         setMainActive(notification.status === "ACTIVE");
