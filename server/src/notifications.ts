@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from './prisma';
+import { io } from './server';
 import webpush from 'web-push';
 import { sendEmail } from './mailer';
 
@@ -19,21 +20,22 @@ export const notificationshandler = async (req: Request, res: Response): Promise
 
   switch (method) {
     case 'GET': {
-      const { orgId } = req.query;
+      const orgId = Number(req.query.orgId);
       if (!orgId) {
-        res.status(400).json({ error: 'Missing organization ID' });
+        res.status(400).json({ error: 'Missing or invalid organization ID' });
         return;
       }
 
       try {
         const notifications = await prisma.notification.findMany({
-          where: { organizationId: Number(orgId) },
+          where: { organizationId: orgId },
           include: { triggeredBy: true },
           orderBy: { createdAt: 'desc' },
           take: 100,
         });
         res.status(200).json(notifications);
-      } catch {
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
         res.status(500).json({ error: 'Error fetching notifications' });
       }
       break;
@@ -41,48 +43,51 @@ export const notificationshandler = async (req: Request, res: Response): Promise
 
     case 'POST': {
       const { type, message, triggeredById, organizationId, status } = req.body;
+
       if (!type || !message || !triggeredById || !organizationId || !status) {
-        res.status(400).json({ error: 'Missing fields' });
+        res.status(400).json({ error: 'Missing required fields' });
         return;
       }
 
+      const orgId = Number(organizationId);
+      const senderId = Number(triggeredById);
+
       try {
         const organization = await prisma.organization.findUnique({
-          where: { id: Number(organizationId) },
+          where: { id: orgId },
           select: { name: true },
         });
 
-        await prisma.notification.create({
+
+        const savedNotification = await prisma.notification.create({
           data: {
             type,
             message,
             status,
-            triggeredById: Number(triggeredById),
-            organizationId: Number(organizationId),
+            triggeredById: senderId,
+            organizationId: orgId,
           },
         });
+
         await prisma.message.create({
           data: {
             text: message,
             type: 'ALARM',
             status,
-            senderId: Number(triggeredById),
-            organizationId: Number(organizationId),
+            senderId,
+            organizationId: orgId,
           },
         });
 
         const sender = await prisma.user.findUnique({
-          where: { id: Number(triggeredById) },
+          where: { id: senderId },
           select: { firstName: true, lastName: true },
         });
 
         const users = await prisma.user.findMany({
           where: {
-            organizationId: Number(organizationId),
+            organizationId: orgId,
             isActive: true,
-            email: {
-              not: undefined,
-            },
           },
           select: {
             email: true,
@@ -91,15 +96,12 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           },
         });
 
-        const emailPromises = users.map((user) => {
+        const emailPromises = users.map(user => {
           if (!user.email) return Promise.resolve();
-
           return sendEmail({
             to: user.email,
             subject: `Nová notifikace: ${type}`,
-            text: message + '\nOdesílatel: ' + 
-                  (sender ? sender.firstName + ' ' + sender.lastName : '') + 
-                  '\nOrganizace: ' + (organization?.name ?? ''),
+            text: `${message}\nOdesílatel: ${sender ? `${sender.firstName} ${sender.lastName}` : ''}\nOrganizace: ${organization?.name ?? ''}`,
           });
         });
 
@@ -108,18 +110,18 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         const subscriptions = await prisma.pushSubscription.findMany({
           where: {
             user: {
-              organizationId: Number(organizationId),
+              organizationId: orgId,
               isActive: true,
             },
           },
         });
-        
+
         const payload = JSON.stringify({
           title: `Notifikace: ${type}`,
           body: message,
         });
-        
-        const pushPromises = subscriptions.map((sub) =>
+
+        const pushPromises = subscriptions.map(sub =>
           webpush.sendNotification({
             endpoint: sub.endpoint,
             keys: {
@@ -130,11 +132,14 @@ export const notificationshandler = async (req: Request, res: Response): Promise
             console.error('Push error:', err);
           })
         );
-        
+
         await Promise.all(pushPromises);
 
+        io.to(`org-${orgId}`).emit('newNotification', savedNotification);
+
         res.status(201).json({ message: 'Notification created successfully' });
-      } catch {
+      } catch (error) {
+        console.error('Error creating notification:', error);
         res.status(500).json({ error: 'Error creating notification' });
       }
       break;

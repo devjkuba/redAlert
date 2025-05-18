@@ -38,7 +38,7 @@ app.use(express.json());
 const server = http.createServer(app);
 
 // Vytvoření WebSocket serveru s použitím Socket.io
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: ["http://localhost:3000", "https://colossal-matelda-devjkuba-aa63c9cd.koyeb.app", "https://localhost", "capacitor://localhost", "https://redalert.onrender.com", "https://redalert.cyberdev.cz"], // Odkud mohou pocházet připojení (frontend URL)
     methods: ["GET", "POST"],
@@ -49,6 +49,12 @@ const io = new Server(server, {
 
 // Socket.io logika pro připojení a chat
 io.on('connection', (socket) => {
+  socket.on('joinOrganization', (organizationId: number) => {
+    const room = `org-${organizationId}`;
+    socket.join(room);
+    console.log(`Socket ${socket.id} joined room ${room}`);
+  });
+
   socket.on('sendMessage', async (message) => {
     try {
       // Uložení zprávy do databáze
@@ -102,7 +108,7 @@ app.route('/api/organizations')
    .post(isUser, organizationsHandler)
    .get(isUser, organizationsHandler);
 
-app.route('/api/notifications')
+   app.route('/api/notifications')
    .get(isUser, notificationshandler)
    .post(isUser, notificationshandler);
 

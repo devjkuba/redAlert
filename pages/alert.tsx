@@ -57,15 +57,13 @@ const createNotification = async (
       }
     );
 
-    if (response.status === 401) {
-      window.location.href = "/login";
-    }
-
     if (!response.ok) {
+      if (response.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       throw new Error("Error creating notification");
     }
-    const savedNotification = await response.json();
-    socket.emit("sendNotification", savedNotification);
     return;
   } catch (error: unknown) {
     if (error instanceof Error) {
