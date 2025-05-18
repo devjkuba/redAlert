@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import MessageItem from "@/components/MessageItem";
 import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
+import subscribeToPush from "@/components/Push";
 
 export interface Message {
   id: string;
@@ -34,6 +35,12 @@ export default function Chat() {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (user?.id && token) {
+      subscribeToPush(user?.id, token);
+    }
+  }, [token, user?.id]);
 
   useEffect(() => {
     const socketConnection = io(`${process.env.NEXT_PUBLIC_API}`, {
