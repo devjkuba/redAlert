@@ -6,6 +6,8 @@ const subscribeToPush = async (userId: number, token: string) => {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
     });
+
+    const subscriptionJson = subscription.toJSON();
   
     await fetch(`${process.env.NEXT_PUBLIC_API}api/push/subscribe`, {
       method: 'POST',
@@ -16,7 +18,10 @@ const subscribeToPush = async (userId: number, token: string) => {
       body: JSON.stringify({
         userId,
         endpoint: subscription.endpoint,
-        keys: subscription.toJSON().keys,
+        keys: {
+          auth: subscriptionJson.keys?.auth ?? '',
+          p256dh: subscriptionJson.keys?.p256dh ?? '',
+        },
       }),
       credentials: 'include',
     });
