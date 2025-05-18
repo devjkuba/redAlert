@@ -58,7 +58,6 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', async (message) => {
     try {
-      // Uložení zprávy do databáze
       const savedMessage = await prisma.message.create({
         data: {
           text: message.text,
@@ -70,7 +69,6 @@ io.on('connection', (socket) => {
         },
       });
 
-      // Odeslání uložené zprávy všem připojeným uživatelům
       io.emit('newMessage', savedMessage);
 
       await sendWebPushToOrg(
