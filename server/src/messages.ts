@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from './prisma';  // Připojte svůj Prisma client
+import { sendWebPushToOrg } from './pushUtils';
 
 export const messagesHandler = async (req: Request, res: Response): Promise<void> => {
   const { method } = req;
@@ -37,14 +38,29 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
       }
 
       try {
+        const orgId = Number(organizationId);
+        const sId = Number(senderId);
+
         const message = await prisma.message.create({
           data: {
             text,
-            senderId: Number(senderId),
+            senderId: sId,
             status,
-            organizationId: Number(organizationId),
+            organizationId: orgId,
           },
         });
+
+        const sender = await prisma.user.findUnique({
+          where: { id: sId },
+          select: { firstName: true, lastName: true },
+        });
+
+        await sendWebPushToOrg(
+          orgId,
+          `Nová zpráva od ${sender?.firstName} ${sender?.lastName}`,
+          text
+        );
+
         res.status(201).json({ message: 'Message created successfully', data: message });
       } catch (error: unknown) {
         if (error instanceof Error) {

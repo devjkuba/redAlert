@@ -3,6 +3,7 @@ import { prisma } from './prisma';
 import { io } from './server';
 import webpush from 'web-push';
 import { sendEmail } from './mailer';
+import { sendWebPushToOrg } from './pushUtils';
 
 const vapidKeys = {
   publicKey: process.env.PUBLIC_KEY ?? '',
@@ -107,33 +108,11 @@ export const notificationshandler = async (req: Request, res: Response): Promise
 
         await Promise.all(emailPromises);
 
-        const subscriptions = await prisma.pushSubscription.findMany({
-          where: {
-            user: {
-              organizationId: orgId,
-              isActive: true,
-            },
-          },
-        });
-
-        const payload = JSON.stringify({
-          title: `Notifikace: ${type}`,
-          body: message,
-        });
-
-        const pushPromises = subscriptions.map(sub =>
-          webpush.sendNotification({
-            endpoint: sub.endpoint,
-            keys: {
-              auth: sub.keysAuth,
-              p256dh: sub.keysP256dh,
-            },
-          }, payload).catch(err => {
-            console.error('Push error:', err);
-          })
+        await sendWebPushToOrg(
+          orgId,
+          `Notifikace: ${type}`,
+          message
         );
-
-        await Promise.all(pushPromises);
 
         io.to(`org-${orgId}`).emit('newNotification', savedNotification);
 
