@@ -42,7 +42,7 @@ export const getLocation = async (): Promise<Location | null> => {
           },
           (error) => {
             console.error("Geolocation error:", error);
-            reject(new Error("Geolocation error"));
+            // reject(new Error("Geolocation error"));
           },
           geoOptions
         );

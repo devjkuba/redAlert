@@ -28,6 +28,7 @@ app.use(cors({
     "https://colossal-matelda-devjkuba-aa63c9cd.koyeb.app",
     "https://redalert.onrender.com",
     "https://redalert.cyberdev.cz",
+    "https://redalert-production.up.railway.app",
   ],
   credentials: true,
 }));
@@ -41,7 +42,7 @@ const server = http.createServer(app);
 // Vytvoření WebSocket serveru s použitím Socket.io
 export const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://colossal-matelda-devjkuba-aa63c9cd.koyeb.app", "https://localhost", "capacitor://localhost", "https://redalert.onrender.com", "https://redalert.cyberdev.cz"], // Odkud mohou pocházet připojení (frontend URL)
+    origin: ["http://localhost:3000", "https://colossal-matelda-devjkuba-aa63c9cd.koyeb.app", "https://localhost", "capacitor://localhost", "https://redalert.onrender.com", "https://redalert-production.up.railway.app", "https://redalert.cyberdev.cz"], // Odkud mohou pocházet připojení (frontend URL)
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],  // Specifikujte hlavičky, které jsou povolené
     credentials: true, // Umožní přenos cookies (pokud používáte autentizaci na serveru)
