@@ -62,7 +62,7 @@ export default function LoginPreview() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/login`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

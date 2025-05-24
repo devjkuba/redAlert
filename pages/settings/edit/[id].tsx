@@ -37,7 +37,7 @@ export default function EditUser() {
 
   useEffect(() => {
     if (id) {
-      fetch(`${process.env.NEXT_PUBLIC_API}api/users/${id}`, {
+      fetch(`${process.env.NEXT_PUBLIC_API}/api/users/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export default function EditUser() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/users/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/users/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export default function EditUser() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API}api/users/${userId}`,
+        `${process.env.NEXT_PUBLIC_API}/api/users/${userId}`,
         {
           method: "DELETE",
           headers: {

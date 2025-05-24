@@ -56,7 +56,7 @@ export default function Chat() {
       if (user?.organizationId) {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API}api/messages?organizationId=${user.organizationId}`,
+            `${process.env.NEXT_PUBLIC_API}/api/messages?organizationId=${user.organizationId}`,
             {
               method: "GET",
               headers: {

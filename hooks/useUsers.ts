@@ -21,7 +21,7 @@ export const useUsers = (organizationId: number) => {
     const fetchUsers = async () => {
       setError(null); // Resetování chybového stavu před načítáním
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/users?organizationId=${organizationId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/users?organizationId=${organizationId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

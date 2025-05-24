@@ -24,7 +24,7 @@ const fetchUser = async (): Promise<User | null> => {
   const token = localStorage.getItem('token')
   if (!token) return null
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API}api/user`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/user`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

@@ -29,7 +29,7 @@ export default function Register2() {
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}api/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

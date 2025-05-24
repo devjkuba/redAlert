@@ -13,7 +13,7 @@ const subscribeToPush = async (userId: number, token: string) => {
     const p256dh = rawKey ? btoa(String.fromCharCode(...new Uint8Array(rawKey))) : '';
     const auth = rawAuth ? btoa(String.fromCharCode(...new Uint8Array(rawAuth))) : '';
   
-    await fetch(`${process.env.NEXT_PUBLIC_API}api/push/subscribe`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API}/api/push/subscribe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
