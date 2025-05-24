@@ -21,12 +21,7 @@ import useUser from "@/hooks/useUser";
 import useDemo from "@/hooks/useDemo";
 import { getNotifications, Notification } from "@/lib/getNotifications";
 import useAuthToken from "@/hooks/useAuthToken";
-import { io } from "socket.io-client";
-
-const socket = io(`${process.env.NEXT_PUBLIC_API}`, {
-  transports: ["websocket"],
-  withCredentials: true,
-});
+import { getSocket } from "@/lib/socket";
 
 const createNotification = async (
   token: string | null,
@@ -90,6 +85,8 @@ const alertButtons = [
 
 export default function Alert() {
   const { data: user } = useUser();
+  const socket = getSocket();
+
   const { isDemoActive } = useDemo();
   const token = useAuthToken();
 

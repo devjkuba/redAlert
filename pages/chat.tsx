@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import useUser from "@/hooks/useUser";
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import { Spinner } from "@/components/ui/spinner";
@@ -10,6 +10,7 @@ import MessageItem from "@/components/MessageItem";
 import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
 import subscribeToPush from "@/components/Push";
+import { getSocket } from "@/lib/socket";
 
 export interface Message {
   id: string;
@@ -43,9 +44,8 @@ export default function Chat() {
   }, [token, user?.id]);
 
   useEffect(() => {
-    const socketConnection = io(`${process.env.NEXT_PUBLIC_API}`, {
-      withCredentials: true,
-    });
+    const socketConnection = getSocket();
+
     setSocket(socketConnection);
 
     socketConnection.on("newMessage", (message: Message) => {
@@ -85,7 +85,7 @@ export default function Chat() {
     fetchMessages();
 
     return () => {
-      socketConnection.disconnect();
+      socketConnection.off("newMessage", setMessages); 
     };
   }, [token, user?.organizationId]);
 
