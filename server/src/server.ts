@@ -42,11 +42,7 @@ const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
     origin: ["http://localhost:3000", "https://localhost", "capacitor://localhost", "https://redalert.cyberdev.cz"],
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
     credentials: true,
-    preflightContinue: true,
-    optionsSuccessStatus: 200,
   },
 });
 
