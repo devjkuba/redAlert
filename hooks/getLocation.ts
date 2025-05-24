@@ -11,13 +11,22 @@ const geoOptions = {
   maximumAge: 0  
 };
 
+const LOCATION_PERMISSION_KEY = "location_permission_granted";
+
 export const getLocation = async (): Promise<Location | null> => {
   try {
     const isNative = Capacitor.isNativePlatform();
+    const previouslyGranted = localStorage.getItem(LOCATION_PERMISSION_KEY);
+
+    if (previouslyGranted === "false") {
+      console.warn("Uživatel dříve odmítl sdílení polohy.");
+      return null;
+    }
 
     if (isNative) {
       const { Geolocation } = await import("@capacitor/geolocation");
       const position = await Geolocation.getCurrentPosition(geoOptions);
+      localStorage.setItem(LOCATION_PERMISSION_KEY, "true");
       return {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
@@ -28,34 +37,38 @@ export const getLocation = async (): Promise<Location | null> => {
         .catch(() => null);
 
       if (permissionStatus?.state === "denied") {
-        console.warn("Permission for geolocation was denied.");
+        console.warn("Přístup k poloze byl odmítnut v oprávněních prohlížeče.");
+        localStorage.setItem(LOCATION_PERMISSION_KEY, "false");
         return null;
       }
 
       return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
+            localStorage.setItem(LOCATION_PERMISSION_KEY, "true");
             resolve({
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
             });
           },
           (error) => {
-            console.error("Geolocation error:", error);
-            // reject(new Error("Geolocation error"));
+            console.error("Chyba při získávání polohy:", error);
+            localStorage.setItem(LOCATION_PERMISSION_KEY, "false");
+            reject(null);
           },
           geoOptions
         );
       });
     } else {
-      console.warn("Geolocation not supported in this environment.");
+      console.warn("Geolokace není v tomto prostředí podporována.");
       return null;
     }
-  } catch (error: unknown) {
-    console.error("Unexpected error while getting location:", error);
+  } catch (error) {
+    console.error("Neočekávaná chyba při získávání polohy:", error);
     return null;
   }
 };
+
 
 export const watchLocation = async (
   onUpdate: (location: Location) => void,
