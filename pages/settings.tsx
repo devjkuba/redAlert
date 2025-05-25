@@ -14,9 +14,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
+import useAuthToken from "@/hooks/useAuthToken";
 
 export default function Settings() {
   const { data: user } = useUser();
+  const token = useAuthToken();
   const queryClient = useQueryClient();
   const [emailEnabled, setEmailEnabled] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
@@ -36,8 +38,11 @@ export default function Settings() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user?.id, enabled: checked }),
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+        },
       });
       if (!res.ok) throw new Error("Chyba při ukládání");
 
