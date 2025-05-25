@@ -29,7 +29,7 @@ app.use(cors({
     "https://redalert.cyberdev.cz",
   ],
   credentials: true,
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.options('*', cors());
