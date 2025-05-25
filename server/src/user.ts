@@ -25,6 +25,7 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
         lastName: true,
         email: true,
         role: true,
+        emailNotificationsEnabled: true,
         organizationId: true,
         organization: {
           select: {

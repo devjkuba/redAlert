@@ -18,6 +18,7 @@ import { userDeleteHandler } from './userDeleteHandler';
 import { registerUserHandler } from './registerUser';
 import { pushSubscribeHandler } from './pushSubscribeHandler';
 import { sendWebPushToOrg } from './pushUtils';
+import { userEmailNotificationHandler } from './userEmailNotificationHandler';
 
 const app = express();
 app.use(cors({
@@ -136,6 +137,7 @@ app.route('/api/users/:id')
   .put(isAdmin, userUpdateHandler);
 
 app.post('/api/register-user', isAdmin, registerUserHandler);
+app.put('/api/user/email-notifications', isUser, userEmailNotificationHandler);
 
 // Nastavení portu a spuštění serveru
 const PORT = process.env.PORT || 4000;

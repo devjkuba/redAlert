@@ -11,11 +11,46 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { useEffect, useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Settings() {
   const { data: user } = useUser();
+  const queryClient = useQueryClient();
+  const [emailEnabled, setEmailEnabled] = useState<boolean>(false);
+  const [saving, setSaving] = useState(false);
   const isAdmin = user?.role === "ADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
+
+  useEffect(() => {
+    if (user) {
+      setEmailEnabled(user.emailNotificationsEnabled);
+    }
+  }, [user]);
+
+  console.log(emailEnabled);
+
+  const handleToggle = async (checked: boolean) => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/user/email-notifications", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user?.id, enabled: checked }),
+      });
+      if (!res.ok) throw new Error("Chyba při ukládání");
+
+      setEmailEnabled(checked);
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+    } catch (err) {
+      console.error(err);
+      alert("Nepodařilo se uložit změnu.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
 
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe mx-auto max-w-4xl w-full">
@@ -52,6 +87,15 @@ export default function Settings() {
                 <br />  
                 Role: <strong>{user?.role}</strong>
               </p>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-700">Emailové notifikace</span>
+                <Switch
+                  checked={emailEnabled}
+                  onCheckedChange={handleToggle}
+                  disabled={saving}
+                />
+              </div>
               <p className="text-xs"><strong>{user?.organization.name}</strong><br />
               {user?.organization.street}<br />
               <span>{user?.organization.city}</span><br />

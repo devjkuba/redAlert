@@ -77,6 +77,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           where: {
             organizationId: orgId,
             isActive: true,
+            emailNotificationsEnabled: true, 
           },
           select: {
             email: true,

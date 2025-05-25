@@ -6,6 +6,7 @@ export type User = {
   lastName: string
   email: string
   role: string
+  emailNotificationsEnabled: boolean
   organizationId: number
   organization: {
     id: number

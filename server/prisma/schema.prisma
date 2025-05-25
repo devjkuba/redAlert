@@ -58,6 +58,7 @@ model User {
   createdAt         DateTime           @default(now())
   role              Role               @default(USER)
   isActive          Boolean            @default(true) // Určuje, zda má uživatel aktivní profil
+  emailNotificationsEnabled Boolean    @default(true)
   notifications     Notification[]     @relation(name: "UserToNotification")
   messages          Message[]
   pushSubscriptions PushSubscription[]
