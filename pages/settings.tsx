@@ -24,7 +24,7 @@ export default function Settings() {
   const queryClient = useQueryClient();
   const [emailEnabled, setEmailEnabled] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
-  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
 
   useEffect(() => {
