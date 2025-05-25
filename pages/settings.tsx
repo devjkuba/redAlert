@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
 import useAuthToken from "@/hooks/useAuthToken";
 import PaymentQRCode from "@/components/PaymentQRCode";
+import { startOfDay } from "@/lib/utils";
 
 export default function Settings() {
   const { data: user } = useUser();
@@ -31,8 +32,6 @@ export default function Settings() {
       setEmailEnabled(user.emailNotificationsEnabled);
     }
   }, [user]);
-
-  console.log(emailEnabled);
 
   const handleToggle = async (checked: boolean) => {
     setSaving(true);
@@ -170,19 +169,44 @@ export default function Settings() {
             user?.organization &&
             (() => {
               const { activeUntil, subscriptionPaid } = user.organization;
-              const now = new Date();
-              const oneMonthFromNow = new Date();
+              const oneMonthFromNow = startOfDay(new Date());
               oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
               const activeUntilDate = activeUntil
-                ? new Date(activeUntil)
+                ? startOfDay(new Date(activeUntil))
                 : null;
+
+              if (
+                subscriptionPaid &&
+                activeUntilDate &&
+                activeUntilDate > oneMonthFromNow
+              ) {
+                return (
+                  <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
+                    <CardHeader>
+                      <CardTitle>Předplatné aplikace</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-700">
+                        Předplatné je aktivní do{" "}
+                        <strong>
+                          {activeUntilDate.toLocaleDateString("cs-CZ", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </strong>
+                        .
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              }
 
               if (
                 !subscriptionPaid ||
                 !activeUntilDate ||
-                activeUntilDate <= now
+                activeUntilDate <= oneMonthFromNow
               ) {
-                // Předplatné neaktivní nebo vypršelo -> zobraz výzvu k platbě
                 return (
                   <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
                     <CardHeader>
@@ -209,29 +233,6 @@ export default function Settings() {
                         organizationName={user.organization.name}
                         priceCzk={1200}
                       />
-                    </CardContent>
-                  </Card>
-                );
-              }
-
-              if (subscriptionPaid && activeUntilDate > oneMonthFromNow) {
-                return (
-                  <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
-                    <CardHeader>
-                      <CardTitle>Předplatné aplikace</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-700">
-                        Předplatné je aktivní do{" "}
-                        <strong>
-                          {activeUntilDate.toLocaleDateString("cs-CZ", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </strong>
-                        .
-                      </p>
                     </CardContent>
                   </Card>
                 );
