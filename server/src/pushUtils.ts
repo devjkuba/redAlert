@@ -16,13 +16,15 @@ export async function sendWebPushToOrg(
   organizationId: number,
   title: string,
   body: string,
-  url?: string
+  url?: string,
+  excludeUserId?: number
 ) {
   const subscriptions = await prisma.pushSubscription.findMany({
     where: {
       user: {
         organizationId,
         isActive: true,
+        ...(excludeUserId && { id: { not: excludeUserId } }),
       },
     },
   });

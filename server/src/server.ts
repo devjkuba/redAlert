@@ -75,6 +75,7 @@ io.on('connection', (socket) => {
         `Nová zpráva`,
         message.text,
         `/chat`,
+        message.senderId,
       );
 
       console.log('Message saved and sent:', savedMessage);
