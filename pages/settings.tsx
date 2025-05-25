@@ -34,7 +34,7 @@ export default function Settings() {
   const handleToggle = async (checked: boolean) => {
     setSaving(true);
     try {
-      const res = await fetch("/api/user/email-notifications", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user?.id, enabled: checked }),
