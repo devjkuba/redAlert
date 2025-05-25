@@ -169,13 +169,20 @@ export default function Settings() {
           {isAdmin &&
             user?.organization &&
             (() => {
-              const activeUntil = user.organization.activeUntil
-                ? new Date(user.organization.activeUntil)
-                : null;
+              const { activeUntil, subscriptionPaid } = user.organization;
+              const now = new Date();
               const oneMonthFromNow = new Date();
               oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
+              const activeUntilDate = activeUntil
+                ? new Date(activeUntil)
+                : null;
 
-              if (activeUntil && activeUntil <= oneMonthFromNow) {
+              if (
+                !subscriptionPaid ||
+                !activeUntilDate ||
+                activeUntilDate <= now
+              ) {
+                // Předplatné neaktivní nebo vypršelo -> zobraz výzvu k platbě
                 return (
                   <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
                     <CardHeader>
@@ -202,6 +209,29 @@ export default function Settings() {
                         organizationName={user.organization.name}
                         priceCzk={1200}
                       />
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              if (subscriptionPaid && activeUntilDate > oneMonthFromNow) {
+                return (
+                  <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
+                    <CardHeader>
+                      <CardTitle>Předplatné aplikace</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-700">
+                        Předplatné je aktivní do{" "}
+                        <strong>
+                          {activeUntilDate.toLocaleDateString("cs-CZ", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </strong>
+                        .
+                      </p>
                     </CardContent>
                   </Card>
                 );

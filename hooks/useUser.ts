@@ -15,6 +15,7 @@ export type User = {
     city: string
     street: string
     postalCode: string
+    subscriptionPaid: boolean
     gpsLat: number
     gpsLng: number
     activeUntil: Date | null
