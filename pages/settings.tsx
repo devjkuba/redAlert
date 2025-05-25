@@ -168,18 +168,20 @@ export default function Settings() {
           {isAdmin &&
             user?.organization &&
             (() => {
-              const { activeUntil, subscriptionPaid } = user.organization;
+              const { subscriptionValidUntil } = user.organization;
+
               const oneMonthFromNow = startOfDay(new Date());
               oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-              const activeUntilDate = activeUntil
-                ? startOfDay(new Date(activeUntil))
+
+              const subscriptionValidUntilDate = subscriptionValidUntil
+                ? startOfDay(new Date(subscriptionValidUntil))
                 : null;
 
-              if (
-                subscriptionPaid &&
-                activeUntilDate &&
-                activeUntilDate > oneMonthFromNow
-              ) {
+              const isSubscriptionValid =
+                subscriptionValidUntilDate &&
+                subscriptionValidUntilDate > oneMonthFromNow;
+
+              if (isSubscriptionValid) {
                 return (
                   <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
                     <CardHeader>
@@ -189,11 +191,14 @@ export default function Settings() {
                       <p className="text-sm text-gray-700">
                         Předplatné je aktivní do{" "}
                         <strong>
-                          {activeUntilDate.toLocaleDateString("cs-CZ", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
+                          {subscriptionValidUntilDate.toLocaleDateString(
+                            "cs-CZ",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
                         </strong>
                         .
                       </p>
@@ -202,43 +207,35 @@ export default function Settings() {
                 );
               }
 
-              if (
-                !subscriptionPaid ||
-                !activeUntilDate ||
-                activeUntilDate <= oneMonthFromNow
-              ) {
-                return (
-                  <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
-                    <CardHeader>
-                      <CardTitle>Předplatné aplikace</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col items-start gap-4">
-                      <p className="text-sm text-gray-700">
-                        <strong>3 měsíční zkušební doba zdarma.</strong>
-                        <br />
-                        Po 3 měsících je potřeba zaplatit roční předplatné.
-                        <br />
-                        Cena: <strong>100 Kč</strong> měsíčně,
-                        <br />
-                        platba je vždy na <strong>12 měsíců</strong> dopředu.
-                        <br />
-                        Roční cena: <strong>1200 Kč</strong>.
-                      </p>
-                      <p className="text-sm text-gray-700">
-                        Pokud nebude platba provedena do konce zkušební doby,
-                        bude přístup k organizaci deaktivován.
-                      </p>
-                      <PaymentQRCode
-                        organizationId={user.organization.id}
-                        organizationName={user.organization.name}
-                        priceCzk={1200}
-                      />
-                    </CardContent>
-                  </Card>
-                );
-              }
-
-              return null;
+              return (
+                <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
+                  <CardHeader>
+                    <CardTitle>Předplatné aplikace</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col items-start gap-4">
+                    <p className="text-sm text-gray-700">
+                      <strong>3 měsíční zkušební doba zdarma.</strong>
+                      <br />
+                      Po 3 měsících je potřeba zaplatit roční předplatné.
+                      <br />
+                      Cena: <strong>100 Kč</strong> měsíčně,
+                      <br />
+                      platba je vždy na <strong>12 měsíců</strong> dopředu.
+                      <br />
+                      Roční cena: <strong>1200 Kč</strong>.
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      Pokud nebude platba provedena do konce zkušební doby, bude
+                      přístup k organizaci deaktivován.
+                    </p>
+                    <PaymentQRCode
+                      organizationId={user.organization.id}
+                      organizationName={user.organization.name}
+                      priceCzk={1200}
+                    />
+                  </CardContent>
+                </Card>
+              );
             })()}
         </div>
       </main>

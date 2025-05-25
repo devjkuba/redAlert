@@ -33,6 +33,7 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
             name: true,
             country: true,
             subscriptionPaid: true,
+            subscriptionValidUntil: true,
             city: true,
             street: true,
             postalCode: true,
