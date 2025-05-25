@@ -170,18 +170,24 @@ export default function Settings() {
             (() => {
               const { subscriptionValidUntil } = user.organization;
 
-              const oneMonthFromNow = startOfDay(new Date());
+              const today = startOfDay(new Date());
+              const oneMonthFromNow = new Date(today);
               oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
 
               const subscriptionValidUntilDate = subscriptionValidUntil
                 ? startOfDay(new Date(subscriptionValidUntil))
                 : null;
 
-              const isSubscriptionValid =
-                subscriptionValidUntilDate &&
-                subscriptionValidUntilDate > oneMonthFromNow;
+              const hasSubscription = !!subscriptionValidUntilDate;
+              const isSubscriptionActive =
+                hasSubscription && subscriptionValidUntilDate > today;
+              const endsInLessThanMonth =
+                hasSubscription &&
+                subscriptionValidUntilDate <= oneMonthFromNow &&
+                subscriptionValidUntilDate > today;
 
-              if (isSubscriptionValid) {
+              if (isSubscriptionActive && !endsInLessThanMonth) {
+                // Aktivní předplatné (více než 1 měsíc)
                 return (
                   <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
                     <CardHeader>
@@ -207,6 +213,40 @@ export default function Settings() {
                 );
               }
 
+              if (endsInLessThanMonth) {
+                return (
+                  <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
+                    <CardHeader>
+                      <CardTitle>Předplatné aplikace</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm">
+                        <strong>Upozornění:</strong> Vaše předplatné končí dne{" "}
+                        <strong>
+                          {subscriptionValidUntilDate.toLocaleDateString(
+                            "cs-CZ",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </strong>
+                        .<br />
+                        Doporučujeme provést platbu co nejdříve, aby nedošlo k
+                        přerušení přístupu.
+                      </p>
+                      <PaymentQRCode
+                        organizationId={user.organization.id}
+                        organizationName={user.organization.name}
+                        priceCzk={1200}
+                      />
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              // Demo režim
               return (
                 <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
                   <CardHeader>
