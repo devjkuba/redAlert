@@ -32,6 +32,7 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
             id: true,
             name: true,
             country: true,
+            subscriptionPaid: true,
             city: true,
             street: true,
             postalCode: true,

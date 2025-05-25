@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
 import useAuthToken from "@/hooks/useAuthToken";
+import PaymentQRCode from "@/components/PaymentQRCode";
 
 export default function Settings() {
   const { data: user } = useUser();
@@ -36,14 +37,17 @@ export default function Settings() {
   const handleToggle = async (checked: boolean) => {
     setSaving(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`, {
-        method: "PUT",
-        body: JSON.stringify({ userId: user?.id, enabled: checked }),
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ userId: user?.id, enabled: checked }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!res.ok) throw new Error("Chyba při ukládání");
 
       setEmailEnabled(checked);
@@ -55,7 +59,6 @@ export default function Settings() {
       setSaving(false);
     }
   };
-
 
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe mx-auto max-w-4xl w-full">
@@ -77,7 +80,7 @@ export default function Settings() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="w-full max-w-4xl px-4 space-y-6 pb-4 overflow-auto overscroll-none max-h-[calc(100vh_-_145px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
-        {/* <div className="flex items-center gap-2 text-sm">
+          {/* <div className="flex items-center gap-2 text-sm">
               <span>{t("language_label")}</span>
               <LanguageDropdown />
             </div> */}
@@ -87,25 +90,32 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="flex flex-col items-start gap-4">
               <p className="text-sm text-gray-700">
-                Jste přihlášen jako{" "}
-                <strong>{user?.email}</strong>
-                <br />  
+                Jste přihlášen jako <strong>{user?.email}</strong>
+                <br />
                 Role: <strong>{user?.role}</strong>
               </p>
 
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-700">Emailové notifikace</span>
+                <span className="text-sm text-gray-700">
+                  Emailové notifikace
+                </span>
                 <Switch
                   checked={emailEnabled}
                   onCheckedChange={handleToggle}
                   disabled={saving}
                 />
               </div>
-              <p className="text-xs"><strong>{user?.organization.name}</strong><br />
-              {user?.organization.street}<br />
-              <span>{user?.organization.city}</span><br />
-              {user?.organization.postalCode}<br />
-              <span>{user?.organization.country}</span></p>
+              <p className="text-xs">
+                <strong>{user?.organization.name}</strong>
+                <br />
+                {user?.organization.street}
+                <br />
+                <span>{user?.organization.city}</span>
+                <br />
+                {user?.organization.postalCode}
+                <br />
+                <span>{user?.organization.country}</span>
+              </p>
               {/* <p className="text-sm text-gray-700">
               {/* <Link href="/settings/profile">
                 <Button>Upravit profil</Button>
@@ -113,7 +123,7 @@ export default function Settings() {
               <Link href="/settings/changePassword">
                 <Button className="mt-4">Změnit heslo</Button>  
               </Link> */}
-          </CardContent>
+            </CardContent>
           </Card>
           <Card className="shadow-lg border border-gray-300 rounded-xl">
             <CardHeader>
@@ -133,7 +143,6 @@ export default function Settings() {
             </CardContent>
           </Card>
 
-          {/* Sekce: Admin notifikace */}
           {isAdmin ? (
             <Card className="shadow-lg border border-gray-300 rounded-xl">
               <CardHeader>
@@ -156,6 +165,50 @@ export default function Settings() {
               <Spinner size="lg" className="mt-[20px] bg-black" />
             </div>
           )}
+
+          {isAdmin &&
+            user?.organization &&
+            (() => {
+              const activeUntil = user.organization.activeUntil
+                ? new Date(user.organization.activeUntil)
+                : null;
+              const oneMonthFromNow = new Date();
+              oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
+
+              if (activeUntil && activeUntil <= oneMonthFromNow) {
+                return (
+                  <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
+                    <CardHeader>
+                      <CardTitle>Předplatné aplikace</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-col items-start gap-4">
+                      <p className="text-sm text-gray-700">
+                        <strong>3 měsíční zkušební doba zdarma.</strong>
+                        <br />
+                        Po 3 měsících je potřeba zaplatit roční předplatné.
+                        <br />
+                        Cena: <strong>100 Kč</strong> měsíčně,
+                        <br />
+                        platba je vždy na <strong>12 měsíců</strong> dopředu.
+                        <br />
+                        Roční cena: <strong>1200 Kč</strong>.
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        Pokud nebude platba provedena do konce zkušební doby,
+                        bude přístup k organizaci deaktivován.
+                      </p>
+                      <PaymentQRCode
+                        organizationId={user.organization.id}
+                        organizationName={user.organization.name}
+                        priceCzk={1200}
+                      />
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              return null;
+            })()}
         </div>
       </main>
     </div>
