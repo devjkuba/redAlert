@@ -93,7 +93,7 @@ export default function LoginPreview() {
       <div className="border-0 mx-auto max-w-sm w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">
-            <img src="../logo.png" alt="Logo" className="h-20" />
+            <img src="../logo.png" alt="Logo" className="w-48 h-auto mb-2" />
           </div>
           <CardTitle className="text-2xl">Přihlášení</CardTitle>
           <CardDescription>

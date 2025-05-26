@@ -23,7 +23,7 @@ const getCoordinates = async (street: string, city: string): Promise<Coordinates
             throw new Error('Network response was not ok');
         }
         const data: GeocodeResponse = await response.json();
-        const { lat, lng } = data.results[0].geometry.location;
+        const { lat, lng } = data.results?.[0]?.geometry?.location || { lat: 0, lng: 0 };
         return { lat, lng };
     } catch (error) {
         console.error('Error fetching coordinates:', error);

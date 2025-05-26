@@ -73,7 +73,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps & { defaultValues?
 
   const handleSubmit = async (data: z.infer<typeof organizationSchema>) => {
     const city = stateName || countryName;
-    const coordinates = await getCoordinates(data.street, city) || [0, 0];
+    const coordinates = await getCoordinates(data.street, city);
 
     const combinedData = {
       ...data,

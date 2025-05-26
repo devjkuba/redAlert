@@ -28,7 +28,7 @@ export default function Register1() {
       <div className="mx-auto max-w-md w-full">
         <CardHeader>
           <div className="flex justify-center mb-4">
-            <img src="../logo.png" alt="Logo" className="h-20" />
+            <img src="../logo.png" alt="Logo" className="w-48 h-auto mb-2" />
           </div>
           <CardTitle className="text-2xl">Registrace organizace</CardTitle>
         </CardHeader>
