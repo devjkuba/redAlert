@@ -31,7 +31,7 @@ export default function AdminNotifications() {
   // Získání notifikací pro administrátora
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (user?.role !== "ADMIN") return; // Pokud uživatel není admin, nic nezobrazujeme
+      if (user?.role !== "ADMIN" && user?.role !== "SUPERADMIN") return; // Pokud uživatel není admin, nic nezobrazujeme
       try {
         const data = await getNotifications(token, user.organizationId!); // Získej notifikace na základě organizace
         setNotifications(data);
