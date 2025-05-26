@@ -5,7 +5,7 @@ export const organizationsHandler = async (req: express.Request, res: express.Re
   if (req.method === 'POST') {
     const { name, gps, postalCode, street, city, country } = req.body;
 
-    if (!name || !gps?.lat || !gps?.lng || !postalCode || !street || !city || !country) {
+    if (!name || !postalCode || !street || !city || !country) {
       res.status(400).json({ message: 'All fields are required.' });
       return;
     }
@@ -15,8 +15,8 @@ export const organizationsHandler = async (req: express.Request, res: express.Re
       const newOrganization = await prisma.organization.create({
         data: {
           name,
-          gpsLat: parseFloat(gps.lat),
-          gpsLng: parseFloat(gps.lng),
+          gpsLat: parseFloat(gps?.lat ?? 0),
+          gpsLng: parseFloat(gps?.lng ?? 0 ),
           postalCode,
           street,
           city,

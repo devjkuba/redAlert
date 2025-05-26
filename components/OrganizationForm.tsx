@@ -75,11 +75,6 @@ export const OrganizationForm: React.FC<OrganizationFormProps & { defaultValues?
     const city = stateName || countryName;
     const coordinates = await getCoordinates(data.street, city);
 
-    if (!coordinates) {
-      alert("Nepodařilo se najít GPS souřadnice pro zadanou adresu.");
-      return;
-    }
-
     const combinedData = {
       ...data,
       gps: coordinates,
