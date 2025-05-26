@@ -19,7 +19,7 @@ export const registerHandler = async (req: Request, res: Response): Promise<void
 
     const { name, street, postalCode, location, gps } = organizationData;
 
-    if (!name || !street || !postalCode || !location || !gps?.lat || !gps?.lng) {
+    if (!name || !street || !postalCode || !location) {
       res.status(400).json({ message: 'Missing organization fields' });
       return;
     }
@@ -45,8 +45,8 @@ export const registerHandler = async (req: Request, res: Response): Promise<void
           postalCode,
           city,
           country,
-          gpsLat: parseFloat(gps.lat.toString()),
-          gpsLng: parseFloat(gps.lng.toString()),
+          gpsLat: parseFloat(gps?.lat?.toString() ?? '0'),
+          gpsLng: parseFloat(gps?.lng?.toString() ?? '0'),
         },
       });
     } catch (error) {
