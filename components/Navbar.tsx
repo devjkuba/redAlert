@@ -46,6 +46,10 @@ export default function Navbar() {
               <Shield className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Záchranné složky
             </Link>
+            {user?.role === 'SUPERADMIN' && <Link href="/monitoring" className={getLinkClassName('/monitoring')} prefetch={false}>
+              <Settings className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
+              Monitoring
+            </Link>}
             <Link href="/settings" className={getLinkClassName('/settings')} prefetch={false}>
               <Settings className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Nastavení

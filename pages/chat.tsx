@@ -10,7 +10,7 @@ import MessageItem from "@/components/MessageItem";
 import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
 import subscribeToPush from "@/components/Push";
-import { getSocket } from "@/lib/socket";
+import { useSocket } from "@/hooks/useSocket";
 
 export interface Message {
   id: string;
@@ -24,11 +24,12 @@ export interface Message {
     lastName: string;
     email: string;
     id: number;
-  }
+  };
 }
 
 export default function Chat() {
   const { data: user } = useUser();
+  const socketConnection = useSocket();
   const token = useAuthToken();
   const { isDemoActive } = useDemo();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -44,13 +45,15 @@ export default function Chat() {
   }, [token, user?.id]);
 
   useEffect(() => {
-    const socketConnection = getSocket();
+    if (!socketConnection || !user?.organizationId || !token) return;
 
     setSocket(socketConnection);
 
-    socketConnection.on("newMessage", (message: Message) => {
+    const handleNewMessage = (message: Message) => {
       setMessages((prev) => [...prev.slice(-99), message]);
-    });
+    };
+
+    socketConnection.on("newMessage", handleNewMessage);
 
     const fetchMessages = async () => {
       if (user?.organizationId) {
@@ -61,12 +64,12 @@ export default function Chat() {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
           if (response.status === 401) {
-            window.location.href = '/login';
+            window.location.href = "/login";
           }
 
           if (response.ok) {
@@ -85,9 +88,9 @@ export default function Chat() {
     fetchMessages();
 
     return () => {
-      socketConnection.off("newMessage", setMessages); 
+      socketConnection.off("newMessage", handleNewMessage);
     };
-  }, [token, user?.organizationId]);
+  }, [socketConnection, token, user?.organizationId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -133,10 +136,7 @@ export default function Chat() {
             <div className="flex-1 overflow-y-auto space-y-3 px-4 py-2 shadow-inner shadow-gray-300">
               {loading ? (
                 <div className="flex justify-center items-center">
-                  <Spinner
-                    size="lg"
-                    className="mt-[20px] bg-black"
-                  />
+                  <Spinner size="lg" className="mt-[20px] bg-black" />
                 </div>
               ) : (
                 messages.map((msg) => {

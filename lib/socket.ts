@@ -1,13 +1,8 @@
 import { io, Socket } from "socket.io-client";
 
-const URL = process.env.NEXT_PUBLIC_API;
+const socket: Socket = io(process.env.NEXT_PUBLIC_API as string, {
+  withCredentials: true,
+  transports: ["websocket"],
+});
 
-let socket: Socket | null = null;
-
-export const getSocket = (): Socket => {
-  socket ??= io(URL, {
-    transports: ["websocket"],
-    withCredentials: true,
-  });
-  return socket;
-};
+export default socket;

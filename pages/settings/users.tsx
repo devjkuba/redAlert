@@ -48,7 +48,7 @@ export default function AdminUsers() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="w-full max-w-4xl px-4 pb-7">
+        <div className="w-full max-w-4xl px-4 pb-7 overflow-y-auto">
           {loading && (
             <div className="flex justify-center items-center">
               <Spinner size="lg" className="mt-[20px] bg-black" />
@@ -84,7 +84,7 @@ export default function AdminUsers() {
                         {user.email}
                       </span>
                     </TableCell>
-                    <TableCell className="text-xs p-1 !w-10">
+                    <TableCell className="text-xs p-1 !w-10 truncate">
                       {user.role}
                     </TableCell>
                     <TableCell className="text-xs p-1">

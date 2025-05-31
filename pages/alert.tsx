@@ -21,7 +21,7 @@ import useUser from "@/hooks/useUser";
 import useDemo from "@/hooks/useDemo";
 import { getNotifications, Notification } from "@/lib/getNotifications";
 import useAuthToken from "@/hooks/useAuthToken";
-import { getSocket } from "@/lib/socket";
+import { useSocket } from "@/hooks/useSocket";
 
 const createNotification = async (
   token: string | null,
@@ -85,7 +85,7 @@ const alertButtons = [
 
 export default function Alert() {
   const { data: user } = useUser();
-  const socket = getSocket();
+  const socket = useSocket();
 
   const { isDemoActive } = useDemo();
   const token = useAuthToken();
@@ -150,7 +150,7 @@ export default function Alert() {
   }, [token, user?.organizationId]);
 
   useEffect(() => {
-    if (!user?.organizationId) return;
+    if (!user?.organizationId || !socket) return;
   
     socket.emit("joinOrganization", user.organizationId);
   
@@ -207,7 +207,7 @@ export default function Alert() {
     return () => {
       socket.off("newNotification", handleNotification);
     };
-  }, [user?.organizationId]);
+  }, [socket, user?.id, user?.organizationId]);
   
 
   const toggleAlert = async (index: number) => {

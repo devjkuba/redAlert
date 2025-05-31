@@ -10,7 +10,6 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
 import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,7 +23,8 @@ export default function Settings() {
   const queryClient = useQueryClient();
   const [emailEnabled, setEmailEnabled] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
-  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
+  const isSuperAdmin = user?.role === "SUPERADMIN";
+  const isAdmin = user?.role === "ADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export default function Settings() {
             </CardContent>
           </Card>
 
-          {isAdmin ? (
+          {isAdmin || isSuperAdmin ? (
             <Card className="shadow-lg border border-gray-300 rounded-xl">
               <CardHeader>
                 <CardTitle>Administrace</CardTitle>
@@ -159,11 +159,7 @@ export default function Settings() {
                 </Link>
               </CardContent>
             </Card>
-          ) : (
-            <div className="flex justify-center items-center">
-              <Spinner size="lg" className="mt-[20px] bg-black" />
-            </div>
-          )}
+          ) : null}
 
           {isAdmin &&
             user?.organization &&
@@ -246,7 +242,6 @@ export default function Settings() {
                 );
               }
 
-              // Demo režim
               return (
                 <Card className="shadow-lg border border-gray-300 rounded-xl mt-6">
                   <CardHeader>

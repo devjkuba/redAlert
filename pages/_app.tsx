@@ -18,6 +18,7 @@ const protectedRoutes = [
   "/alert",
   "/rescueTeams",
   "/profile",
+  "/monitoring",
   "/settings",
   "settings/notifications",
   "settings/users",

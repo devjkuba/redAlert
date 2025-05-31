@@ -71,7 +71,7 @@ export default function AdminNotifications() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="w-full max-w-4xl px-4 pb-7">
+        <div className="w-full max-w-4xl px-4 pb-7 overflow-y-auto">
           {!notifications.length && loading && (
             <div className="flex justify-center items-center">
               <Spinner size="lg" className="mt-[20px] bg-black" />
