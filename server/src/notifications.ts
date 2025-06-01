@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from './prisma';
 import { io } from './server';
 import { sendEmail } from './mailer';
-import { sendWebPushToOrg } from './pushUtils';
+import { sendWebPushToOrg, sendWebPushToSuperAdmins } from './pushUtils';
 
 export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
   const { method } = req;
@@ -86,12 +86,13 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           },
         });
 
+        const senderName = sender ? [sender.firstName, sender.lastName].filter(Boolean).join(' ') : '';
         const emailPromises = users.map(user => {
           if (!user.email) return Promise.resolve();
           return sendEmail({
             to: user.email,
             subject: `Nová notifikace: ${type}`,
-            text: `${message}\nOdesílatel: ${sender ? `${sender.firstName} ${sender.lastName}` : ''}\nOrganizace: ${organization?.name ?? ''}`,
+            text: `${message}\nOdesílatel: ${senderName}\nOrganizace: ${organization?.name ?? ''}`,
           });
         });
 
@@ -100,6 +101,11 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         await sendWebPushToOrg(
           orgId,
           `Notifikace: ${type}`,
+          message
+        );
+
+        await sendWebPushToSuperAdmins(
+          `🔔 [${organization?.name ?? 'Neznámá organizace'}] ${type}`,
           message
         );
 
