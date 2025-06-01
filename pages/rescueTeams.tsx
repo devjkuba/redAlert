@@ -19,9 +19,12 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
+import useUser from "@/hooks/useUser";
 
 export default function RescueTeams() {
   const { isDemoActive } = useDemo();
+  const { data: user } = useUser();
+
   const [coordinates, setCoordinates] = useState<string | null>(null);
 
   useEffect(() => {
@@ -117,7 +120,15 @@ export default function RescueTeams() {
                     <Button
                       onClick={() => {
                         if (!isDemoActive) {
-                          window.location.href = `sms:${emergency.number}?body=Potřebuji%20pomoc!%20Aktivní%20útočník!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Odesláno%20z%20Red%20Alert.`;
+                          const org = user?.organization;
+                          let address = "";
+                          if (org?.street) address += `, ${org.street}`;
+                          if (org?.city) address += `, ${org.city}`;
+                          window.location.href = `sms:${
+                            emergency.number
+                          }?body=Potřebuji%20pomoc!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Organizace:%20${
+                            org?.name ?? ""
+                          }${address} Odesláno%20z%20aplikace%20Red%20alert.`;
                         } else {
                           window.alert(
                             "Demo režim je aktivní. Nelze vytvořit sms."
