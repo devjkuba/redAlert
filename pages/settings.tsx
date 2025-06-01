@@ -249,15 +249,19 @@ export default function Settings() {
                   </CardHeader>
                   <CardContent className="flex flex-col items-start gap-4">
                     <p className="text-sm text-gray-700">
-                      <strong>3 měsíční zkušební doba zdarma.</strong>
+                      <strong>1 měsíční zkušební doba zdarma.</strong>
                       <br />
-                      Po 3 měsících je potřeba zaplatit roční předplatné.
+                      Po 1 měsíci je potřeba zaplatit roční předplatné.
                       <br />
                       Cena: <strong>100 Kč</strong> měsíčně,
                       <br />
                       platba je vždy na <strong>12 měsíců</strong> dopředu.
                       <br />
                       Roční cena: <strong>1200 Kč</strong>.
+                      <br />
+                      Faktura bude odeslána na Váš e-mail po zaplacení.
+                      <br />
+                      Pro zaplacení použijte přiložený QR kód.
                     </p>
                     <p className="text-sm text-gray-700">
                       Pokud nebude platba provedena do konce zkušební doby, bude

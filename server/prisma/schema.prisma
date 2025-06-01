@@ -73,7 +73,7 @@ model Organization {
   postalCode    String
   street        String
   city          String
-  activeUntil DateTime @default(dbgenerated("(CURRENT_DATE + interval '3 months')"))
+  activeUntil   DateTime       @default(dbgenerated("(CURRENT_DATE + interval '1 month')"))
   subscriptionPaid Boolean       @default(false) // zda bylo zaplaceno (můžeš i podle activeUntil kontrolovat)
   subscriptionValidUntil DateTime?
   users         User[]
