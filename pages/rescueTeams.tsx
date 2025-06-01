@@ -128,7 +128,7 @@ export default function RescueTeams() {
                             emergency.number
                           }?body=Potřebuji%20pomoc!%20Moje%20GPS%20poloha:%20${coordinates}.%20Nemohu%20mluvit.%20Organizace:%20${
                             org?.name ?? ""
-                          }${address} Odesláno%20z%20aplikace%20Red%20alert.`;
+                          }${address}. Odesláno%20z%20aplikace%20Red%20Alert.`;
                         } else {
                           window.alert(
                             "Demo režim je aktivní. Nelze vytvořit sms."
