@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
         },
       });
 
-      io.emit('newMessage', savedMessage);
+      io.to(`org-${message.organizationId}`).emit('newMessage', savedMessage);
 
       await sendWebPushToOrg(
         message.organizationId,

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from './prisma';
 import { io } from './server';
 import { sendEmail } from './mailer';
-import { sendWebPushToOrg, sendWebPushToSuperAdmins } from './pushUtils';
+import { sendWebPushToOrg } from './pushUtils';
 
 export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
   const { method } = req;
@@ -101,11 +101,6 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         await sendWebPushToOrg(
           orgId,
           `Notifikace: ${type}`,
-          message
-        );
-
-        await sendWebPushToSuperAdmins(
-          `🔔 [${organization?.name ?? 'Neznámá organizace'}] ${type}`,
           message
         );
 

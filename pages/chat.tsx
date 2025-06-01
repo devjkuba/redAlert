@@ -49,6 +49,8 @@ export default function Chat() {
 
     setSocket(socketConnection);
 
+    socketConnection.emit("joinOrganization", user.organizationId);
+
     const handleNewMessage = (message: Message) => {
       setMessages((prev) => [...prev.slice(-99), message]);
     };
