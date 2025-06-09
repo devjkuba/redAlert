@@ -302,7 +302,7 @@ export default function Alert() {
           </div>
         )}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center">
-          <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
+          <img src="/logo.png" alt="Logo" className="w-40 h-auto" />
         </div>
         <Navbar />
         <div className="w-full max-w-4xl text-center px-4 space-y-6 overflow-auto overscroll-none max-h-[calc(100vh_-_100px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">

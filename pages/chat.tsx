@@ -3,14 +3,15 @@ import useUser from "@/hooks/useUser";
 import { Socket } from "socket.io-client";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
-import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import MessageItem from "@/components/MessageItem";
+import Avvvatars from "avvvatars-react";
 import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
 import subscribeToPush from "@/components/Push";
 import { useSocket } from "@/hooks/useSocket";
+import { ShieldAlert, ShieldBan } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 export interface Message {
   id: string;
@@ -120,7 +121,7 @@ export default function Chat() {
           </div>
         )}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center">
-          <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
+          <img src="/logo.png" alt="Logo" className="w-40 h-auto" />
         </div>
         <Navbar />
         <Toaster
@@ -135,14 +136,107 @@ export default function Chat() {
         />
         <div className="flex flex-col flex-grow items-center">
           <div className="flex flex-col w-full max-w-3xl overflow-scroll h-[calc(100vh_-_109px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
-            <div className="flex-1 overflow-y-auto space-y-3 px-4 py-2 shadow-inner shadow-gray-300">
+            <div className="flex-1 overflow-y-auto px-4 space-y-4">
               {loading ? (
                 <div className="flex justify-center items-center">
                   <Spinner size="lg" className="mt-[20px] bg-black" />
                 </div>
               ) : (
                 messages.map((msg) => {
-                  return <MessageItem user={user} message={msg} key={msg.id} />;
+                  const createdAt = new Date(msg.createdAt);
+                  const time = createdAt.toLocaleTimeString("cs-CZ", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+
+                  const date = createdAt.toLocaleDateString("cs-CZ", {
+                    day: "numeric",
+                    month: "numeric",
+                    year: "numeric",
+                  }).replace(/\s/g, "");
+
+                  const formattedDate = `${time}\u00A0\u00A0${date}`;
+                  const isCurrentUser =
+                    user && String(msg.senderId) === String(user.id);
+
+                  const isSystem = msg.type === "ALARM";
+
+                  if (isSystem) {
+                    const isActive = msg.status === "ACTIVE";
+
+                    const background = isActive ? "bg-red-100" : "bg-green-100";
+
+                    return (
+                      <div key={msg.id} className="flex justify-center gap-2">
+                        <div className="flex flex-col items-center gap-1">
+                          <Avvvatars
+                            value={`${msg.sender.firstName} ${msg.sender.lastName}`}
+                            size={18}
+                          />
+                          <span className="text-[8px] font-medium">
+                            {`${
+                              msg.sender.firstName
+                            } ${msg.sender.lastName.charAt(0)}`}
+                          </span>
+                        </div>
+
+                        <div className="space-y-1 max-w-xs">
+                          <div
+                            className={`${background} px-2 py-2 rounded-xl text-sm shadow-sm max-w-sm text-center`}
+                          >
+                            {isActive ? (
+                              <ShieldAlert className="inline-block h-5 mt-[-3px]" />
+                            ) : (
+                              <ShieldBan className="inline-block h-5 mt-[-3px]" />
+                            )}{" "}
+                            {msg.text}
+                          </div>
+                          <div className="text-xs text-gray-500 text-center">
+                            {formattedDate}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-2 ${
+                        isCurrentUser ? "items-start" : "justify-end "
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-1">
+                        <Avvvatars
+                          value={`${msg.sender.firstName} ${msg.sender.lastName}`}
+                          size={18}
+                        />
+                        <span className="text-[8px] font-medium">
+                          {`${
+                            msg.sender.firstName
+                          } ${msg.sender.lastName.charAt(0)}`}
+                        </span>
+                      </div>
+                      <div
+                        className={`space-y-1 max-w-xs ${
+                          isCurrentUser ? "" : "text-right"
+                        }`}
+                      >
+                        <div
+                          className={`px-4 py-2 rounded-xl text-sm text-left ${
+                            isCurrentUser
+                              ? "bg-gray-100"
+                              : "bg-[#D7EBFA] text-black "
+                          }`}
+                        >
+                          {msg.text}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {formattedDate}
+                        </div>
+                      </div>
+                    </div>
+                  );
                 })
               )}
               <div ref={messagesEndRef} />

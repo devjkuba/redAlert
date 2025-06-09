@@ -77,7 +77,7 @@ export default function RescueTeams() {
           </div>
         )}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center">
-          <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
+          <img src="/logo.png" alt="Logo" className="w-40 h-auto" />
         </div>
         <Navbar />
         <Toaster

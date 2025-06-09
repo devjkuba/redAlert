@@ -46,7 +46,7 @@ export default function AdminNotifications() {
     };
 
     fetchNotifications();
-  }, [user?.organizationId, user?.role]);
+  }, [token, user?.organizationId, user?.role]);
 
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
@@ -57,7 +57,7 @@ export default function AdminNotifications() {
           </div>
         )}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center">
-          <img src="/logo.png" alt="Logo" className="w-48 h-auto mb-2" />
+          <img src="/logo.png" alt="Logo" className="w-40 h-auto" />
         </div>
         <Navbar />
         <Breadcrumb className="w-full max-w-4xl px-4 py-2">

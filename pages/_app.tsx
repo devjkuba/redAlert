@@ -98,7 +98,6 @@ export default function App({ Component, pageProps }: AppProps) {
           <link rel="manifest" href="/manifest.json" />
           <link rel="icon" href="/icons/icon-48.webp" />
           <link rel="apple-touch-icon" href="/icons/icon-192.webp" />
-
         </Head>
         <Component {...pageProps} />
         <Footer />
