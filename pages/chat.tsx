@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Avvvatars from "avvvatars-react";
 import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
 import subscribeToPush from "@/components/Push";
@@ -112,6 +111,28 @@ export default function Chat() {
     }
   };
 
+  const COLORS = [
+    "#1f77b4", // modrá
+    "#ff7f0e", // oranžová
+    "#2ca02c", // zelená
+    "#d62728", // červená
+    "#9467bd", // fialová
+    "#8c564b", // hnědá
+    "#e377c2", // růžová
+    "#7f7f7f", // šedá
+    "#17becf", // tyrkysová
+    "#bcbd22", // limetka
+  ];
+
+  const stringToColorIndex = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % COLORS.length;
+    return COLORS[index];
+  };
+
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
       <main className="relative overflow-hidden flex flex-col flex-grow">
@@ -149,17 +170,24 @@ export default function Chat() {
                     minute: "2-digit",
                   });
 
-                  const date = createdAt.toLocaleDateString("cs-CZ", {
-                    day: "numeric",
-                    month: "numeric",
-                    year: "numeric",
-                  }).replace(/\s/g, "");
+                  const date = createdAt
+                    .toLocaleDateString("cs-CZ", {
+                      day: "numeric",
+                      month: "numeric",
+                      year: "numeric",
+                    })
+                    .replace(/\s/g, "");
 
                   const formattedDate = `${time}\u00A0\u00A0${date}`;
                   const isCurrentUser =
                     user && String(msg.senderId) === String(user.id);
 
+                  const senderName = `${msg.sender.firstName} ${msg.sender.lastName}`;
+
                   const isSystem = msg.type === "ALARM";
+                  const color = stringToColorIndex(
+                    senderName || msg.sender.email
+                  );
 
                   if (isSystem) {
                     const isActive = msg.status === "ACTIVE";
@@ -168,28 +196,25 @@ export default function Chat() {
 
                     return (
                       <div key={msg.id} className="flex justify-center gap-2">
-                        <div className="flex flex-col items-center gap-1">
-                          <Avvvatars
-                            value={`${msg.sender.firstName} ${msg.sender.lastName}`}
-                            size={18}
-                          />
-                          <span className="text-[8px] font-medium">
-                            {`${
-                              msg.sender.firstName
-                            } ${msg.sender.lastName.charAt(0)}`}
-                          </span>
-                        </div>
-
                         <div className="space-y-1 max-w-xs">
                           <div
-                            className={`${background} px-2 py-2 rounded-xl text-sm shadow-sm max-w-sm text-center`}
+                            className={`${background} px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm shadow-sm max-w-sm text-center`}
                           >
-                            {isActive ? (
-                              <ShieldAlert className="inline-block h-5 mt-[-3px]" />
-                            ) : (
-                              <ShieldBan className="inline-block h-5 mt-[-3px]" />
-                            )}{" "}
-                            {msg.text}
+                            <span
+                              className="text-[8px] text-left font-medium"
+                              style={{ color }}
+                            >
+                              {!isCurrentUser &&
+                                `${senderName}`}
+                            </span>
+                            <span>
+                              {msg.text}
+                              {isActive ? (
+                                <ShieldAlert className="inline-block h-5 mt-[-3px]" />
+                              ) : (
+                                <ShieldBan className="inline-block h-5 mt-[-3px]" />
+                              )}
+                            </span>
                           </div>
                           <div className="text-xs text-gray-500 text-center">
                             {formattedDate}
@@ -203,32 +228,28 @@ export default function Chat() {
                     <div
                       key={msg.id}
                       className={`flex gap-2 ${
-                        isCurrentUser ? "items-start" : "justify-end "
+                        isCurrentUser ? "justify-end" : "items-start"
                       }`}
                     >
-                      <div className="flex flex-col items-center gap-1">
-                        <Avvvatars
-                          value={`${msg.sender.firstName} ${msg.sender.lastName}`}
-                          size={18}
-                        />
-                        <span className="text-[8px] font-medium">
-                          {`${
-                            msg.sender.firstName
-                          } ${msg.sender.lastName.charAt(0)}`}
-                        </span>
-                      </div>
                       <div
                         className={`space-y-1 max-w-xs ${
-                          isCurrentUser ? "" : "text-right"
+                          isCurrentUser ? "text-right" : ""
                         }`}
                       >
                         <div
-                          className={`px-4 py-2 rounded-xl text-sm text-left ${
+                          className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm text-left ${
                             isCurrentUser
-                              ? "bg-gray-100"
-                              : "bg-[#D7EBFA] text-black "
+                              ? "bg-[#D7EBFA] text-black"
+                              : "bg-gray-100"
                           }`}
                         >
+                          <span
+                            className="text-[8px] text-left font-medium"
+                            style={{ color }}
+                          >
+                            {!isCurrentUser &&
+                              `${senderName}`}
+                          </span>
                           {msg.text}
                         </div>
                         <div className="text-xs text-gray-500">
