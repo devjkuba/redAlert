@@ -27,6 +27,8 @@ app.use(cors({
     "capacitor://localhost",
     "https://localhost",
     "https://redalert.cyberdev.cz",
+    "https://www.redalert.cz", 
+    "https://redalert.cz",
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "OPTIONS"],
