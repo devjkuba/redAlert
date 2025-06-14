@@ -13,15 +13,15 @@ rm -rf server/dist
 rm -rf frontend/.next
 rm -rf frontend/node_modules
 
-echo "📦 Instalace závislostí..."
+echo "📦 build backend..."
+cd server
 yarn install
-cd frontend && yarn install && cd ..
+yarn run build
+cd ..
 
-echo "🔨 Build backendu..."
-yarn run build --prefix server
-
-echo "⚙️  Build frontendu (statický export)..."
-yarn run build --prefix frontend
+echo "🔨 build frontend..."
+yarn install
+yarn run build
 
 echo "🚀 Restart PM2 procesů..."
 pm2 restart all
