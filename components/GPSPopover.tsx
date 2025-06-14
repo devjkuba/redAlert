@@ -76,7 +76,7 @@ export default function GPSPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="rounded-3xl px-4 py-2 border border-grey/20">
+        <div className="rounded-3xl cursor-pointer px-4 py-2 border border-grey/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-between w-full">
               <div className="p-3 bg-red-500/20 rounded-2xl">
