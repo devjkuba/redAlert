@@ -72,15 +72,43 @@ const createNotification = async (
 };
 
 const alertButtons = [
-  { label: "Zdravotní pomoc", icon: HeartPulse },
-  { label: "Požár", icon: Flame },
-  { label: "Vniknutí", icon: DoorOpen },
-  { label: "Rvačka", icon: FightIcon },
-  { label: "Evakuace", icon: LogOut },
-  { label: "Vandalismus", icon: SprayCan },
-  { label: "Výpadek proudu", icon: PlugZap },
-  { label: "Aktivní útočník", icon: GunIcon },
-  { label: "Únik plynu", icon: GasIcon },
+  {
+    label: "Zdravotní pomoc",
+    icon: HeartPulse,
+    className: "from-red-500 to-pink-600",
+  },
+  { label: "Požár", icon: Flame, className: "from-orange-500 to-red-500 " },
+  {
+    label: "Vniknutí",
+    icon: DoorOpen,
+    className: "from-indigo-600 to-indigo-700",
+  },
+  {
+    label: "Rvačka",
+    icon: FightIcon,
+    className: "from-purple-500 to-purple-600",
+  },
+  { label: "Evakuace", icon: LogOut, className: "from-green-500 to-green-600" },
+  {
+    label: "Vandalismus",
+    icon: SprayCan,
+    className: "from-pink-500 to-pink-600",
+  },
+  {
+    label: "Výpadek proudu",
+    icon: PlugZap,
+    className: "from-yellow-500 to-orange-700",
+  },
+  {
+    label: "Aktivní útočník",
+    icon: GunIcon,
+    className: "from-gray-500 to-gray-900",
+  },
+  {
+    label: "Únik plynu",
+    icon: GasIcon,
+    className: "from-yellow-500 to-lime-600",
+  },
 ];
 
 export default function Alert() {
@@ -133,7 +161,7 @@ export default function Alert() {
 
           if (
             (error as { response?: { status?: number } })?.response?.status ===
-              401
+            401
           ) {
             window.location.href = "/login";
           }
@@ -151,48 +179,51 @@ export default function Alert() {
 
   useEffect(() => {
     if (!user?.organizationId || !socket) return;
-  
+
     socket.emit("joinOrganization", user.organizationId);
-  
+
     const handleNotification = (notification: Notification) => {
       if (
         Number(notification.organizationId) !== Number(user?.organizationId)
       ) {
         return;
       }
-  
+
       if (user?.id !== notification.triggeredById) {
-        const classNames = notification.status !== "ACTIVE" ? {
-          toast:
-            "!bg-green-100 border-l-4 !border-green-500 !text-green-700 p-4 shadow-lg rounded-lg",
-          title: "font-bold !text-green-700",
-          description: "!text-green-600",
-          icon: "!text-green-500",
-          closeButton: "!text-green-500 !hover:text-green-700",
-        } : {
-          toast:
-            "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
-          title: "font-bold text-red-700",
-          description: "text-red-600",
-          icon: "text-red-500",
-          closeButton: "text-red-500 hover:text-red-700",
-        };
+        const classNames =
+          notification.status !== "ACTIVE"
+            ? {
+                toast:
+                  "!bg-green-100 border-l-4 !border-green-500 !text-green-700 p-4 shadow-lg rounded-lg",
+                title: "font-bold !text-green-700",
+                description: "!text-green-600",
+                icon: "!text-green-500",
+                closeButton: "!text-green-500 !hover:text-green-700",
+              }
+            : {
+                toast:
+                  "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
+                title: "font-bold text-red-700",
+                description: "text-red-600",
+                icon: "text-red-500",
+                closeButton: "text-red-500 hover:text-red-700",
+              };
 
         toast(`${notification.message}`, {
           duration: 5000,
           classNames,
         });
       }
-  
+
       if (notification.type === "Hlavní poplach") {
         setMainActive(notification.status === "ACTIVE");
         return;
       }
-  
+
       const index = alertButtons.findIndex(
         (btn) => btn.label === notification.type
       );
-  
+
       if (index !== -1) {
         setActiveStates((prev) => {
           const newStates = [...prev];
@@ -201,14 +232,13 @@ export default function Alert() {
         });
       }
     };
-  
+
     socket.on("newNotification", handleNotification);
-  
+
     return () => {
       socket.off("newNotification", handleNotification);
     };
   }, [socket, user?.id, user?.organizationId]);
-  
 
   const toggleAlert = async (index: number) => {
     const updatedStates = [...activeStates];
@@ -305,47 +335,50 @@ export default function Alert() {
           <img src="/logo.png" alt="Logo" className="w-40 h-auto" />
         </div>
         <Navbar />
-        <div className="w-full max-w-4xl text-center px-4 space-y-6 overflow-auto overscroll-none max-h-[calc(100vh_-_100px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
+        <div className="w-full mx-auto max-w-sm text-center px-4 space-y-6 overflow-auto overscroll-none max-h-[calc(100vh_-_100px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
           <GPSPopover />
           <div className="mt-6 grid grid-cols-3 gap-4">
-            {alertButtons.map(({ label, icon: Icon }, index) => (
+            {alertButtons.map(({ label, className, icon: Icon }, index) => (
               <button
                 key={index}
                 onClick={() => toggleAlert(index)}
                 className={twMerge(
-                  "flex shadow-lg flex-col min-h-[106px] items-center justify-center p-4 rounded-xl border border-gray-300 transition-all",
-                  activeStates[index]
-                    ? "bg-[#982121] text-white shadow-none"
-                    : "text-[#982121]"
+                  "group relative aspect-square rounded-3xl bg-gradient-to-br shadow-xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm",
+                  className,
+                  activeStates[index] &&
+                    "bg-gradient-to-br from-red-600 to-red-900 text-white shadow-none animate-pulse-soft"
                 )}
               >
-                <Icon className="w-6 h-6 mb-2" />
-                <span
-                  className={twMerge(
-                    "text-sm text-center text-gray-700 font-medium",
-                    activeStates[index] && "text-white"
-                  )}
-                >
-                  {label}
-                </span>
+                <div className="absolute inset-0 bg-black/20 rounded-3xl"></div>
+                <div className="relative h-full flex flex-col items-center justify-center space-y-2 p-3">
+                  <div className="text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Icon className="lucide lucide-heart w-7 h-7" />
+                  </div>
+                  <span className="text-xs font-semibold text-center text-white drop-shadow-lg leading-tight whitespace-pre-line">
+                    {label}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
-          <div className="mt-4 flex justify-center">
+          <div className="px-6 mb-20 flex justify-center">
             <button
               onClick={toggleMainAlert}
               className={twMerge(
-                "flex shadow-lg flex-col items-center justify-center w-[120px] h-[120px] p-4 rounded-xl border border-gray-300 transition-all",
-                mainActive
-                  ? "bg-[#982121] !text-white shadow-none"
-                  : "text-[#982121]",
-                "transition-colors duration-300"
+                "relative max-w-[200px] group bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 rounded-3xl px-12 py-6 hover:shadow-red-500/60 active:scale-95 transition-all duration-300 border-2 border-red-400/30 min-w-[200px]",
+                mainActive &&
+                  "bg-gradient-to-br !from-red-600 !to-red-900 text-white shadow-none animate-pulse-soft"
               )}
             >
-              <AlertTriangle className="w-6 h-6 mb-2" />
-              <span className="text-sm text-center font-semibold">
-                {mainActive ? "Poplach aktivní" : "Aktivovat poplach"}
-              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-transparent rounded-3xl" />
+              <div className="relative flex flex-col items-center space-y-3">
+                <AlertTriangle className="lucide lucide-triangle-alert w-10 h-10 text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
+                <div className="text-center">
+                  <div className="text-lg font-bold text-white drop-shadow-lg">
+                    {mainActive ? "Poplach aktivní" : "Aktivovat poplach"}
+                  </div>
+                </div>
+              </div>
             </button>
           </div>
           <Toaster

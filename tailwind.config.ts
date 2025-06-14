@@ -75,9 +75,14 @@ const config: Config = {
             opacity: "1",
           },
         },
+        "pulse-soft": {
+          "0%, 100%": { opacity: "0.7", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.05)" },
+        },
       },
       animation: {
         "spinner-leaf-fade": "spinner-leaf-fade 800ms linear infinite",
+        "pulse-soft": "pulse-soft 1.5s ease-in-out infinite",
       },
     },
   },

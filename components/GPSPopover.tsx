@@ -5,7 +5,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Copy, Share } from "lucide-react";
+import { Copy, MapPin, Share } from "lucide-react";
 import { getLocation, watchLocation } from "@/hooks/getLocation";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -76,26 +76,50 @@ export default function GPSPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="border border-gray-300 mx-auto shadow-lg border-black py-2 px-4 rounded-lg inline-block cursor-pointer">
-          <p className="flex items-center space-x-2 text-sm">
-            <span className="font-semibold">GPS:</span>
-            {(() => {
-              let content;
-              if (loading) {
-                content = <Spinner size="sm" className="bg-black float-right ml-2.5 mt-[5px]" />;
-              } else if (coordinates) {
-                content = (
-                  <span
-                    className="text-gray-700 truncate flex flex-col leading-[1.1]"
-                    dangerouslySetInnerHTML={{ __html: coordinates }}
-                  />
-                );
-              } else {
-                content = <span className="text-gray-500 text-xs">Neznámé souřadnice</span>;
-              }
-              return content;
-            })()}
-          </p>
+        <div className="rounded-3xl px-4 py-2 border border-grey/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between w-full">
+              <div className="p-3 bg-red-500/20 rounded-2xl">
+                <MapPin className="w-6 h-6 text-red-400" />
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="text-sm font-semibold">
+                  Aktuální poloha
+                </div>
+                {(() => {
+                  let content;
+                  if (loading) {
+                    content = (
+                      <Spinner
+                        size="sm"
+                        className="bg-black float-right ml-2.5 mt-[5px]"
+                      />
+                    );
+                  } else if (coordinates) {
+                    content = (
+                      <span
+                        className="text-xs font-mono inline-block"
+                        dangerouslySetInnerHTML={{
+                          __html: coordinates ?? "",
+                        }}
+                      />
+                    );
+                  } else {
+                    content = (
+                      <span className="text-xs font-mono inline-block">
+                        <span className="text-[10px]">Neznámé souřadnice</span>
+                      </span>
+                    );
+                  }
+                  return content;
+                })()}
+              </div>
+              <div className="text-right">
+              <div className="text-xs text-gray-400">Přesnost</div>
+              <div className="text-sm font-semibold text-green-400">±3m</div>
+            </div>
+            </div>
+          </div>
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-auto">
