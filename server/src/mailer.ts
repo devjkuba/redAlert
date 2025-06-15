@@ -12,7 +12,7 @@ interface EmailOptions {
 export const sendEmail = async ({ to, subject, text }: EmailOptions): Promise<void> => {
   const transporter = nodemailer.createTransport({
     host: 'smtp.seznam.cz',
-    port: 465,
+    port: 587,
     secure: true, // Používáme SSL
     auth: {
       user: process.env.EMAIL_USER,
