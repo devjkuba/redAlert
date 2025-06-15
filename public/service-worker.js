@@ -3,8 +3,21 @@ self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", () => {
+self.addEventListener("activate", (event) => {
   console.log("Service Worker activating.");
+
+  event.waitUntil(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      console.log("Cache cleared.");
+
+      const clientsList = await self.clients.matchAll({ type: "window" });
+      clientsList.forEach((client) => {
+        client.navigate(client.url);
+      });
+    })()
+  );
 });
 
 self.addEventListener("fetch", (event) => {
