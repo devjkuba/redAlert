@@ -15,11 +15,9 @@ module.exports = {
     {
       name: 'redalert-frontend',
       cwd: '/srv/redAlert',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3000',
-      interpreter: 'node',
-      autorestart: true,
-      watch: false,
+      script: 'yarn',
+      args: 'start',
+      interpreter: 'bash', 
     },
   ]
 }
