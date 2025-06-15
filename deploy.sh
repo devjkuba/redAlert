@@ -1,29 +1,31 @@
 #!/bin/bash
 
+set -e
+
 echo "🔁 Přepínám do složky projektu..."
-cd /srv/redAlert || exit 1
+cd /srv/redAlert || { echo "Chyba: složka /srv/redAlert neexistuje"; exit 1; }
 
-echo "🔄 Přepínám na hlavní branch a stahuji změny z GitHubu..."
-git checkout master
-git pull origin master
+echo "🔄 Stahuji poslední změny z GitHubu..."
+git fetch origin
+git reset --hard origin/master
 
-echo "🧹 Mažu node_modules, dist a .next (cache)..."
-rm -rf node_modules
-rm -rf server/dist
-rm -rf frontend/.next
-rm -rf frontend/node_modules
+echo "🧹 Mažu backend node_modules a build..."
+rm -rf server/node_modules server/dist
 
-echo "📦 build backend..."
+echo "📦 Instalace závislostí a build backendu..."
 cd server
-yarn install
+yarn install --frozen-lockfile
 yarn run build
 cd ..
 
-echo "🔨 build frontend..."
-yarn install
+echo "🧹 Mažu frontend node_modules a .next..."
+rm -rf node_modules .next
+
+echo "📦 Instalace závislostí a build frontendu..."
+yarn install --frozen-lockfile
 yarn run build
 
-echo "🚀 Restart PM2 procesů..."
-pm2 restart all
+echo "🚀 Restart PM2 procesů podle ecosystem.config.js..."
+pm2 reload /srv/redAlert/ecosystem.config.js
 
 echo "✅ Deploy dokončen."
