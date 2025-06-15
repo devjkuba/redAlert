@@ -13,17 +13,13 @@ module.exports = {
       max_restarts: 10,
     },
     {
-      name: "redalert-frontend",
-      cwd: ".",
-      script: "node_modules/.bin/next",
-      args: "start",
-      env: {
-        NODE_ENV: "production",
-        PORT: 3000,
-      },
-      watch: false,
+      name: 'redalert-frontend',
+      cwd: '/srv/redAlert',
+      script: 'node_modules/.bin/next',
+      args: 'start -p 3000',
+      interpreter: 'node',
       autorestart: true,
-      max_restarts: 10,
-    }
+      watch: false,
+    },
   ]
 }
