@@ -4,8 +4,8 @@ echo "🔁 Přepínám do složky projektu..."
 cd /srv/redAlert || exit 1
 
 echo "🔄 Přepínám na hlavní branch a stahuji změny z GitHubu..."
-git fetch origin
-git reset --hard origin/master
+git checkout master
+git pull origin master
 
 echo "🧹 Mažu node_modules, dist a .next (cache)..."
 rm -rf node_modules
