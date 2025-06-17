@@ -2,7 +2,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetDescription } from 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import useUser from "@/hooks/useUser";
-import { Bell, MessageCircle, Shield, LogOut, Settings } from "lucide-react";
+import { Bell, MessageCircle, Shield, LogOut, Settings, MonitorSmartphone } from "lucide-react";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
@@ -47,7 +47,7 @@ export default function Navbar() {
               Záchranné složky
             </Link>
             {user?.role === 'SUPERADMIN' && <Link href="/monitoring" className={getLinkClassName('/monitoring')} prefetch={false}>
-              <Settings className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
+              <MonitorSmartphone className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Monitoring
             </Link>}
             <Link href="/settings" className={getLinkClassName('/settings')} prefetch={false}>

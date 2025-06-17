@@ -192,28 +192,28 @@ export default function Chat() {
                   if (isSystem) {
                     const isActive = msg.status === "ACTIVE";
 
-                    const background = isActive ? "bg-red-100" : "bg-green-100";
+                    const background = isActive ? "from-red-100 to-red-200" : "from-green-100 to-green-200";
 
                     return (
                       <div key={msg.id} className="flex justify-center gap-2">
                         <div className="space-y-1 max-w-xs">
                           <div
-                            className={`${background} px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm shadow-sm max-w-sm text-center`}
+                            className={`${background} px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm max-w-sm text-center bg-gradient-to-br backdrop-blur-sm`}
                           >
                             <span
-                              className="text-[8px] text-left font-medium"
+                              className="text-[8px] text-center font-medium"
                               style={{ color }}
                             >
                               {!isCurrentUser &&
                                 `${senderName}`}
                             </span>
                             <span>
-                              {msg.text}
                               {isActive ? (
                                 <ShieldAlert className="inline-block h-5 mt-[-3px]" />
                               ) : (
                                 <ShieldBan className="inline-block h-5 mt-[-3px]" />
                               )}
+                              {msg.text}
                             </span>
                           </div>
                           <div className="text-xs text-gray-500 text-center">
@@ -239,8 +239,8 @@ export default function Chat() {
                         <div
                           className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm text-left ${
                             isCurrentUser
-                              ? "bg-[#D7EBFA] text-black"
-                              : "bg-gray-100"
+                              ? "bg-gradient-to-br text-black backdrop-blur-sm from-sky-100 to-sky-200"
+                              : "bg-gradient-to-br backdrop-blur-sm from-gray-100 to-gray-200"
                           }`}
                         >
                           <span

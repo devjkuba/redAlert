@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge"; // Přidejte import knihovny
+import { twMerge } from "tailwind-merge";
 import GPSPopover from "@/components/GPSPopover";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";

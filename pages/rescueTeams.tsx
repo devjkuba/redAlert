@@ -101,7 +101,7 @@ export default function RescueTeams() {
           {emergencyNumbers.map((emergency) => (
             <Card
               key={emergency.id}
-              className="shadow-lg border border-gray-300 rounded-xl"
+              className="rounded-3xl border border-grey/20 bg-[#f8f8f8] shadow-none"
             >
               <CardHeader className="flex flex-row items-center justify-between !p-4 !pb-0">
                 <CardTitle className="text-md !pb-0 gap-[7px] flex items-center">
@@ -135,7 +135,7 @@ export default function RescueTeams() {
                           );
                         }
                       }}
-                      className="flex items-center bg-emerald-500 hover:bg-emerald-600 text-white"
+                      className="flex gap-0 items-center rounded-3xl bg-gradient-to-br hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm from-green-600 to-green-700"
                     >
                       <MessageCircle className="w-5 h-5 mr-2" />
                       <span>SMS</span>
@@ -151,7 +151,8 @@ export default function RescueTeams() {
                         );
                       }
                     }}
-                    className="flex items-center bg-sky-500 hover:bg-sky-600 text-white"
+                    className="flex gap-0 items-center rounded-3xl bg-gradient-to-br hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm from-sky-600 to-sky-700"
+
                   >
                     <Phone className="w-5 h-5 mr-2" />
                     <span>Zavolat</span>
