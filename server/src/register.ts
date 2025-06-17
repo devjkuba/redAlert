@@ -74,7 +74,7 @@ export const registerHandler = async (req: Request, res: Response): Promise<void
       await sendEmail({
         to: email,
         subject: 'Registrace byla úspěšná',
-        text: `Dobrý den ${firstName} ${lastName},\n\nbyl jste úspěšně zaregistrován jako administrátor organizace "${newOrganization.name}" <a href="https://redalert.cz">https://redalert.cz</a>.\n\nDěkujeme,\nTým CyberDev.cz`,
+        text: `Dobrý den ${firstName} ${lastName},\n\nbyl jste úspěšně zaregistrován jako administrátor organizace "${newOrganization.name}" https://redalert.cz.\n\nDěkujeme,\nTým CyberDev.cz`,
       });
 
       const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string);
