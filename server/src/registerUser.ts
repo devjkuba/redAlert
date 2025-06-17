@@ -49,7 +49,7 @@ export const registerUserHandler = async (req: Request, res: Response): Promise<
     await sendEmail({
       to: email,
       subject: 'Registrace byla úspěšná',
-      text: `Dobrý den ${firstName} ${lastName},\n\nbyl jste úspěšně zaregistrován do systému RedAlert.cz.\n\nOrganizace: ${organization?.name ?? 'neuvedeno'}\n\nDěkujeme,\nTým CyberDev.cz`,
+      text: `Dobrý den ${firstName} ${lastName},\n\nbyl jste úspěšně zaregistrován do systému <a href="https://redalert.cz">https://redalert.cz</a>. \n\nOrganizace: ${organization?.name ?? 'neuvedeno'}\n\nDěkujeme,\nTým CyberDev.cz`,
     });
 
     res.status(201).json({ message: 'User created successfully', userId: user.id });
