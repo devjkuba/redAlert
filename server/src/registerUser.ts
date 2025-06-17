@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
+import { sendEmail } from './mailer';
 
 export const registerUserHandler = async (req: Request, res: Response): Promise<void> => {
   if (req.method !== 'POST') {
@@ -39,6 +40,16 @@ export const registerUserHandler = async (req: Request, res: Response): Promise<
         isActive: true,
         organizationId, 
       },
+    });
+
+     const organization = await prisma.organization.findUnique({
+      where: { id: organizationId },
+    });
+
+    await sendEmail({
+      to: email,
+      subject: 'Registrace byla úspěšná',
+      text: `Dobrý den ${firstName} ${lastName},\n\nbyl jste úspěšně zaregistrován do systému RedAlert.cz.\n\nOrganizace: ${organization?.name ?? 'neuvedeno'}\n\nDěkujeme,\nTým CyberDev.cz`,
     });
 
     res.status(201).json({ message: 'User created successfully', userId: user.id });
