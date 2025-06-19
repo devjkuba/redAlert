@@ -133,13 +133,15 @@ const [longitude, setLongitude] = useState<number | null>(null);
                               ? `https://maps.google.com/?q=${latitude},${longitude}`
                               : "";
 
-                          const smsBody = encodeURIComponent(
-                            `Potřebuji pomoc! Moje GPS poloha: ${coordinates || "neznámá"}. ${mapLink} Nemohu mluvit. Organizace: ${org?.name ?? ""}${address}. Odesláno z aplikace Red Alert.`
-                          );
-
-                          window.location.href = `sms:${emergency.number}?body=${smsBody}`;
+                          window.location.href = `sms:${
+                            emergency.number
+                          }?body=Potřebuji%20pomoc!%20Moje%20GPS%20poloha:%20${coordinates}%20${mapLink}.%20Nemohu%20mluvit.%20Organizace:%20${
+                            org?.name ?? ""
+                          }${address}. Odesláno%20z%20aplikace%20Red%20Alert.`;
                         } else {
-                          window.alert("Demo režim je aktivní. Nelze vytvořit sms.");
+                          window.alert(
+                            "Demo režim je aktivní. Nelze vytvořit sms."
+                          );
                         }
                       }}
                       className="flex gap-0 items-center rounded-3xl bg-gradient-to-br hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm from-green-600 to-green-700"
