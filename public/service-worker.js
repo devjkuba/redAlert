@@ -1,3 +1,6 @@
+const CACHE_VERSION = 'v2'; // zvýš při každém releasu!
+const CACHE_NAME = `redalert-cache-${CACHE_VERSION}`;
+
 self.addEventListener("install", () => {
   console.log("Service Worker installing.");
   self.skipWaiting();
@@ -9,7 +12,15 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+      await Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log(`Mazání staré cache: ${cacheName}`);
+            return caches.delete(cacheName);
+          }
+          return Promise.resolve();
+        })
+      );
 
       const clientsList = await self.clients.matchAll({ type: "window" });
       clientsList.forEach((client) => {
