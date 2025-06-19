@@ -21,6 +21,9 @@ cd ..
 echo "🧹 Mažu frontend node_modules a .next..."
 rm -rf node_modules .next
 
+echo "🧹 Mažu frontend node_modules a .next..."
+rm -rf node_modules .next public/.next
+
 echo "📦 Instalace závislostí a build frontendu..."
 yarn install --frozen-lockfile
 yarn run build
