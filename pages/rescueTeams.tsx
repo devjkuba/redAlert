@@ -43,11 +43,18 @@ const [longitude, setLongitude] = useState<number | null>(null);
 
   const emergencyNumbers = [
     {
-      icon: <Shield className="text-blue-500 w-5 h-5 inline" />,
+      icon: <Shield className="text-sky-500 w-5 h-5 inline" />,
       label: "Policie ČR",
       number: "158",
       hasSms: true,
       id: 1,
+    },
+    {
+      icon: <Shield className="text-blue-800 w-5 h-5 inline" />,
+      label: "Městská policie",
+      number: "156",
+      hasSms: true,
+      id: 3,
     },
     {
       icon: <Ambulance className="text-red-500 w-5 h-5 inline" />,
