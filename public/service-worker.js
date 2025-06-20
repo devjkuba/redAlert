@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2'; // zvýš při každém releasu!
+const CACHE_VERSION = 'v3'; // zvýš při každém releasu!
 const CACHE_NAME = `redalert-cache-${CACHE_VERSION}`;
 
 self.addEventListener("install", () => {
