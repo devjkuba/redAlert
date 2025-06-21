@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import useUser from "@/hooks/useUser";
 import { Socket } from "socket.io-client";
+import { Camera } from 'lucide-react';
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,8 @@ export interface Message {
   text: string;
   status: string;
   createdAt: Date;
-  type: "TEXT" | "ALARM";
+  type: "TEXT" | "ALARM" | "IMAGE";
+  imageUrl?: string;
   sender: {
     firstName: string;
     lastName: string;
@@ -33,6 +35,8 @@ export default function Chat() {
   const token = useAuthToken();
   const { isDemoActive } = useDemo();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -99,6 +103,35 @@ export default function Chat() {
   }, [messages]);
 
   const sendMessage = async () => {
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      formData.append("senderId", String(user?.id ?? ""));
+      formData.append("organizationId", String(user?.organizationId ?? ""));
+      formData.append("type", "IMAGE");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/messages/image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        socket?.emit("sendMessage", data);
+        setImageFile(null);
+        setImagePreview(null);
+      } else {
+        console.error("Chyba při nahrávání obrázku");
+      }
+      return;
+    }
+
     if (text) {
       const messageData = {
         text,
@@ -192,7 +225,9 @@ export default function Chat() {
                   if (isSystem) {
                     const isActive = msg.status === "ACTIVE";
 
-                    const background = isActive ? "from-red-100 to-red-200" : "from-green-100 to-green-200";
+                    const background = isActive
+                      ? "from-red-100 to-red-200"
+                      : "from-green-100 to-green-200";
 
                     return (
                       <div key={msg.id} className="flex justify-center gap-2">
@@ -204,8 +239,7 @@ export default function Chat() {
                               className="text-[8px] text-center font-medium"
                               style={{ color }}
                             >
-                              {!isCurrentUser &&
-                                `${senderName}`}
+                              {!isCurrentUser && `${senderName}`}
                             </span>
                             <span>
                               {isActive ? (
@@ -217,6 +251,49 @@ export default function Chat() {
                             </span>
                           </div>
                           <div className="text-xs text-gray-500 text-center">
+                            {formattedDate}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (msg.type === "IMAGE") {
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex gap-2 ${
+                          isCurrentUser ? "justify-end" : "items-start"
+                        }`}
+                      >
+                        <div
+                          className={`space-y-1 max-w-xs ${
+                            isCurrentUser ? "text-right" : ""
+                          }`}
+                        >
+                          <div
+                            className={`px-2 py-2 rounded-xl flex flex-col text-sm ${
+                              isCurrentUser
+                                ? "bg-gradient-to-br from-sky-100 to-sky-200"
+                                : "bg-gradient-to-br from-gray-100 to-gray-200"
+                            }`}
+                          >
+                            {!isCurrentUser && (
+                              <span
+                                className="text-[8px] font-medium"
+                                style={{ color }}
+                              >
+                                {senderName}
+                              </span>
+                            )}
+                            <img
+                              src={msg.imageUrl}
+                              alt="Obrázek"
+                              className="rounded max-w-xs max-h-60 object-cover"
+                            />
+                            {msg.text && <p className="mt-1">{msg.text}</p>}
+                          </div>
+                          <div className="text-xs text-gray-500">
                             {formattedDate}
                           </div>
                         </div>
@@ -247,8 +324,7 @@ export default function Chat() {
                             className="text-[8px] text-left font-medium"
                             style={{ color }}
                           >
-                            {!isCurrentUser &&
-                              `${senderName}`}
+                            {!isCurrentUser && `${senderName}`}
                           </span>
                           {msg.text}
                         </div>
@@ -264,6 +340,43 @@ export default function Chat() {
             </div>
 
             <div className="sticky bottom-0 border-t p-3 flex gap-2 bg-white">
+              <div className="flex gap-2 items-center">
+                <label className="cursor-pointer bg-gray-100 rounded px-3 py-1 text-sm border border-gray-300 hover:bg-gray-200">
+                  <Camera />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImageFile(file);
+                        setImagePreview(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+
+                {imagePreview && (
+                  <div className="relative">
+                    <img
+                      src={imagePreview}
+                      alt="Náhled"
+                      className="w-16 h-16 object-cover rounded shadow"
+                    />
+                    <button
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
+                      className="absolute top-0 right-0 bg-white text-red-600 rounded-full px-1"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </div>
               <Input
                 type="text"
                 value={text}
