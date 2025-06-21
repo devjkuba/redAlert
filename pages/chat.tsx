@@ -301,39 +301,42 @@ export default function Chat() {
                     );
                   }
 
-                  return (
-                    <div
-                      key={msg.id}
-                      className={`flex gap-2 ${
-                        isCurrentUser ? "justify-end" : "items-start"
-                      }`}
-                    >
+                  if (msg.type === "TEXT" && msg.text?.trim()) {
+                    return (
                       <div
-                        className={`space-y-1 max-w-xs ${
-                          isCurrentUser ? "text-right" : ""
+                        key={msg.id}
+                        className={`flex gap-2 ${
+                          isCurrentUser ? "justify-end" : "items-start"
                         }`}
                       >
                         <div
-                          className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm text-left ${
-                            isCurrentUser
-                              ? "bg-gradient-to-br text-black backdrop-blur-sm from-sky-100 to-sky-200"
-                              : "bg-gradient-to-br backdrop-blur-sm from-gray-100 to-gray-200"
+                          className={`space-y-1 max-w-xs ${
+                            isCurrentUser ? "text-right" : ""
                           }`}
                         >
-                          <span
-                            className="text-[8px] text-left font-medium"
-                            style={{ color }}
+                          <div
+                            className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm text-left ${
+                              isCurrentUser
+                                ? "bg-gradient-to-br text-black backdrop-blur-sm from-sky-100 to-sky-200"
+                                : "bg-gradient-to-br backdrop-blur-sm from-gray-100 to-gray-200"
+                            }`}
                           >
-                            {!isCurrentUser && `${senderName}`}
-                          </span>
-                          {msg.text}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {formattedDate}
+                            <span
+                              className="text-[8px] text-left font-medium"
+                              style={{ color }}
+                            >
+                              {!isCurrentUser && `${senderName}`}
+                            </span>
+                            {msg.text}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {formattedDate}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
+                    );
+                  }
+                  return null;
                 })
               )}
               <div ref={messagesEndRef} />

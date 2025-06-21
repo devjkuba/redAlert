@@ -38,7 +38,7 @@ export default function Navbar() {
               <Bell className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Alert
             </Link>
-            <Link href="/chat" className={getLinkClassName('#')} prefetch={false}>
+            <Link href="/chat" className={getLinkClassName('/chat')} prefetch={false}>
               <MessageCircle className="h-5 w-5 transition-colors duration-300 ease-in-out ml-3" />
               Chat
             </Link>
