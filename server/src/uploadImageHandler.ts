@@ -33,7 +33,7 @@ export const uploadImageHandler = [
       const sId = Number(senderId);
 
       const fileName = `message_${Date.now()}.webp`;
-      const filePath = path.join(__dirname, '../public/uploads', fileName);
+      const filePath = path.join(__dirname, '../../public/uploads', fileName);
       const imageUrl = `/uploads/${fileName}`;
 
       // Optimalizace a uložení
