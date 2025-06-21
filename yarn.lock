@@ -1427,6 +1427,13 @@
   resolved "https://registry.npmjs.org/@tsconfig/node16/-/node16-1.0.4.tgz"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
+"@types/exif-js@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@types/exif-js/-/exif-js-2.3.1.tgz#abd9de21ecc722036a3cf1a28dc8923d19497541"
+  integrity sha512-vylc2UhpCygw5i1cNA0m+acpq+Ufs3m9ekFJhZ7+PZyDECh05qfmRtgJE0y9QLFZo0hnvHfP+lVkPM746of5Uw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/fs-extra@^8.0.0":
   version "8.1.5"
   resolved "https://registry.npmjs.org/@types/fs-extra/-/fs-extra-8.1.5.tgz"
@@ -3062,6 +3069,11 @@ esutils@^2.0.2:
   version "2.0.3"
   resolved "https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
+
+exif-js@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/exif-js/-/exif-js-2.3.0.tgz#9d10819bf571f873813e7640241255ab9ce1a814"
+  integrity sha512-1Og9pAzG2FZRVlaavH8bB8BTeHcjMdJhKmeQITkX+uLRCD0xPtKAdZ2clZmQdJ56p9adXtJ8+jwrGp/4505lYg==
 
 expand-template@^2.0.3:
   version "2.0.3"

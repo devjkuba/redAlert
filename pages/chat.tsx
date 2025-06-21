@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import useUser from "@/hooks/useUser";
 import { Socket } from "socket.io-client";
-import { Camera } from 'lucide-react';
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -10,8 +9,9 @@ import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
 import subscribeToPush from "@/components/Push";
 import { useSocket } from "@/hooks/useSocket";
-import { ShieldAlert, ShieldBan } from "lucide-react";
+import { ShieldAlert, Camera, ShieldBan } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { fixImageOrientation } from "@/lib/imageUtils";
 
 export interface Message {
   id: string;
@@ -291,7 +291,7 @@ export default function Chat() {
                               alt="Obrázek"
                               className="rounded max-w-xs max-h-60 object-cover"
                             />
-                            {msg.text && <p className="mt-1">{msg.text}</p>}
+                            {msg.text?.trim() && <p className="mt-1">{msg.text}</p>}
                           </div>
                           <div className="text-xs text-gray-500">
                             {formattedDate}
@@ -347,11 +347,13 @@ export default function Chat() {
                     type="file"
                     accept="image/*"
                     capture="environment"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        setImageFile(file);
-                        setImagePreview(URL.createObjectURL(file));
+                        const fixedBlob = await fixImageOrientation(file);
+                        const fixedFile = new File([fixedBlob], file.name, { type: file.type });
+                        setImageFile(fixedFile);
+                        setImagePreview(URL.createObjectURL(fixedFile));
                       }
                     }}
                     className="hidden"

@@ -32,6 +32,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
+    "exif-js": "^2.3.0",
     "framer-motion": "^12.4.2",
     "i18next": "^25.0.1",
     "i18next-browser-languagedetector": "^8.0.5",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
+    "@types/exif-js": "^2.3.1",
     "@types/node": "^20.17.17",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
