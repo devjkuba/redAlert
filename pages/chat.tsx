@@ -35,6 +35,7 @@ export default function Chat() {
   const token = useAuthToken();
   const { isDemoActive } = useDemo();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [text, setText] = useState<string>("");
@@ -315,8 +316,9 @@ export default function Chat() {
                             )}
                             <img
                               src={`https://api.redalert.cz${msg.imageUrl}`}
+                              onClick={() => setFullscreenImage(`https://api.redalert.cz${msg.imageUrl}`)}
                               alt="Obrázek"
-                              className="rounded max-w-xs max-h-60 object-cover"
+                              className="rounded max-w-xs max-h-60 object-cover cursor-pointer"
                             />
                             {msg.text?.trim() && (
                               <p className="mt-1">{msg.text}</p>
@@ -426,6 +428,18 @@ export default function Chat() {
           </div>
         </div>
       </main>
+      {fullscreenImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50"
+          onClick={() => setFullscreenImage(null)}
+        >
+          <img
+            src={fullscreenImage}
+            alt="Fullscreen"
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+      )}
     </div>
   );
 }
