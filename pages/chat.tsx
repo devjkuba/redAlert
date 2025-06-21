@@ -287,7 +287,7 @@ export default function Chat() {
                               </span>
                             )}
                             <img
-                              src={msg.imageUrl}
+                              src={`https://api.redalert.cz${msg.imageUrl}`}
                               alt="Obrázek"
                               className="rounded max-w-xs max-h-60 object-cover"
                             />
