@@ -110,6 +110,30 @@ export default function Chat() {
       formData.append("organizationId", String(user?.organizationId ?? ""));
       formData.append("type", "IMAGE");
 
+      const tempId = `temp-${Date.now()}`;
+
+      const optimisticMessage: Message = {
+        id: tempId,
+        senderId: String(user?.id),
+        text: "",
+        status: "SENT",
+        createdAt: new Date(),
+        type: "IMAGE",
+        imageUrl: imagePreview || "",
+        sender: {
+          id: user?.id ?? 0,
+          firstName: user?.firstName ?? "",
+          lastName: user?.lastName ?? "",
+          email: user?.email ?? "",
+        },
+      };
+
+      // Zobrazit zprávu okamžitě v UI
+      setMessages((prev) => [...prev, optimisticMessage]);
+
+      setImageFile(null);
+      setImagePreview(null);
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/messages/image`,
         {
@@ -123,9 +147,12 @@ export default function Chat() {
 
       if (response.ok) {
         const data = await response.json();
+
         socket?.emit("sendMessage", data);
-        setImageFile(null);
-        setImagePreview(null);
+
+        setMessages((prev) =>
+          prev.map((msg) => (msg.id === tempId ? data : msg))
+        );
       } else {
         console.error("Chyba při nahrávání obrázku");
       }
@@ -291,7 +318,9 @@ export default function Chat() {
                               alt="Obrázek"
                               className="rounded max-w-xs max-h-60 object-cover"
                             />
-                            {msg.text?.trim() && <p className="mt-1">{msg.text}</p>}
+                            {msg.text?.trim() && (
+                              <p className="mt-1">{msg.text}</p>
+                            )}
                           </div>
                           <div className="text-xs text-gray-500">
                             {formattedDate}
@@ -354,7 +383,9 @@ export default function Chat() {
                       const file = e.target.files?.[0];
                       if (file) {
                         const fixedBlob = await compressImage(file);
-                        const fixedFile = new File([fixedBlob], file.name, { type: file.type });
+                        const fixedFile = new File([fixedBlob], file.name, {
+                          type: file.type,
+                        });
                         setImageFile(fixedFile);
                         setImagePreview(URL.createObjectURL(fixedFile));
                       }
