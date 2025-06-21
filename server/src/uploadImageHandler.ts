@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import sharp from 'sharp';
 import { prisma } from './prisma';
 import { sendWebPushToOrg } from './pushUtils';
+import { MessageType } from '@prisma/client';
 
 const upload = multer({
   storage: multer.memoryStorage(), // ukládá do paměti, ne na disk
@@ -22,7 +23,7 @@ export const uploadImageHandler = [
   upload.single('file'),
   async (req: Request, res: Response) => {
     try {
-      const { senderId, organizationId } = req.body;
+      const { senderId, organizationId, text } = req.body;
 
       if (!req.file || !senderId || !organizationId) {
         return res.status(400).json({ error: 'Missing required fields or file' });
@@ -46,9 +47,9 @@ export const uploadImageHandler = [
         data: {
           senderId: sId,
           organizationId: orgId,
-          type: 'IMAGE',
+          type: MessageType.IMAGE,
           imageUrl,
-          text: '', // nebo přidej možnost přidat text k obrázku
+          text: text || '',
         },
         include: {
           sender: true,

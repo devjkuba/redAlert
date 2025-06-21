@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import http from 'http';
+import path from "path";
 import { organizationsHandler } from './organizations';
 import { loginHandler } from './login';
 import { notificationshandler } from './notifications';
@@ -19,6 +20,7 @@ import { registerUserHandler } from './registerUser';
 import { pushSubscribeHandler } from './pushSubscribeHandler';
 import { sendWebPushToOrg } from './pushUtils';
 import { userEmailNotificationHandler } from './userEmailNotificationHandler';
+import { uploadImageHandler } from './uploadImageHandler';
 
 const app = express();
 app.use(cors({
@@ -32,6 +34,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.options('*', cors());
 
 app.use(express.json());
@@ -122,6 +125,20 @@ app.route('/api/organizations')
 app.route('/api/messages')
    .get(isUser, messagesHandler)
    .post(isUser, messagesHandler);
+
+function asyncHandler(fn: any) {
+  return function (req: express.Request, res: express.Response, next: express.NextFunction) {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+}
+
+app.post(
+  '/api/messages/image',
+  isUser,
+  ...(Array.isArray(uploadImageHandler)
+    ? uploadImageHandler.map((h) => asyncHandler(h))
+    : [asyncHandler(uploadImageHandler)])
+);
 
 app.get('/api/user', isUser, userHandler);
 app.get('/api/users', isUser, usersHandler);

@@ -90,4 +90,5 @@ enum Role {
 enum MessageType {
   TEXT
   ALARM
+  IMAGE
 }
