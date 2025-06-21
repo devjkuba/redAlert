@@ -37,7 +37,6 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -103,10 +102,12 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (imageFile) {
+  const sendMessage = async (fileToSend?: File) => {
+    const file = fileToSend || imageFile;
+
+    if (file) {
       const formData = new FormData();
-      formData.append("file", imageFile);
+      formData.append("file", file);
       formData.append("senderId", String(user?.id ?? ""));
       formData.append("organizationId", String(user?.organizationId ?? ""));
       formData.append("type", "IMAGE");
@@ -120,7 +121,7 @@ export default function Chat() {
         status: "SENT",
         createdAt: new Date(),
         type: "IMAGE",
-        imageUrl: imagePreview || "",
+        imageUrl: URL.createObjectURL(file), // použití URL pro okamžité zobrazení
         sender: {
           id: user?.id ?? 0,
           firstName: user?.firstName ?? "",
@@ -129,11 +130,10 @@ export default function Chat() {
         },
       };
 
-      // Zobrazit zprávu okamžitě v UI
+      // Okamžitě přidej obrázek do chatu
       setMessages((prev) => [...prev, optimisticMessage]);
 
       setImageFile(null);
-      setImagePreview(null);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/messages/image`,
@@ -151,6 +151,7 @@ export default function Chat() {
 
         socket?.emit("sendMessage", data);
 
+        // aktualizuj zprávu s reálným id a URL z backendu
         setMessages((prev) =>
           prev.map((msg) => (msg.id === tempId ? data : msg))
         );
@@ -316,7 +317,11 @@ export default function Chat() {
                             )}
                             <img
                               src={`https://api.redalert.cz${msg.imageUrl}`}
-                              onClick={() => setFullscreenImage(`https://api.redalert.cz${msg.imageUrl}`)}
+                              onClick={() =>
+                                setFullscreenImage(
+                                  `https://api.redalert.cz${msg.imageUrl}`
+                                )
+                              }
                               alt="Obrázek"
                               className="rounded max-w-xs max-h-60 object-cover cursor-pointer"
                             />
@@ -388,31 +393,17 @@ export default function Chat() {
                           type: file.type,
                         });
                         setImageFile(fixedFile);
-                        setImagePreview(URL.createObjectURL(fixedFile));
+
+                        // rovnou zavoláme sendMessage
+                        await sendMessage(fixedFile);
+
+                        // vyčistíme input (pokud chceš)
+                        e.target.value = "";
                       }
                     }}
                     className="hidden"
                   />
                 </label>
-
-                {imagePreview && (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="Náhled"
-                      className="w-16 h-16 object-cover rounded shadow"
-                    />
-                    <button
-                      onClick={() => {
-                        setImageFile(null);
-                        setImagePreview(null);
-                      }}
-                      className="absolute top-0 right-0 bg-white text-red-600 rounded-full px-1"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
               </div>
               <Input
                 type="text"
@@ -422,7 +413,7 @@ export default function Chat() {
                 className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Napište zprávu..."
               />
-              <Button onClick={sendMessage}>Odeslat</Button>
+              <Button onClick={() => sendMessage()}>Odeslat</Button>
             </div>
           </div>
         </div>
