@@ -11,7 +11,7 @@ import subscribeToPush from "@/components/Push";
 import { useSocket } from "@/hooks/useSocket";
 import { ShieldAlert, Camera, ShieldBan } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import { fixImageOrientation } from "@/lib/imageUtils";
+import { compressImage } from "@/lib/imageUtils";
 
 export interface Message {
   id: string;
@@ -353,7 +353,7 @@ export default function Chat() {
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const fixedBlob = await fixImageOrientation(file);
+                        const fixedBlob = await compressImage(file);
                         const fixedFile = new File([fixedBlob], file.name, { type: file.type });
                         setImageFile(fixedFile);
                         setImagePreview(URL.createObjectURL(fixedFile));
