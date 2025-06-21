@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs/promises';
 import sharp from 'sharp';
 import { prisma } from './prisma';
 import { sendWebPushToOrg } from './pushUtils';
