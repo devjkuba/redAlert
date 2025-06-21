@@ -3,7 +3,6 @@ import multer from 'multer';
 import path from 'path';
 import sharp from 'sharp';
 import { prisma } from './prisma';
-import { sendWebPushToOrg } from './pushUtils';
 import { MessageType } from '@prisma/client';
 
 const upload = multer({
@@ -54,13 +53,6 @@ export const uploadImageHandler = [
           sender: true,
         },
       });
-
-      await sendWebPushToOrg(
-        orgId,
-        'Nová fotografie',
-        'Uživatel odeslal obrázek',
-        '/chat',
-      );
 
       res.status(201).json(message);
     } catch (err) {

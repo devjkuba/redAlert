@@ -10,7 +10,6 @@ export async function compressImage(file: File, maxSizeMB = 5): Promise<Blob> {
         let width = img.width;
         let height = img.height;
 
-        // Nepovolit extrémní rozměry
         const maxDim = 1600;
         if (width > maxDim || height > maxDim) {
           if (width > height) {
@@ -36,9 +35,9 @@ export async function compressImage(file: File, maxSizeMB = 5): Promise<Blob> {
               if (blob.size <= maxFileSize) {
                 resolve(blob);
               } else if (quality > 0.1) {
-                tryCompress(quality - 0.1); // sníží kvalitu a zkusí znovu
+                tryCompress(quality - 0.1);
               } else {
-                resolve(blob); // když už jsme na limitu, vrátíme to
+                resolve(blob);
               }
             },
             "image/jpeg",
@@ -46,7 +45,7 @@ export async function compressImage(file: File, maxSizeMB = 5): Promise<Blob> {
           );
         };
 
-        tryCompress(0.9); // Startovací kvalita
+        tryCompress(0.9);
       };
 
       img.onerror = reject;
