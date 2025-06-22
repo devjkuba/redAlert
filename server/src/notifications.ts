@@ -43,7 +43,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
 
       const orgId = Number(organizationId);
       const senderId = Number(triggeredById);
-      const intervalSec = 10;
+      const intervalSec = 30;
       const jobKey = `${orgId}-${type}`;
 
       try {
