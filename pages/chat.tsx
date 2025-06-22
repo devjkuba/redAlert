@@ -197,18 +197,6 @@ export default function Chat() {
 
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
-      {fullscreenImage && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50"
-          onClick={() => setFullscreenImage(null)}
-        >
-          <img
-            src={fullscreenImage}
-            alt="Fullscreen"
-            className="max-w-full max-h-full object-contain"
-          />
-        </div>
-      )}
       <main className="relative overflow-hidden flex flex-col flex-grow">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
@@ -330,6 +318,9 @@ export default function Chat() {
                               }
                               alt="Obrázek"
                               className="rounded w-[45vw] max-h-[35vh] object-cover cursor-pointer"
+                              onLoad={() => {
+                                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+                              }}
                             />
                             {msg.text?.trim() && (
                               <p className="mt-1">{msg.text}</p>
@@ -423,6 +414,18 @@ export default function Chat() {
           </div>
         </div>
       </main>
+      {fullscreenImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50"
+          onClick={() => setFullscreenImage(null)}
+        >
+          <img
+            src={fullscreenImage}
+            alt="Fullscreen"
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+      )}
     </div>
   );
 }
