@@ -324,8 +324,9 @@ export default function Alert() {
   };
 
   return (
-    <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
-      <main className="relative overflow-hidden flex flex-col flex-grow">
+    <div className="flex flex-col h-[100dvh] w-full mx-auto max-w-4xl bg-white text-black !pt-safe !px-safe overflow-hidden">
+      {/* <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full"> */}
+      <main className="relative flex flex-col flex-grow">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
             DEMO
