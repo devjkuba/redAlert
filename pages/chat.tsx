@@ -301,11 +301,7 @@ export default function Chat() {
                           }`}
                         >
                           <div
-                            className={`px-2 py-2 rounded-xl flex flex-col text-sm ${
-                              isCurrentUser
-                                ? "bg-gradient-to-br from-sky-100 to-sky-200"
-                                : "bg-gradient-to-br from-gray-100 to-gray-200"
-                            }`}
+                            className="rounded-xl flex flex-col text-sm"
                           >
                             {!isCurrentUser && (
                               <span
@@ -323,7 +319,7 @@ export default function Chat() {
                                 )
                               }
                               alt="Obrázek"
-                              className="rounded max-w-xs max-h-60 object-cover cursor-pointer"
+                              className="rounded max-w-xs max-h-[35vh] object-cover cursor-pointer"
                             />
                             {msg.text?.trim() && (
                               <p className="mt-1">{msg.text}</p>
