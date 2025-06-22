@@ -296,7 +296,7 @@ export default function Chat() {
                         }`}
                       >
                         <div
-                          className={`space-y-1 max-w-[45vw] ${
+                          className={`space-y-1 max-w-[200px] ${
                             isCurrentUser ? "text-right" : ""
                           }`}
                         >
