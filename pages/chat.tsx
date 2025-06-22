@@ -296,7 +296,7 @@ export default function Chat() {
                         }`}
                       >
                         <div
-                          className={`space-y-1 max-w-[50vw] ${
+                          className={`space-y-1 max-w-[45vw] ${
                             isCurrentUser ? "text-right" : ""
                           }`}
                         >
@@ -319,7 +319,7 @@ export default function Chat() {
                                 )
                               }
                               alt="Obrázek"
-                              className="rounded max-w-[50vw] max-h-[35vh] object-cover cursor-pointer"
+                              className="rounded w-[45vw] max-h-[35vh] object-cover cursor-pointer"
                             />
                             {msg.text?.trim() && (
                               <p className="mt-1">{msg.text}</p>
