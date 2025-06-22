@@ -1475,6 +1475,11 @@ next@^15.0.1:
     "@next/swc-win32-x64-msvc" "15.0.1"
     sharp "^0.33.5"
 
+node-cron@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/node-cron/-/node-cron-4.1.1.tgz#1b9a27138cd08fea46f23fc024c7761c5801658c"
+  integrity sha512-oJj9CYV7teeCVs+y2Efi5IQ4FGmAYbsXQOehc1AGLlwteec8pC7DjBCUzSyRQ0LYa+CRCgmD+vtlWQcnPpXowA==
+
 nodemailer@^7.0.3:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-7.0.3.tgz#c098ce79ac60c7c111a86949eed2f99bd00cdac3"

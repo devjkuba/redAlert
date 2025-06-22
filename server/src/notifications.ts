@@ -3,6 +3,9 @@ import { prisma } from './prisma';
 import { io } from './server';
 import { sendEmail } from './mailer';
 import { sendWebPushToOrg } from './pushUtils';
+import cron, { ScheduledTask } from 'node-cron';
+
+const notificationJobs = new Map<number, ScheduledTask>();
 
 export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
   const { method } = req;
@@ -40,6 +43,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
 
       const orgId = Number(organizationId);
       const senderId = Number(triggeredById);
+      const intervalSec = 10;
 
       try {
         const organization = await prisma.organization.findUnique({
@@ -105,6 +109,23 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         );
 
         io.to(`org-${orgId}`).emit('newNotification', savedNotification);
+
+        if (savedNotification.status === 'ACTIVE') {
+          const cronExpr = `*/${intervalSec} * * * * *`;
+          const task: ScheduledTask = cron.schedule(cronExpr, async () => {
+            const current = await prisma.notification.findUnique({
+              where: { id: savedNotification.id },
+              select: { status: true },
+            });
+            if (current?.status === 'ACTIVE') {
+              await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
+            } else {
+              task.stop();
+              notificationJobs.delete(savedNotification.id);
+            }
+          });
+          notificationJobs.set(savedNotification.id, task);
+        }
 
         res.status(201).json({ message: 'Notification created successfully' });
       } catch (error) {
