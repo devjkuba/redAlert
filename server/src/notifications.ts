@@ -117,13 +117,19 @@ export const notificationshandler = async (req: Request, res: Response): Promise
               where: { id: savedNotification.id },
               select: { status: true },
             });
+
             if (current?.status === 'ACTIVE') {
               await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
             } else {
-              task.stop();
-              notificationJobs.delete(savedNotification.id);
+              const job = notificationJobs.get(savedNotification.id);
+              if (job) {
+                job.stop();
+                notificationJobs.delete(savedNotification.id);
+              }
             }
           });
+
+          task.start();
           notificationJobs.set(savedNotification.id, task);
         }
 
@@ -131,30 +137,6 @@ export const notificationshandler = async (req: Request, res: Response): Promise
       } catch (error) {
         console.error('Error creating notification:', error);
         res.status(500).json({ error: 'Error creating notification' });
-      }
-      break;
-    }
-
-    case 'PATCH': {
-      const id = Number(req.query.id);
-      if (!id) {
-        res.status(400).json({ error: 'Missing or invalid notification ID' });
-        return;
-      }
-      try {
-        await prisma.notification.update({
-          where: { id },
-          data: { status: 'INACTIVE' },
-        });
-        const task = notificationJobs.get(id);
-        if (task) {
-          task.stop();
-          notificationJobs.delete(id);
-        }
-        res.status(200).json({ message: 'Notification deactivated' });
-      } catch (error) {
-        console.error('Error deactivating notification:', error);
-        res.status(500).json({ error: 'Error deactivating notification' });
       }
       break;
     }
