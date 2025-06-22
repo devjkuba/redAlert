@@ -197,6 +197,18 @@ export default function Chat() {
 
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
+      {fullscreenImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50"
+          onClick={() => setFullscreenImage(null)}
+        >
+          <img
+            src={fullscreenImage}
+            alt="Fullscreen"
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+      )}
       <main className="relative overflow-hidden flex flex-col flex-grow">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
@@ -300,9 +312,7 @@ export default function Chat() {
                             isCurrentUser ? "text-right" : ""
                           }`}
                         >
-                          <div
-                            className="rounded-xl flex flex-col text-sm"
-                          >
+                          <div className="rounded-xl flex flex-col text-sm">
                             {!isCurrentUser && (
                               <span
                                 className="text-[8px] font-medium"
@@ -373,7 +383,6 @@ export default function Chat() {
               )}
               <div ref={messagesEndRef} />
             </div>
-
             <div className="sticky bottom-0 border-t p-3 flex gap-2 bg-white">
               <div className="flex gap-2 items-center">
                 <label className="cursor-pointer bg-gray-100 rounded px-3 py-1 text-sm border border-gray-300 hover:bg-gray-200">
@@ -414,18 +423,6 @@ export default function Chat() {
           </div>
         </div>
       </main>
-      {fullscreenImage && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50"
-          onClick={() => setFullscreenImage(null)}
-        >
-          <img
-            src={fullscreenImage}
-            alt="Fullscreen"
-            className="max-w-full max-h-full object-contain"
-          />
-        </div>
-      )}
     </div>
   );
 }
