@@ -135,6 +135,30 @@ export const notificationshandler = async (req: Request, res: Response): Promise
       break;
     }
 
+    case 'PATCH': {
+      const id = Number(req.query.id);
+      if (!id) {
+        res.status(400).json({ error: 'Missing or invalid notification ID' });
+        return;
+      }
+      try {
+        await prisma.notification.update({
+          where: { id },
+          data: { status: 'INACTIVE' },
+        });
+        const task = notificationJobs.get(id);
+        if (task) {
+          task.stop();
+          notificationJobs.delete(id);
+        }
+        res.status(200).json({ message: 'Notification deactivated' });
+      } catch (error) {
+        console.error('Error deactivating notification:', error);
+        res.status(500).json({ error: 'Error deactivating notification' });
+      }
+      break;
+    }
+
     default:
       res.status(405).json({ error: 'Method not allowed' });
       break;
