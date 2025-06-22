@@ -5,7 +5,7 @@ import { sendEmail } from './mailer';
 import { sendWebPushToOrg } from './pushUtils';
 import cron, { ScheduledTask } from 'node-cron';
 
-const notificationJobs = new Map<number, ScheduledTask>();
+const cronJobsByOrgType = new Map<string, ScheduledTask>();
 
 export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
   const { method } = req;
@@ -44,8 +44,15 @@ export const notificationshandler = async (req: Request, res: Response): Promise
       const orgId = Number(organizationId);
       const senderId = Number(triggeredById);
       const intervalSec = 10;
+      const jobKey = `${orgId}-${type}`;
 
       try {
+       const existingJob = cronJobsByOrgType.get(jobKey);
+        if (existingJob) {
+          existingJob.stop();
+          cronJobsByOrgType.delete(jobKey);
+        }
+
         const organization = await prisma.organization.findUnique({
           where: { id: orgId },
           select: { name: true },
@@ -110,27 +117,13 @@ export const notificationshandler = async (req: Request, res: Response): Promise
 
         io.to(`org-${orgId}`).emit('newNotification', savedNotification);
 
-        if (savedNotification.status === 'ACTIVE') {
+        if (status === 'ACTIVE') {
           const cronExpr = `*/${intervalSec} * * * * *`;
           const task: ScheduledTask = cron.schedule(cronExpr, async () => {
-            const current = await prisma.notification.findUnique({
-              where: { id: savedNotification.id },
-              select: { status: true },
-            });
-
-            if (current?.status === 'ACTIVE') {
-              await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
-            } else {
-              const job = notificationJobs.get(savedNotification.id);
-              if (job) {
-                job.stop();
-                notificationJobs.delete(savedNotification.id);
-              }
-            }
+            await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
           });
-
           task.start();
-          notificationJobs.set(savedNotification.id, task);
+          cronJobsByOrgType.set(jobKey, task);
         }
 
         res.status(201).json({ message: 'Notification created successfully' });
