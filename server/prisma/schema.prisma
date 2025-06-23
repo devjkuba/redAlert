@@ -17,7 +17,7 @@ model Message {
   type           MessageType         @default(TEXT)
   status         NotificationStatus?
   organization   Organization        @relation(fields: [organizationId], references: [id])
-  sender         User                @relation(fields: [senderId], references: [id])
+  sender         User                @relation(fields: [senderId], references: [id], onDelete: Cascade) // ADDED
 }
 
 model Notification {
@@ -29,7 +29,7 @@ model Notification {
   createdAt      DateTime           @default(now())
   status         NotificationStatus @default(INACTIVE)
   organization   Organization       @relation(fields: [organizationId], references: [id])
-  triggeredBy    User               @relation("UserToNotification", fields: [triggeredById], references: [id])
+  triggeredBy    User               @relation("UserToNotification", fields: [triggeredById], references: [id], onDelete: Cascade) // ADDED
 }
 
 model User {
