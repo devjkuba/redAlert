@@ -525,7 +525,7 @@ export default function RescueTeams() {
                   }
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <Checkbox
                   checked={form.hasSms}
                   onCheckedChange={(val) =>
@@ -533,7 +533,7 @@ export default function RescueTeams() {
                   }
                 />
                 <span>Podpora SMS</span>
-              </div>
+              </label>
             </div>
             <DialogFooter className="justify-between flex-row">
               <Button variant="secondary" onClick={() => setEditingSvc(null)}>

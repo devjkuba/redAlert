@@ -3,11 +3,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const defaultServices = [
-  { label: 'Policie ČR', number: '158', icon: 'Shield', hasSms: true },
-  { label: 'Městská policie', number: '156', icon: 'Shield', hasSms: true },
-  { label: 'Zdravotnická záchranná služba', number: '155', icon: 'Ambulance', hasSms: false },
-  { label: 'Tísňová linka', number: '112', icon: 'PhoneCall', hasSms: true },
-  { label: 'Hasičský záchranný sbor ČR', number: '150', icon: 'Flame', hasSms: true },
+  { label: 'Policie ČR', number: '158', icon: 'Shield', hasSms: true, iconColor: '#0284C7', order: 1 },
+  { label: 'Městská policie', number: '156', icon: 'Shield', hasSms: true, iconColor: '#1E40AF', order: 2 },
+  { label: 'Zdravotnická záchranná služba', number: '155', icon: 'Ambulance', hasSms: false, iconColor: '#DC2626', order: 3 },
+  { label: 'Tísňová linka', number: '112', icon: 'PhoneCall', hasSms: true, iconColor: '#7C3AED', order: 4 },
+  { label: 'Hasičský záchranný sbor ČR', number: '150', icon: 'Flame', hasSms: true, iconColor: '#FBBF24', order: 5 },
 ];
 
 async function main() {
