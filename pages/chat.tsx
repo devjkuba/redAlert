@@ -16,6 +16,7 @@ import { compressImage } from "@/lib/imageUtils";
 export interface Message {
   id: string;
   senderId: string;
+  organizationId: number;
   text: string;
   status: string;
   createdAt: Date;
@@ -119,6 +120,7 @@ export default function Chat() {
         senderId: String(user?.id),
         text: "",
         status: "SENT",
+        organizationId: Number(user?.organizationId),
         createdAt: new Date(),
         type: "IMAGE",
         imageUrl: URL.createObjectURL(file), // použití URL pro okamžité zobrazení

@@ -19,12 +19,13 @@ const upload = multer({
 
 export const uploadImageHandler = [
   upload.single('file'),
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response):Promise<void> => {
     try {
       const { senderId, organizationId, text } = req.body;
 
       if (!req.file || !senderId || !organizationId) {
-        return res.status(400).json({ error: 'Missing required fields or file' });
+        res.status(400).json({ error: 'Missing required fields or file' });
+        return;
       }
 
       const orgId = Number(organizationId);

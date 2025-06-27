@@ -64,6 +64,7 @@ model Organization {
   messages               Message[]
   notifications          Notification[]
   users                  User[]
+  emergencyServices      EmergencyService[] 
 }
 
 model PushSubscription {
@@ -74,6 +75,20 @@ model PushSubscription {
   userId     Int
   createdAt  DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id])
+}
+
+model EmergencyService {
+  id             Int          @id @default(autoincrement())
+  label          String
+  number         String
+  icon           String       // např. název ikony ("Shield", "Ambulance"...)
+  iconColor      String?
+  hasSms         Boolean
+  order          Int          @default(0)  // ⬅️ přidáno
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 enum NotificationStatus {

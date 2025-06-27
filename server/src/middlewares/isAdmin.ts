@@ -9,7 +9,7 @@ interface AdminRequest extends Request {
 export const isAdmin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith('Bearer ')) {
     res.status(401).json({ message: 'Unauthorized' });
     return;
   }
@@ -18,7 +18,6 @@ export const isAdmin = async (req: Request, res: Response, next: NextFunction): 
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
-
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
@@ -32,7 +31,6 @@ export const isAdmin = async (req: Request, res: Response, next: NextFunction): 
       return;
     }
 
-    // Přidáme uživatele do requestu pro další použití
     (req as AdminRequest).user = user;
 
     next();

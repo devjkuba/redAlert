@@ -21,6 +21,7 @@ import { pushSubscribeHandler } from "./pushSubscribeHandler";
 import { sendWebPushToOrg } from "./pushUtils";
 import { userEmailNotificationHandler } from "./userEmailNotificationHandler";
 import { uploadImageHandler } from "./uploadImageHandler";
+import { emergencyServiceHandler } from "./emergencyServiceHandler";
 
 const app = express();
 app.use(
@@ -149,24 +150,10 @@ app
   .get(isUser, messagesHandler)
   .post(isUser, messagesHandler);
 
-function asyncHandler(
-  fn: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<unknown> | void
-) {
-  return function (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-}
-
 app.post(
   "/api/messages/image",
   isUser,
-  ...(Array.isArray(uploadImageHandler)
-    ? uploadImageHandler.map((h) => asyncHandler(h))
-    : [asyncHandler(uploadImageHandler)])
+  uploadImageHandler
 );
 
 app.get("/api/user", isUser, userHandler);
@@ -176,6 +163,11 @@ app.post("/api/login", loginHandler);
 app.post("/api/register", registerHandler);
 
 app.post("/api/push/subscribe", isUser, pushSubscribeHandler);
+
+app.get('/api/emergency-services', emergencyServiceHandler);
+app.post('/api/emergency-services', isAdmin, emergencyServiceHandler);
+app.put('/api/emergency-services', isAdmin, emergencyServiceHandler);
+app.delete('/api/emergency-services', isAdmin, emergencyServiceHandler);
 
 app
   .route("/api/users/:id")

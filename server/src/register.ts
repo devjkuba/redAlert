@@ -37,6 +37,19 @@ export const registerHandler = async (req: Request, res: Response): Promise<void
       return;
     }
 
+    const existingOrganization = await prisma.organization.findFirst({
+      where: {
+        name,
+        city,
+        country,
+      },
+    });
+
+    if (existingOrganization) {
+      res.status(400).json({ message: 'Organization already exists' });
+      return;
+    }
+
     let newOrganization;
     try {
       newOrganization = await prisma.organization.create({
@@ -57,6 +70,17 @@ export const registerHandler = async (req: Request, res: Response): Promise<void
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const defaultServices = [
+      { label: 'Policie ČR', number: '158', icon: 'Shield', hasSms: true },
+      { label: 'Městská policie', number: '156', icon: 'Shield', hasSms: true },
+      { label: 'Zdravotnická záchranná služba', number: '155', icon: 'Ambulance', hasSms: false },
+      { label: 'Tísňová linka', number: '112', icon: 'PhoneCall', hasSms: true },
+      { label: 'Hasičský záchranný sbor ČR', number: '150', icon: 'Flame', hasSms: true },
+    ];
+    await prisma.emergencyService.createMany({
+      data: defaultServices.map(s => ({ ...s, organizationId: newOrganization.id })),
+    });
 
     try {
       const user = await prisma.user.create({
