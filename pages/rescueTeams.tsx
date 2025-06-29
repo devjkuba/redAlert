@@ -506,7 +506,7 @@ export default function RescueTeams() {
                       >
                         {cloneElement(icon, {
                           className: "w-6 h-6",
-                          color: form.iconColor, // tady se bere barva z pickeru
+                          color: form.iconColor || '#000000',
                           strokeWidth: isSelected ? 2 : 1,
                         })}
                       </button>
