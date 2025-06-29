@@ -13,7 +13,7 @@ import {
   Crosshair,
   MapPin,
   ShieldAlert,
-  SquarePen
+  SquarePen,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { cloneElement, useEffect, useState } from "react";
@@ -295,10 +295,12 @@ export default function RescueTeams() {
                     >
                       <CardHeader className="flex flex-row items-center justify-between !p-4 !pb-0">
                         <CardTitle className="text-md !pb-0 gap-[7px] flex items-center">
-                          {cloneElement(iconMap[svc.icon], {
-                            className: "w-5 h-5",
-                            color: svc.iconColor ?? "#000",
-                          })}
+                          {svc.icon && iconMap[svc.icon]
+                            ? cloneElement(iconMap[svc.icon], {
+                                className: "w-5 h-5",
+                                color: svc.iconColor ?? "#000",
+                              })
+                            : null}
                           {svc.label}
                         </CardTitle>
 
@@ -356,14 +358,14 @@ export default function RescueTeams() {
                             <span>Zavolat</span>
                           </Button>
                         </div>
-                          <div className="flex items-center">
-                            <button onClick={() => openEdit(svc)}>
-                              <SquarePen className="w-5 h-5" color="#2563EB" />
-                            </button>
-                            {/* <button onClick={() => handleDelete(svc.id)}>
+                        <div className="flex items-center">
+                          <button onClick={() => openEdit(svc)}>
+                            <SquarePen className="w-5 h-5" color="#2563EB" />
+                          </button>
+                          {/* <button onClick={() => handleDelete(svc.id)}>
                                 <Trash className="w-5 h-5 text-red-600" />
                               </button> */}
-                          </div>
+                        </div>
                       </CardContent>
                     </Card>
                   </SortableItem>
@@ -385,10 +387,12 @@ export default function RescueTeams() {
                 >
                   <CardHeader className="flex flex-row items-center justify-between !p-4 !pb-0">
                     <CardTitle className="text-md !pb-0 gap-[7px] flex items-center">
-                      {cloneElement(iconMap[svc.icon], {
-                        className: "w-5 h-5",
-                        color: svc.iconColor ?? "#000",
-                      })}
+                      {svc.icon && iconMap[svc.icon]
+                        ? cloneElement(iconMap[svc.icon], {
+                            className: "w-5 h-5",
+                            color: svc.iconColor ?? "#000",
+                          })
+                        : null}
                       {svc.label}
                     </CardTitle>
 
@@ -506,7 +510,7 @@ export default function RescueTeams() {
                       >
                         {cloneElement(icon, {
                           className: "w-6 h-6",
-                          color: form.iconColor || '#000000',
+                          color: form.iconColor || "#000000",
                           strokeWidth: isSelected ? 2 : 1,
                         })}
                       </button>
@@ -539,12 +543,14 @@ export default function RescueTeams() {
               <Button variant="secondary" onClick={() => setEditingSvc(null)}>
                 Zrušit
               </Button>
-              {editingSvc && <button
-                onClick={() => handleDelete(editingSvc.id)}
-                disabled={!editingSvc}
-              >
-                <Trash className="w-5 h-5 text-red-600" />
-              </button>}
+              {editingSvc && (
+                <button
+                  onClick={() => handleDelete(editingSvc.id)}
+                  disabled={!editingSvc}
+                >
+                  <Trash className="w-5 h-5 text-red-600" />
+                </button>
+              )}
               <Button onClick={submit} disabled={isLoading}>
                 {isNew
                   ? isLoading
