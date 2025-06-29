@@ -50,6 +50,8 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  TouchSensor,
+  MouseSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -192,8 +194,22 @@ export default function RescueTeams() {
     }
   };
 
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250,
+      tolerance: 5,
+    },
+  });
+
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    mouseSensor,
+    touchSensor
   );
 
   interface DragEndEvent {
@@ -291,7 +307,7 @@ export default function RescueTeams() {
                   <SortableItem key={svc.id} svc={svc}>
                     <Card
                       key={svc.id}
-                      className="rounded-3xl border border-grey/20 bg-[#f8f8f8] shadow-none relative"
+                      className="cursor-grab active:cursor-grabbing rounded-3xl border border-grey/20 bg-[#f8f8f8] shadow-none relative"
                     >
                       <CardHeader className="flex flex-row items-center justify-between !p-4 !pb-0">
                         <CardTitle className="text-md !pb-0 gap-[7px] flex items-center">
