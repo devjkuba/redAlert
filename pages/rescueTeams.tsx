@@ -49,7 +49,6 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-  PointerSensor,
   TouchSensor,
   MouseSensor,
 } from "@dnd-kit/core";
