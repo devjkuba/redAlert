@@ -199,7 +199,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex h-screen !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
+    <div className="flex h-[calc(100vh_-_32px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
       <div className="absolute top-[22px] left-4 z-50">
         <button
           onClick={() => window.history.back()}
@@ -228,7 +228,7 @@ export default function Chat() {
         />
         <div className="flex flex-col flex-grow items-center min-h-0">
           <div className="flex flex-col w-full max-w-3xl flex-grow min-h-0">
-            <div className="flex flex-col flex-grow overflow-y-auto px-4 space-y-4 min-h-0 mb-[20px]">
+            <div className="flex flex-col flex-grow overflow-y-auto px-4 space-y-4 min-h-0">
               {loading ? (
                 <div className="flex justify-center items-center">
                   <Spinner size="lg" className="mt-[20px] bg-black" />
@@ -396,7 +396,7 @@ export default function Chat() {
               )}
               <div ref={messagesEndRef} />
             </div>
-            <div className="sticky bottom-[20px] border-t p-3 flex gap-2 bg-white">
+            <div className="sticky bottom-0 border-t p-3 flex gap-2 bg-white">
               <div className="flex gap-2 items-center">
                 <label className="cursor-pointer bg-gray-100 rounded px-3 py-1 text-sm border border-gray-300 hover:bg-gray-200">
                   <Camera />
