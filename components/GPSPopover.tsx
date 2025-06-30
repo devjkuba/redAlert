@@ -61,7 +61,7 @@ const GPSPopover = ({ latitude, longitude, setLatitude, setLongitude }: GPSPopov
     return () => {
       stopWatching?.();
     };
-  }, []);
+  }, [setLatitude, setLongitude]);
 
   const copyToClipboard = () => {
     if (latitude !== null && longitude !== null) {

@@ -11,11 +11,6 @@ import { useSocket } from "@/hooks/useSocket";
 import { ShieldAlert, Camera, ShieldBan, ArrowLeft, MapPin } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { compressImage } from "@/lib/imageUtils";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
 
 export interface Message {
   id: string;
