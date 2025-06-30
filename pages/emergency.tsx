@@ -78,7 +78,7 @@ const availableIcons: { name: string; icon: JSX.Element }[] = [
   { name: "StarOfLife", icon: <ShieldAlert /> },
 ];
 
-export default function RescueTeams() {
+export default function EmergencyContacts() {
   const { isDemoActive } = useDemo();
   const token = useAuthToken();
   const { data: user } = useUser();
@@ -261,7 +261,7 @@ export default function RescueTeams() {
         <Breadcrumb className="w-full max-w-4xl px-4 py-2">
           <BreadcrumbList className="justify-between">
             <BreadcrumbItem>
-              <BreadcrumbLink>Záchranné složky</BreadcrumbLink>
+              <BreadcrumbLink>Nouzové kontakty</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbItem>
               {isAdmin && (

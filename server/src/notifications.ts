@@ -34,7 +34,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
     }
 
     case 'POST': {
-      const { type, message, triggeredById, organizationId, status } = req.body;
+      const { type, message, triggeredById, latitude, longitude, organizationId, status } = req.body;
 
       if (!type || !message || !triggeredById || !organizationId || !status) {
         res.status(400).json({ error: 'Missing required fields' });
@@ -75,6 +75,8 @@ export const notificationshandler = async (req: Request, res: Response): Promise
             type: 'ALARM',
             status,
             senderId,
+            latitude,
+            longitude,
             organizationId: orgId,
           },
         });

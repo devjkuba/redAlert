@@ -9,10 +9,15 @@ import { Copy, MapPin, Share, Map } from "lucide-react";
 import { getLocation, watchLocation } from "@/hooks/getLocation";
 import { Spinner } from "@/components/ui/spinner";
 
-export default function GPSPopover() {
+type GPSPopoverProps = {
+  latitude: number | null;
+  longitude: number | null;
+  setLatitude: (lat: number) => void;
+  setLongitude: (lng: number) => void;
+};
+
+const GPSPopover = ({ latitude, longitude, setLatitude, setLongitude }: GPSPopoverProps) => {
   const [coordinates, setCoordinates] = useState<string | null>(null);
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -166,3 +171,5 @@ export default function GPSPopover() {
     </Popover>
   );
 }
+
+export default GPSPopover;

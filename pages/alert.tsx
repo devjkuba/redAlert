@@ -30,7 +30,9 @@ const createNotification = async (
   status: string,
   triggeredById: number,
   organizationId: number,
-  isDemo: boolean = false
+  isDemo: boolean = false,
+  latitude: number | null = null,
+  longitude: number | null = null
 ) => {
   if (isDemo) return;
 
@@ -49,6 +51,8 @@ const createNotification = async (
           status,
           triggeredById,
           organizationId,
+          latitude,
+          longitude,
         }),
       }
     );
@@ -114,6 +118,8 @@ const alertButtons = [
 export default function Alert() {
   const { data: user } = useUser();
   const socket = useSocket();
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
 
   const { isDemoActive } = useDemo();
   const token = useAuthToken();
@@ -265,7 +271,9 @@ export default function Alert() {
         "ACTIVE",
         Number(user?.id),
         Number(user?.organizationId),
-        isDemoActive
+        isDemoActive,
+        latitude,
+        longitude
       ); // replace with actual user and organization IDs
     } else {
       toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
@@ -286,7 +294,9 @@ export default function Alert() {
         "INACTIVE",
         Number(user?.id),
         Number(user?.organizationId),
-        isDemoActive
+        isDemoActive,
+        latitude,
+        longitude
       );
     }
   };
@@ -319,7 +329,9 @@ export default function Alert() {
       mainActive ? "INACTIVE" : "ACTIVE",
       Number(user?.id),
       Number(user?.organizationId),
-      isDemoActive
+      isDemoActive,
+      latitude,
+      longitude
     );
   };
 
@@ -337,7 +349,12 @@ export default function Alert() {
         </div>
         <Navbar />
         <div className="w-full mx-auto max-w-sm text-center px-4 space-y-6 overflow-auto overscroll-none max-h-[calc(100vh_-_79px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
-          <GPSPopover />
+          <GPSPopover
+            latitude={latitude}
+            longitude={longitude}
+            setLatitude={setLatitude}
+            setLongitude={setLongitude}
+          />
           <div className="mt-6 grid grid-cols-3 gap-4">
             {alertButtons.map(({ label, className, icon: Icon }, index) => (
               <button

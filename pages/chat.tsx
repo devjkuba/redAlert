@@ -2,16 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import useUser from "@/hooks/useUser";
 import { Socket } from "socket.io-client";
 import { Toaster } from "@/components/ui/sonner";
-import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
 import subscribeToPush from "@/components/Push";
 import { useSocket } from "@/hooks/useSocket";
-import { ShieldAlert, Camera, ShieldBan } from "lucide-react";
+import { ShieldAlert, Camera, ShieldBan, ArrowLeft, MapPin } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { compressImage } from "@/lib/imageUtils";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 export interface Message {
   id: string;
@@ -20,6 +24,8 @@ export interface Message {
   text: string;
   status: string;
   createdAt: Date;
+  latitude?: number;
+  longitude?: number;
   type: "TEXT" | "ALARM" | "IMAGE";
   imageUrl?: string;
   sender: {
@@ -198,17 +204,23 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
+    <div className="flex h-screen !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
+      <div className="absolute top-[22px] left-4 z-50">
+        <button
+          onClick={() => window.history.back()}
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 w-9 bg-transparent hover:bg-transparent hover:text-gray-300 transition-colors duration-300 ease-in-out"
+          aria-label="Zpět"
+        >
+          <ArrowLeft stroke="black" strokeWidth={2} />
+          <span className="sr-only">Zpět</span>
+        </button>
+      </div>
       <main className="relative overflow-hidden flex flex-col flex-grow">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
             DEMO
           </div>
         )}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center">
-          <img src="/logo.png" alt="Logo" className="w-40 h-auto" />
-        </div>
-        <Navbar />
         <Toaster
           position="bottom-center"
           toastOptions={{
@@ -219,9 +231,9 @@ export default function Chat() {
             },
           }}
         />
-        <div className="flex flex-col flex-grow items-center">
-          <div className="flex flex-col w-full max-w-3xl overflow-scroll h-[calc(100vh_-_109px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
-            <div className="flex-1 overflow-y-auto px-4 space-y-4">
+        <div className="flex flex-col flex-grow items-center min-h-0">
+          <div className="flex flex-col w-full max-w-3xl flex-grow min-h-0">
+            <div className="flex flex-col flex-grow overflow-y-auto px-4 space-y-4 min-h-0 mb-[20px]">
               {loading ? (
                 <div className="flex justify-center items-center">
                   <Spinner size="lg" className="mt-[20px] bg-black" />
@@ -274,15 +286,26 @@ export default function Chat() {
                             </span>
                             <span>
                               {isActive ? (
-                                <ShieldAlert className="inline-block h-5 mt-[-3px]" />
+                                  <ShieldAlert className="inline-block h-5 mt-[-3px] text-red-500" />
                               ) : (
-                                <ShieldBan className="inline-block h-5 mt-[-3px]" />
+                                <ShieldBan className="inline-block h-5 mt-[-3px] text-green-600" />
                               )}
                               {msg.text}
                             </span>
                           </div>
                           <div className="text-xs text-gray-500 text-center">
                             {formattedDate}
+                            {isActive && msg.latitude && msg.longitude && (
+                                  <a
+                                    href={`https://maps.google.com/?q=${msg.latitude},${msg.longitude}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                                    aria-label="Zobrazit polohu na mapě"
+                                  >
+                                    <MapPin className="inline-block ml-1 w-3 h-3 mt-[-3px] text-current" />Zobrazit na mapě
+                                  </a>
+                                )}
                           </div>
                         </div>
                       </div>
@@ -321,7 +344,9 @@ export default function Chat() {
                               alt="Obrázek"
                               className="rounded w-[45vw] max-h-[35vh] object-cover cursor-pointer"
                               onLoad={() => {
-                                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+                                messagesEndRef.current?.scrollIntoView({
+                                  behavior: "smooth",
+                                });
                               }}
                             />
                             {msg.text?.trim() && (
@@ -376,7 +401,7 @@ export default function Chat() {
               )}
               <div ref={messagesEndRef} />
             </div>
-            <div className="sticky bottom-0 border-t p-3 flex gap-2 bg-white">
+            <div className="sticky bottom-[20px] border-t p-3 flex gap-2 bg-white">
               <div className="flex gap-2 items-center">
                 <label className="cursor-pointer bg-gray-100 rounded px-3 py-1 text-sm border border-gray-300 hover:bg-gray-200">
                   <Camera />

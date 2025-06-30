@@ -16,6 +16,8 @@ model Message {
   createdAt      DateTime            @default(now())
   type           MessageType         @default(TEXT)
   status         NotificationStatus?
+  latitude       Float?              // ← přidáno
+  longitude      Float?
   organization   Organization        @relation(fields: [organizationId], references: [id])
   sender         User                @relation(fields: [senderId], references: [id], onDelete: Cascade) // ADDED
 }
@@ -74,7 +76,7 @@ model PushSubscription {
   keysP256dh String
   userId     Int
   createdAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id])
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade) // ← přidáno
 }
 
 model EmergencyService {

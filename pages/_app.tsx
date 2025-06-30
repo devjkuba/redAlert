@@ -17,7 +17,7 @@ const checkUserPermissions = (token: string | null) => {
 
 const protectedRoutes = [
   "/alert",
-  "/rescueTeams",
+  "/emergency",
   "/profile",
   "/monitoring",
   "/settings",
