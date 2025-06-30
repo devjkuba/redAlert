@@ -199,8 +199,8 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex h-[calc(100vh_-_32px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
-      <div className="absolute top-[22px] left-4 z-50">
+    <div className="flex relative h-[calc(100vh_-_32px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] landscape:h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
+      <div className="absolute top-[22px] z-50" style={{ left: `calc(1rem + env(safe-area-inset-left))` }}>
         <button
           onClick={() => window.history.back()}
           className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 w-9 bg-transparent hover:bg-transparent hover:text-gray-300 transition-colors duration-300 ease-in-out"
