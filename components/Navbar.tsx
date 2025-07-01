@@ -20,8 +20,8 @@ export default function Navbar() {
     <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="bg-[#f8f8f8] text-black hover:bg-gray-600 hover:text-white transition-colors duration-300 ease-in-out border border-gray-300">
-            <Menu className="h-6 w-6 text-current transition-colors duration-300 ease-in-out" />
+          <Button variant="outline" size="icon" className="bg-[#f8f8f8] text-black border border-gray-300">
+            <Menu className="h-6 w-6 text-current" />
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
