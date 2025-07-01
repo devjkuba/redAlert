@@ -2,7 +2,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetDescription } from 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import useUser from "@/hooks/useUser";
-import { Bell, MessageCircle, Shield, LogOut, Settings, MonitorSmartphone } from "lucide-react";
+import { Bell, MessageCircle, Shield, LogOut, Settings, MonitorSmartphone, Menu } from "lucide-react";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
@@ -20,8 +20,8 @@ export default function Navbar() {
     <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="bg-transparent hover:bg-transparent hover:text-gray-300 transition-colors duration-300 ease-in-out">
-            <MenuIcon className="h-6 w-6" />
+          <Button variant="outline" size="icon" className="bg-[#f8f8f8] text-black hover:bg-gray-600 hover:text-white transition-colors duration-300 ease-in-out border border-gray-300">
+            <Menu className="h-6 w-6 text-current transition-colors duration-300 ease-in-out" />
             <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
@@ -62,26 +62,5 @@ export default function Navbar() {
         </SheetContent>
       </Sheet>
     </header>
-  )
-}
-
-function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="black"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="4" x2="20" y1="12" y2="12" />
-      <line x1="4" x2="20" y1="6" y2="6" />
-      <line x1="4" x2="20" y1="18" y2="18" />
-    </svg>
   )
 }

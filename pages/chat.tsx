@@ -203,10 +203,10 @@ export default function Chat() {
       <div className="absolute top-[22px] z-50" style={{ left: `calc(1rem + env(safe-area-inset-left))` }}>
         <button
           onClick={() => window.history.back()}
-          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 w-9 bg-transparent hover:bg-transparent hover:text-gray-300 transition-colors duration-300 ease-in-out"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 w-9 bg-[#f8f8f8] text-black hover:bg-gray-600 hover:text-white transition-colors duration-300 ease-in-out border border-gray-300"
           aria-label="Zpět"
         >
-          <ArrowLeft stroke="black" strokeWidth={2} />
+          <ArrowLeft className="text-current transition-colors duration-300 ease-in-out" strokeWidth={2} />
           <span className="sr-only">Zpět</span>
         </button>
       </div>
