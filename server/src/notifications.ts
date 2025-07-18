@@ -1,20 +1,23 @@
-import { Request, Response } from 'express';
-import { prisma } from './prisma';
-import { io } from './server';
-import { sendEmail } from './mailer';
-import { sendWebPushToOrg } from './pushUtils';
-import cron, { ScheduledTask } from 'node-cron';
+import { Request, Response } from "express";
+import { prisma } from "./prisma";
+import { io } from "./server";
+import { sendEmail } from "./mailer";
+import { sendWebPushToOrg } from "./pushUtils";
+import cron, { ScheduledTask } from "node-cron";
 
 const cronJobsByOrgType = new Map<string, ScheduledTask>();
 
-export const notificationshandler = async (req: Request, res: Response): Promise<void> => {
+export const notificationshandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { method } = req;
 
   switch (method) {
-    case 'GET': {
+    case "GET": {
       const orgId = Number(req.query.orgId);
       if (!orgId) {
-        res.status(400).json({ error: 'Missing or invalid organization ID' });
+        res.status(400).json({ error: "Missing or invalid organization ID" });
         return;
       }
 
@@ -22,32 +25,58 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         const notifications = await prisma.notification.findMany({
           where: { organizationId: orgId },
           include: { triggeredBy: true },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 100,
         });
         res.status(200).json(notifications);
       } catch (error) {
-        console.error('Error fetching notifications:', error);
-        res.status(500).json({ error: 'Error fetching notifications' });
+        console.error("Error fetching notifications:", error);
+        res.status(500).json({ error: "Error fetching notifications" });
       }
       break;
     }
 
-    case 'POST': {
-      const { type, message, triggeredById, latitude, longitude, organizationId, status } = req.body;
+    case "POST": {
+      const {
+        type,
+        message,
+        triggeredById,
+        latitude,
+        longitude,
+        organizationId,
+        status,
+      } = req.body;
 
       if (!type || !message || !triggeredById || !organizationId || !status) {
-        res.status(400).json({ error: 'Missing required fields' });
+        res.status(400).json({ error: "Missing required fields" });
         return;
       }
 
       const orgId = Number(organizationId);
       const senderId = Number(triggeredById);
       const intervalSec = 30;
-      const jobKey = `${orgId}`;
+      const jobKey = `${orgId}-${type}`;
 
       try {
-       const existingJob = cronJobsByOrgType.get(jobKey);
+        const existingActive = await prisma.notification.findFirst({
+          where: {
+            organizationId: orgId,
+            type,
+            status: "ACTIVE",
+          },
+        });
+
+        if (existingActive) {
+          res
+            .status(400)
+            .json({
+              error:
+                "Aktivní notifikace tohoto typu již existuje. Nejprve ji deaktivujte.",
+            });
+          return;
+        }
+
+        const existingJob = cronJobsByOrgType.get(jobKey);
         if (existingJob) {
           existingJob.stop();
           cronJobsByOrgType.delete(jobKey);
@@ -57,7 +86,6 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           where: { id: orgId },
           select: { name: true },
         });
-
 
         const savedNotification = await prisma.notification.create({
           data: {
@@ -72,7 +100,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
         await prisma.message.create({
           data: {
             text: message,
-            type: 'ALARM',
+            type: "ALARM",
             status,
             senderId,
             latitude,
@@ -90,7 +118,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           where: {
             organizationId: orgId,
             isActive: true,
-            emailNotificationsEnabled: true, 
+            emailNotificationsEnabled: true,
           },
           select: {
             email: true,
@@ -99,27 +127,27 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           },
         });
 
-        const senderName = sender ? [sender.firstName, sender.lastName].filter(Boolean).join(' ') : '';
-        const emailPromises = users.map(user => {
+        const senderName = sender
+          ? [sender.firstName, sender.lastName].filter(Boolean).join(" ")
+          : "";
+        const emailPromises = users.map((user) => {
           if (!user.email) return Promise.resolve();
           return sendEmail({
             to: user.email,
             subject: `Nová notifikace: ${type}`,
-            text: `${message}\nOdesílatel: ${senderName}\nOrganizace: ${organization?.name ?? ''}`,
+            text: `${message}\nOdesílatel: ${senderName}\nOrganizace: ${
+              organization?.name ?? ""
+            }`,
           });
         });
 
         await Promise.all(emailPromises);
 
-        await sendWebPushToOrg(
-          orgId,
-          `Notifikace: ${type}`,
-          message
-        );
+        await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
 
-        io.to(`org-${orgId}`).emit('newNotification', savedNotification);
+        io.to(`org-${orgId}`).emit("newNotification", savedNotification);
 
-        if (status === 'ACTIVE') {
+        if (status === "ACTIVE") {
           const cronExpr = `*/${intervalSec} * * * * *`;
           const task: ScheduledTask = cron.schedule(cronExpr, async () => {
             await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
@@ -128,16 +156,16 @@ export const notificationshandler = async (req: Request, res: Response): Promise
           cronJobsByOrgType.set(jobKey, task);
         }
 
-        res.status(201).json({ message: 'Notification created successfully' });
+        res.status(201).json({ message: "Notification created successfully" });
       } catch (error) {
-        console.error('Error creating notification:', error);
-        res.status(500).json({ error: 'Error creating notification' });
+        console.error("Error creating notification:", error);
+        res.status(500).json({ error: "Error creating notification" });
       }
       break;
     }
 
     default:
-      res.status(405).json({ error: 'Method not allowed' });
+      res.status(405).json({ error: "Method not allowed" });
       break;
   }
 };
