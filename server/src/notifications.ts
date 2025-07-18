@@ -55,7 +55,6 @@ export const notificationshandler = async (
       const orgId = Number(organizationId);
       const senderId = Number(triggeredById);
       const intervalSec = 30;
-      const jobKey = `${orgId}-${type}`;
 
       try {
         const latestNotification = await prisma.notification.findFirst({
@@ -68,10 +67,11 @@ export const notificationshandler = async (
           },
         });
 
-        const existingJob = cronJobsByOrgType.get(jobKey);
-        if (existingJob) {
-          existingJob.stop();
-          cronJobsByOrgType.delete(jobKey);
+        for (const [key, job] of cronJobsByOrgType.entries()) {
+          if (key.startsWith(orgId + "-")) {
+            job.stop();
+            cronJobsByOrgType.delete(key);
+          }
         }
 
         const organization = await prisma.organization.findUnique({
@@ -146,6 +146,7 @@ export const notificationshandler = async (
         }
 
         if (status === "ACTIVE") {
+          const jobKey = `${orgId}-${type}`;
           const cronExpr = `*/${intervalSec} * * * * *`;
           const task: ScheduledTask = cron.schedule(cronExpr, async () => {
             await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
