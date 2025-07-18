@@ -119,6 +119,7 @@ export default function Alert() {
   const { data: user } = useUser();
   const socket = useSocket();
   const [latitude, setLatitude] = useState<number | null>(null);
+  const [sending, setSending] = useState(false);
   const [longitude, setLongitude] = useState<number | null>(null);
 
   const { isDemoActive } = useDemo();
@@ -247,6 +248,14 @@ export default function Alert() {
   }, [socket, user?.id, user?.organizationId]);
 
   const toggleAlert = async (index: number) => {
+    if (sending) {
+      toast("Počkejte prosím, notifikace se právě odesílá.", {
+        duration: 2000,
+      });
+      return;
+    }
+    setSending(true);
+
     const updatedStates = [...activeStates];
     updatedStates[index] = !updatedStates[index];
     setActiveStates(updatedStates);
@@ -258,7 +267,8 @@ export default function Alert() {
       toast.error("Chyba: Uživatel nebo organizace není definována.", {
         duration: 5000,
         classNames: {
-          toast: "!bg-yellow-100 border-l-4 !border-yellow-500 !text-yellow-700 p-4 shadow-lg rounded-lg",
+          toast:
+            "!bg-yellow-100 border-l-4 !border-yellow-500 !text-yellow-700 p-4 shadow-lg rounded-lg",
           title: "font-bold text-yellow-700",
           description: "text-yellow-600",
           icon: "text-yellow-500",
@@ -268,53 +278,57 @@ export default function Alert() {
       return;
     }
 
-    const alert = alertButtons[index];
-    if (updatedStates[index]) {
-      toast.error(`Poplach "${alert.label}" byl aktivován.`, {
-        duration: 5000,
-        classNames: {
-          toast:
-            "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
-          title: "font-bold text-red-700",
-          description: "text-red-600",
-          icon: "text-red-500",
-          closeButton: "text-red-500 hover:text-red-700",
-        },
-      });
-      await createNotification(
-        token,
-        alert.label,
-        `${alert.label} aktivován.`,
-        "ACTIVE",
-        userId,
-        organizationId,
-        isDemoActive,
-        latitude,
-        longitude
-      ); // replace with actual user and organization IDs
-    } else {
-      toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
-        duration: 5000,
-        classNames: {
-          toast:
-            "!bg-green-100 border-l-4 !border-green-500 !text-green-700 p-4 shadow-lg rounded-lg",
-          title: "font-bold !text-green-700",
-          description: "!text-green-600",
-          icon: "!text-green-500",
-          closeButton: "!text-green-500 !hover:text-green-700",
-        },
-      });
-      await createNotification(
-        token,
-        alert.label,
-        `${alert.label} deaktivován.`,
-        "INACTIVE",
-        userId,
-        organizationId,
-        isDemoActive,
-        latitude,
-        longitude
-      );
+    try {
+      const alert = alertButtons[index];
+      if (updatedStates[index]) {
+        toast.error(`Poplach "${alert.label}" byl aktivován.`, {
+          duration: 5000,
+          classNames: {
+            toast:
+              "!bg-red-100 border-l-4 !border-red-500 !text-red-700 p-4 shadow-lg rounded-lg",
+            title: "font-bold text-red-700",
+            description: "text-red-600",
+            icon: "text-red-500",
+            closeButton: "text-red-500 hover:text-red-700",
+          },
+        });
+        await createNotification(
+          token,
+          alert.label,
+          `${alert.label} aktivován.`,
+          "ACTIVE",
+          userId,
+          organizationId,
+          isDemoActive,
+          latitude,
+          longitude
+        ); // replace with actual user and organization IDs
+      } else {
+        toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
+          duration: 5000,
+          classNames: {
+            toast:
+              "!bg-green-100 border-l-4 !border-green-500 !text-green-700 p-4 shadow-lg rounded-lg",
+            title: "font-bold !text-green-700",
+            description: "!text-green-600",
+            icon: "!text-green-500",
+            closeButton: "!text-green-500 !hover:text-green-700",
+          },
+        });
+        await createNotification(
+          token,
+          alert.label,
+          `${alert.label} deaktivován.`,
+          "INACTIVE",
+          userId,
+          organizationId,
+          isDemoActive,
+          latitude,
+          longitude
+        );
+      }
+    } finally {
+      setSending(false);
     }
   };
 
@@ -376,6 +390,7 @@ export default function Alert() {
             {alertButtons.map(({ label, className, icon: Icon }, index) => (
               <button
                 key={index}
+                disabled={sending}
                 onClick={() => toggleAlert(index)}
                 className={twMerge(
                   "group relative aspect-square rounded-3xl bg-gradient-to-br shadow-xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm",
@@ -399,6 +414,7 @@ export default function Alert() {
           <div className="px-6 mb-20 flex justify-center">
             <button
               onClick={toggleMainAlert}
+              disabled={sending}
               className={twMerge(
                 "relative max-w-[200px] group bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 rounded-3xl px-12 py-6 hover:shadow-red-500/60 active:scale-95 transition-all duration-300 border-2 border-red-400/30 min-w-[200px]",
                 mainActive &&
