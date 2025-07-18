@@ -7,6 +7,8 @@ import cron, { ScheduledTask } from "node-cron";
 
 const cronJobsByOrgType = new Map<string, ScheduledTask>();
 
+const cronJobLocks = new Set<string>();
+
 export const notificationshandler = async (
   req: Request,
   res: Response
@@ -55,6 +57,13 @@ export const notificationshandler = async (
       const orgId = Number(organizationId);
       const senderId = Number(triggeredById);
       const intervalSec = 30;
+      const jobKey = `${orgId}-${type}`;
+
+      if (cronJobLocks.has(jobKey)) {
+        res.status(429).json({ error: "Processing in progress, try again shortly" });
+        return;
+      }
+      cronJobLocks.add(jobKey);
 
       try {
         const latestNotification = await prisma.notification.findFirst({
@@ -146,7 +155,6 @@ export const notificationshandler = async (
         }
 
         if (status === "ACTIVE") {
-          const jobKey = `${orgId}-${type}`;
           const cronExpr = `*/${intervalSec} * * * * *`;
           const task: ScheduledTask = cron.schedule(cronExpr, async () => {
             await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
@@ -159,6 +167,8 @@ export const notificationshandler = async (
       } catch (error) {
         console.error("Error creating notification:", error);
         res.status(500).json({ error: "Error creating notification" });
+      } finally {
+        cronJobLocks.delete(jobKey);
       }
       break;
     }
