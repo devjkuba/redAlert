@@ -64,15 +64,16 @@ export const notificationshandler = async (
             type,
             status: "ACTIVE",
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         });
 
         if (existingActive) {
-          res
-            .status(400)
-            .json({
-              error:
-                "Aktivní notifikace tohoto typu již existuje. Nejprve ji deaktivujte.",
-            });
+          res.status(400).json({
+            error:
+              "Aktivní notifikace tohoto typu již existuje. Nejprve ji deaktivujte.",
+          });
           return;
         }
 
