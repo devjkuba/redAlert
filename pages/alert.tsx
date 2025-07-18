@@ -251,6 +251,23 @@ export default function Alert() {
     updatedStates[index] = !updatedStates[index];
     setActiveStates(updatedStates);
 
+    const userId = Number(user?.id);
+    const organizationId = Number(user?.organizationId);
+
+    if (!userId || !organizationId) {
+      toast.error("Chyba: Uživatel nebo organizace není definována.", {
+        duration: 5000,
+        classNames: {
+          toast: "!bg-yellow-100 border-l-4 !border-yellow-500 !text-yellow-700 p-4 shadow-lg rounded-lg",
+          title: "font-bold text-yellow-700",
+          description: "text-yellow-600",
+          icon: "text-yellow-500",
+          closeButton: "text-yellow-500 hover:text-yellow-700",
+        },
+      });
+      return;
+    }
+
     const alert = alertButtons[index];
     if (updatedStates[index]) {
       toast.error(`Poplach "${alert.label}" byl aktivován.`, {
@@ -269,8 +286,8 @@ export default function Alert() {
         alert.label,
         `${alert.label} aktivován.`,
         "ACTIVE",
-        Number(user?.id),
-        Number(user?.organizationId),
+        userId,
+        organizationId,
         isDemoActive,
         latitude,
         longitude
@@ -292,8 +309,8 @@ export default function Alert() {
         alert.label,
         `${alert.label} deaktivován.`,
         "INACTIVE",
-        Number(user?.id),
-        Number(user?.organizationId),
+        userId,
+        organizationId,
         isDemoActive,
         latitude,
         longitude
