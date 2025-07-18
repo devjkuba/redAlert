@@ -58,18 +58,17 @@ export const notificationshandler = async (
       const jobKey = `${orgId}-${type}`;
 
       try {
-        const existingActive = await prisma.notification.findFirst({
+        const latestNotification = await prisma.notification.findFirst({
           where: {
             organizationId: orgId,
             type,
-            status: "ACTIVE",
           },
           orderBy: {
             createdAt: "desc",
           },
         });
 
-        if (existingActive) {
+        if (latestNotification?.status === "ACTIVE" && latestNotification.type === type) {
           res.status(400).json({
             error:
               "Aktivní notifikace tohoto typu již existuje. Nejprve ji deaktivujte.",
