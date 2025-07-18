@@ -44,7 +44,7 @@ export const notificationshandler = async (req: Request, res: Response): Promise
       const orgId = Number(organizationId);
       const senderId = Number(triggeredById);
       const intervalSec = 30;
-      const jobKey = `${orgId}-${type}`;
+      const jobKey = `${orgId}`;
 
       try {
        const existingJob = cronJobsByOrgType.get(jobKey);
