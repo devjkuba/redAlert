@@ -68,14 +68,6 @@ export const notificationshandler = async (
           },
         });
 
-        if (latestNotification?.status === "ACTIVE" && latestNotification.type === type) {
-          res.status(400).json({
-            error:
-              "Aktivní notifikace tohoto typu již existuje. Nejprve ji deaktivujte.",
-          });
-          return;
-        }
-
         const existingJob = cronJobsByOrgType.get(jobKey);
         if (existingJob) {
           existingJob.stop();
@@ -146,6 +138,12 @@ export const notificationshandler = async (
         await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
 
         io.to(`org-${orgId}`).emit("newNotification", savedNotification);
+
+        if (latestNotification?.status === "ACTIVE" && latestNotification.type === type) {
+          res.status(201).json({ message: "Notification created successfully" });
+
+          return;
+        }
 
         if (status === "ACTIVE") {
           const cronExpr = `*/${intervalSec} * * * * *`;
