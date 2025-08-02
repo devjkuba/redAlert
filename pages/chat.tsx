@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { compressImage } from "@/lib/imageUtils";
+import { useRouter } from "next/router";
 
 export interface Message {
   id: string;
@@ -52,6 +53,7 @@ export default function Chat() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const [socket, setSocket] = useState<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -232,7 +234,13 @@ export default function Chat() {
         style={{ left: `calc(1rem + env(safe-area-inset-left))` }}
       >
         <Button
-          onClick={() => window.history.back()}
+          onClick={() => {
+            if (window.history.length > 1) {
+              router.back();
+            } else {
+              router.push("/alert");
+            }
+          }}
           variant="outline"
           size="icon"
           className="bg-[#f8f8f8] text-black border border-gray-300"
