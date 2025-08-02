@@ -31,7 +31,7 @@ export default function AdminNotifications() {
   // Získání notifikací pro administrátora
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (user?.role !== "ADMIN" && user?.role !== "SUPERADMIN") return; // Pokud uživatel není admin, nic nezobrazujeme
+      if (!user?.isDevice && user?.role !== "ADMIN" && user?.role !== "SUPERADMIN") return; // Pokud uživatel není admin, nic nezobrazujeme
       try {
         const data = await getNotifications(token, user.organizationId!); // Získej notifikace na základě organizace
         setNotifications(data);
@@ -46,7 +46,7 @@ export default function AdminNotifications() {
     };
 
     fetchNotifications();
-  }, [token, user?.organizationId, user?.role]);
+  }, [token, user?.isDevice, user?.organizationId, !user?.isDevice && user?.role]);
 
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
