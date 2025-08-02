@@ -106,7 +106,7 @@ export default function EmergencyContacts() {
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
 
-  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
+  const isAdmin = !user?.isDevice && user?.role === "ADMIN" || !user?.isDevice && user?.role === "SUPERADMIN";
 
   const [coordinates, setCoordinates] = useState<string | null>(null);
 
@@ -305,7 +305,6 @@ export default function EmergencyContacts() {
                 {sortedServices?.map((svc) => (
                   <SortableItem key={svc.id} svc={svc}>
                     <Card
-                      key={svc.id}
                       className="cursor-grab active:cursor-grabbing rounded-3xl border border-grey/20 bg-[#f8f8f8] shadow-none relative"
                     >
                       <CardHeader className="flex flex-row items-center justify-between !p-4 !pb-0">

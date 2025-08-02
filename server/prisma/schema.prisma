@@ -9,29 +9,33 @@ datasource db {
 
 model Message {
   id             Int                 @id @default(autoincrement())
-  text           String
+  text           String?
   imageUrl       String?
-  senderId       Int
+  senderId       Int?
+  deviceId       Int?
   organizationId Int
   createdAt      DateTime            @default(now())
   type           MessageType         @default(TEXT)
   status         NotificationStatus?
-  latitude       Float?              // ← přidáno
+  latitude       Float?
   longitude      Float?
   organization   Organization        @relation(fields: [organizationId], references: [id])
-  sender         User                @relation(fields: [senderId], references: [id], onDelete: Cascade) // ADDED
+  sender         User?               @relation(fields: [senderId], references: [id], onDelete: Cascade, name: "MessageSender")
+  device         Device?             @relation(fields: [deviceId], references: [id], onDelete: Cascade, name: "MessageDevice")
 }
 
 model Notification {
   id             Int                @id @default(autoincrement())
   type           String
   message        String
-  triggeredById  Int
+  triggeredById  Int?
+  triggeredByDeviceId Int?
   organizationId Int
   createdAt      DateTime           @default(now())
   status         NotificationStatus @default(INACTIVE)
   organization   Organization       @relation(fields: [organizationId], references: [id])
-  triggeredBy    User               @relation("UserToNotification", fields: [triggeredById], references: [id], onDelete: Cascade) // ADDED
+  triggeredBy    User?              @relation("UserToNotification", fields: [triggeredById], references: [id], onDelete: Cascade)
+  triggeredByDevice Device?         @relation("DeviceToNotification", fields: [triggeredByDeviceId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -40,19 +44,33 @@ model User {
   lastName                  String             @default("")
   organizationId            Int?
   email                     String             @unique
+  phoneNumber               String?            @unique
   password                  String
   createdAt                 DateTime           @default(now())
   role                      Role               @default(USER)
   isActive                  Boolean            @default(true)
   emailNotificationsEnabled Boolean            @default(true)
-  messages                  Message[]
+  messages                  Message[]          @relation("MessageSender")
   notifications             Notification[]     @relation("UserToNotification")
   pushSubscriptions         PushSubscription[]
   organization              Organization?      @relation(fields: [organizationId], references: [id])
 }
 
+model Device {
+  id                Int                @id @default(autoincrement())
+  name              String             @default("")
+  phoneNumber       String             @unique
+  password          String
+  organizationId    Int
+  createdAt         DateTime           @default(now())
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pushSubscriptions PushSubscription[]
+  messages          Message[]          @relation("MessageDevice")
+  notifications     Notification[]     @relation("DeviceToNotification")
+}
+
 model Organization {
-  id                     Int            @id @default(autoincrement())
+  id                     Int                @id @default(autoincrement())
   name                   String
   country                String
   gpsLat                 Float
@@ -60,13 +78,14 @@ model Organization {
   postalCode             String
   street                 String
   city                   String
-  activeUntil            DateTime       @default(dbgenerated("(CURRENT_DATE + '1 mon'::interval)"))
-  subscriptionPaid       Boolean        @default(false)
+  activeUntil            DateTime           @default(dbgenerated("(CURRENT_DATE + '1 mon'::interval)"))
+  subscriptionPaid       Boolean            @default(false)
   subscriptionValidUntil DateTime?
   messages               Message[]
   notifications          Notification[]
   users                  User[]
-  emergencyServices      EmergencyService[] 
+  emergencyServices      EmergencyService[]
+  devices                Device[]
 }
 
 model PushSubscription {
@@ -74,19 +93,21 @@ model PushSubscription {
   endpoint   String   @unique
   keysAuth   String
   keysP256dh String
-  userId     Int
+  userId     Int?
+  deviceId   Int?
   createdAt  DateTime @default(now())
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade) // ← přidáno
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device     Device?  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 }
 
 model EmergencyService {
   id             Int          @id @default(autoincrement())
   label          String
   number         String
-  icon           String       // např. název ikony ("Shield", "Ambulance"...)
+  icon           String // např. název ikony ("Shield", "Ambulance"...)
   iconColor      String?
   hasSms         Boolean
-  order          Int          @default(0)  // ⬅️ přidáno
+  order          Int          @default(0) // ⬅️ přidáno
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId Int
   createdAt      DateTime     @default(now())

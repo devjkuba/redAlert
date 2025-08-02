@@ -28,15 +28,40 @@ const createNotification = async (
   type: string,
   message: string,
   status: string,
-  triggeredById: number,
+  senderId: number,
   organizationId: number,
   isDemo: boolean = false,
   latitude: number | null = null,
-  longitude: number | null = null
+  longitude: number | null = null,
+  isDevice: boolean = false
 ) => {
   if (isDemo) return;
 
   try {
+    const body: {
+      type: string;
+      message: string;
+      status: string;
+      organizationId: number;
+      latitude: number | null;
+      longitude: number | null;
+      triggeredByDeviceId?: number;
+      triggeredById?: number;
+    } = {
+      type,
+      message,
+      status,
+      organizationId,
+      latitude,
+      longitude,
+    };
+
+    if (isDevice) {
+      body.triggeredByDeviceId = senderId;
+    } else {
+      body.triggeredById = senderId;
+    }
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/notifications`,
       {
@@ -45,15 +70,7 @@ const createNotification = async (
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          type,
-          message,
-          status,
-          triggeredById,
-          organizationId,
-          latitude,
-          longitude,
-        }),
+        body: JSON.stringify(body),
       }
     );
 
@@ -64,7 +81,6 @@ const createNotification = async (
       }
       throw new Error("Error creating notification");
     }
-    return;
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error:", error.message);
@@ -74,6 +90,7 @@ const createNotification = async (
     }
   }
 };
+
 
 const alertButtons = [
   {
@@ -132,7 +149,7 @@ export default function Alert() {
 
   useEffect(() => {
     if (user?.id && token) {
-      subscribeToPush(user?.id, token);
+      subscribeToPush({token, userId: !user?.isDevice ? user?.id : undefined, deviceId: user?.isDevice ? user?.id : undefined});
     }
   }, [token, user?.id]);
 
@@ -301,7 +318,8 @@ export default function Alert() {
           organizationId,
           isDemoActive,
           latitude,
-          longitude
+          longitude,
+          user?.isDevice
         ); // replace with actual user and organization IDs
       } else {
         toast.success(`Poplach "${alert.label}" byl deaktivován.`, {
@@ -324,7 +342,8 @@ export default function Alert() {
           organizationId,
           isDemoActive,
           latitude,
-          longitude
+          longitude,
+          user?.isDevice
         );
       }
     } finally {
@@ -362,7 +381,8 @@ export default function Alert() {
       Number(user?.organizationId),
       isDemoActive,
       latitude,
-      longitude
+      longitude,
+      user?.isDevice
     );
   };
 

@@ -8,13 +8,20 @@ import useDemo from "@/hooks/useDemo";
 import useAuthToken from "@/hooks/useAuthToken";
 import subscribeToPush from "@/components/Push";
 import { useSocket } from "@/hooks/useSocket";
-import { ShieldAlert, Camera, ShieldBan, ArrowLeft, MapPin } from "lucide-react";
+import {
+  ShieldAlert,
+  Camera,
+  ShieldBan,
+  ArrowLeft,
+  MapPin,
+} from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { compressImage } from "@/lib/imageUtils";
 
 export interface Message {
   id: string;
-  senderId: string;
+  senderId?: string;
+  deviceId?: string;
   organizationId: number;
   text: string;
   status: string;
@@ -23,11 +30,15 @@ export interface Message {
   longitude?: number;
   type: "TEXT" | "ALARM" | "IMAGE";
   imageUrl?: string;
-  sender: {
+  sender?: {
     firstName: string;
     lastName: string;
     email: string;
     id: number;
+  };
+  device?: {
+    id: number;
+    name: string;
   };
 }
 
@@ -46,9 +57,13 @@ export default function Chat() {
 
   useEffect(() => {
     if (user?.id && token) {
-      subscribeToPush(user?.id, token);
+      subscribeToPush({
+        token,
+        userId: !user?.isDevice ? user?.id : undefined,
+        deviceId: user?.isDevice ? user?.id : undefined,
+      });
     }
-  }, [token, user?.id]);
+  }, [token, user?.id, user?.isDevice]);
 
   useEffect(() => {
     if (!socketConnection || !user?.organizationId || !token) return;
@@ -101,8 +116,10 @@ export default function Chat() {
   }, [socketConnection, token, user?.organizationId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({
+      behavior: loading ? "auto" : "smooth",
+    });
+  }, [messages, loading]);
 
   const sendMessage = async (fileToSend?: File) => {
     const file = fileToSend || imageFile;
@@ -125,12 +142,21 @@ export default function Chat() {
         createdAt: new Date(),
         type: "IMAGE",
         imageUrl: URL.createObjectURL(file), // použití URL pro okamžité zobrazení
-        sender: {
-          id: user?.id ?? 0,
-          firstName: user?.firstName ?? "",
-          lastName: user?.lastName ?? "",
-          email: user?.email ?? "",
-        },
+        sender:
+          user && !user.isDevice
+            ? {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                id: user.id,
+              }
+            : undefined,
+        device: user?.isDevice
+          ? {
+              id: user.id,
+              name: user.name || "Zařízení",
+            }
+          : undefined,
       };
 
       // Okamžitě přidej obrázek do chatu
@@ -167,7 +193,8 @@ export default function Chat() {
     if (text) {
       const messageData = {
         text,
-        senderId: user?.id ?? "",
+        senderId: user?.isDevice ? undefined : user?.id,
+        deviceId: user?.isDevice ? user?.id : undefined,
         organizationId: user?.organizationId ?? "",
       };
 
@@ -200,9 +227,20 @@ export default function Chat() {
 
   return (
     <div className="flex relative h-[calc(100vh_-_32px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] landscape:h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
-      <div className="absolute top-[22px] z-50" style={{ left: `calc(1rem + env(safe-area-inset-left))` }}>
-        <Button onClick={() => window.history.back()} variant="outline" size="icon" className="bg-[#f8f8f8] text-black border border-gray-300">
-          <ArrowLeft className="text-current transition-colors duration-300 ease-in-out" strokeWidth={2} />
+      <div
+        className="absolute top-[22px] z-50"
+        style={{ left: `calc(1rem + env(safe-area-inset-left))` }}
+      >
+        <Button
+          onClick={() => window.history.back()}
+          variant="outline"
+          size="icon"
+          className="bg-[#f8f8f8] text-black border border-gray-300"
+        >
+          <ArrowLeft
+            className="text-current transition-colors duration-300 ease-in-out"
+            strokeWidth={2}
+          />
           <span className="sr-only">Zpět</span>
         </Button>
       </div>
@@ -224,7 +262,7 @@ export default function Chat() {
         />
         <div className="flex flex-col flex-grow items-center min-h-0">
           <div className="flex flex-col w-full max-w-3xl flex-grow min-h-0">
-            <div className="flex flex-col flex-grow overflow-y-auto px-4 space-y-4 min-h-0">
+            <div className="flex flex-col flex-grow overflow-y-auto scroll-smooth px-4 space-y-4 min-h-0">
               {loading ? (
                 <div className="flex justify-center items-center">
                   <Spinner size="lg" className="mt-[20px] bg-black" />
@@ -247,13 +285,20 @@ export default function Chat() {
 
                   const formattedDate = `${time}\u00A0\u00A0${date}`;
                   const isCurrentUser =
-                    user && String(msg.senderId) === String(user.id);
+                    user &&
+                    (String(msg.senderId) === String(user.id) ||
+                      String(msg.deviceId) === String(user.id));
 
-                  const senderName = `${msg.sender.firstName} ${msg.sender.lastName}`;
+                  let senderName = "Neznámý odesílatel";
+                  if (msg.sender?.firstName && msg.sender?.lastName) {
+                    senderName = `${msg.sender.firstName} ${msg.sender.lastName}`;
+                  } else if (msg.device?.name) {
+                    senderName = msg.device.name;
+                  }
 
                   const isSystem = msg.type === "ALARM";
                   const color = stringToColorIndex(
-                    senderName || msg.sender.email
+                    senderName || msg.sender?.email || "unknown"
                   );
 
                   if (isSystem) {
@@ -277,7 +322,7 @@ export default function Chat() {
                             </span>
                             <span>
                               {isActive ? (
-                                  <ShieldAlert className="inline-block h-5 mt-[-3px] text-red-500" />
+                                <ShieldAlert className="inline-block h-5 mt-[-3px] text-red-500" />
                               ) : (
                                 <ShieldBan className="inline-block h-5 mt-[-3px] text-green-600" />
                               )}
@@ -287,16 +332,17 @@ export default function Chat() {
                           <div className="text-xs text-gray-500 text-center">
                             {formattedDate}
                             {isActive && msg.latitude && msg.longitude && (
-                                  <a
-                                    href={`https://maps.google.com/?q=${msg.latitude},${msg.longitude}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 hover:underline transition-colors"
-                                    aria-label="Zobrazit polohu na mapě"
-                                  >
-                                    <MapPin className="inline-block ml-1 w-3 h-3 mt-[-3px] text-current" />Zobrazit na mapě
-                                  </a>
-                                )}
+                              <a
+                                href={`https://maps.google.com/?q=${msg.latitude},${msg.longitude}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                                aria-label="Zobrazit polohu na mapě"
+                              >
+                                <MapPin className="inline-block ml-1 w-3 h-3 mt-[-3px] text-current" />
+                                Zobrazit na mapě
+                              </a>
+                            )}
                           </div>
                         </div>
                       </div>

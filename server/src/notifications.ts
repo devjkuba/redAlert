@@ -26,7 +26,7 @@ export const notificationshandler = async (
       try {
         const notifications = await prisma.notification.findMany({
           where: { organizationId: orgId },
-          include: { triggeredBy: true },
+          include: { triggeredBy: true, triggeredByDevice: true },
           orderBy: { createdAt: "desc" },
           take: 100,
         });
@@ -43,19 +43,21 @@ export const notificationshandler = async (
         type,
         message,
         triggeredById,
+        triggeredByDeviceId,
         latitude,
         longitude,
         organizationId,
         status,
       } = req.body;
 
-      if (!type || !message || !triggeredById || !organizationId || !status) {
+      if (!type || !message || !organizationId || !status || (!triggeredById && !triggeredByDeviceId)) {
         res.status(400).json({ error: "Missing required fields" });
         return;
       }
 
       const orgId = Number(organizationId);
-      const senderId = Number(triggeredById);
+      const senderUserId = triggeredById ? Number(triggeredById) : null;
+      const senderDeviceId = triggeredByDeviceId ? Number(triggeredByDeviceId) : null;
       const intervalSec = 30;
       const jobKey = `${orgId}-${type}`;
 
@@ -93,7 +95,8 @@ export const notificationshandler = async (
             type,
             message,
             status,
-            triggeredById: senderId,
+            triggeredById: senderUserId,
+            triggeredByDeviceId: senderDeviceId,
             organizationId: orgId,
           },
         });
@@ -103,17 +106,32 @@ export const notificationshandler = async (
             text: message,
             type: "ALARM",
             status,
-            senderId,
+            senderId: senderUserId,
+            deviceId: senderDeviceId,
             latitude,
             longitude,
             organizationId: orgId,
           },
         });
 
-        const sender = await prisma.user.findUnique({
-          where: { id: senderId },
-          select: { firstName: true, lastName: true },
-        });
+        let senderName = "";
+        if (senderUserId) {
+          const sender = await prisma.user.findUnique({
+            where: { id: senderUserId },
+            select: { firstName: true, lastName: true },
+          });
+          if (sender) {
+            senderName = [sender.firstName, sender.lastName].filter(Boolean).join(" ");
+          }
+        } else if (senderDeviceId) {
+          const device = await prisma.device.findUnique({
+            where: { id: senderDeviceId },
+            select: { name: true },
+          });
+          if (device) {
+            senderName = device.name;
+          }
+        }
 
         const users = await prisma.user.findMany({
           where: {
@@ -128,9 +146,6 @@ export const notificationshandler = async (
           },
         });
 
-        const senderName = sender
-          ? [sender.firstName, sender.lastName].filter(Boolean).join(" ")
-          : "";
         const emailPromises = users.map((user) => {
           if (!user.email) return Promise.resolve();
           return sendEmail({

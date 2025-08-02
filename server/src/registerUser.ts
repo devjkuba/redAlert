@@ -9,9 +9,9 @@ export const registerUserHandler = async (req: Request, res: Response): Promise<
     return;
   }
 
-  const { firstName, lastName, email, password, role, confirmPassword, organizationId } = req.body;
+  const { firstName, lastName, email, phoneNumber, password, role, confirmPassword, organizationId } = req.body;
 
-  if (!firstName || !lastName || !email || !password || !confirmPassword || !organizationId || !role) {
+  if (!firstName || !lastName || !email || !phoneNumber || !password || !confirmPassword || !organizationId || !role) {
     res.status(400).json({ message: 'Missing required fields' });
     return;
   }
@@ -35,6 +35,7 @@ export const registerUserHandler = async (req: Request, res: Response): Promise<
         firstName,
         lastName,
         email,
+        phoneNumber,
         password: hashedPassword,
         role,
         isActive: true,

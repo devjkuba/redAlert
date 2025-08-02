@@ -7,6 +7,7 @@ interface UserUpdateData {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber: string;
   role: Role;
   password?: string;
 }
@@ -19,10 +20,10 @@ export const userUpdateHandler = async (req: Request, res: Response): Promise<vo
     return;
   }
 
-  const { firstName, lastName, password, email, role } = req.body;
+  const { firstName, lastName, phoneNumber, password, email, role } = req.body;
 
-  if (!firstName || !lastName || !email || !role) {
-    res.status(400).json({ message: 'First name, last name, role and email are required' });
+  if (!firstName || !lastName || !email || !role || !phoneNumber) {
+    res.status(400).json({ message: 'First name, last name, role, email and phone number are required' });
     return;
   }
 
@@ -36,6 +37,7 @@ export const userUpdateHandler = async (req: Request, res: Response): Promise<vo
     const dataToUpdate: UserUpdateData = {
       firstName,
       lastName,
+      phoneNumber,
       email,
       role,
     };

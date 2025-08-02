@@ -18,6 +18,7 @@ import useDemo from "@/hooks/useDemo";
 import useUser from "@/hooks/useUser";
 import router from "next/router";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 const registerUserSchema = z
   .object({
@@ -29,6 +30,7 @@ const registerUserSchema = z
       .string()
       .min(2, { message: "Příjmení musí mít alespoň 2 znaky" })
       .max(50, { message: "Příjmení nemůže být delší než 50 znaků" }),
+    phoneNumber: z.string().min(4, { message: "Telefonní číslo je povinné" }),
     email: z.string().email({ message: "Neplatná emailová adresa" }),
     password: z
       .string()
@@ -47,6 +49,7 @@ const registerUserSchema = z
 interface RegisterUserFormData {
   firstName: string;
   lastName: string;
+  phoneNumber: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -64,10 +67,14 @@ export default function RegisterUser() {
     register,
     handleSubmit,
     control,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerUserSchema),
   });
+
+  const phoneNumberValue = watch("phoneNumber") || "";
 
   const onSubmit = async (data: RegisterUserFormData): Promise<void> => {
     // Kontrola, zda je organizationId k dispozici
@@ -88,6 +95,7 @@ export default function RegisterUser() {
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
+          phoneNumber: data.phoneNumber,
           password: data.password,
           confirmPassword: data.confirmPassword,
           role: data.role,
@@ -151,6 +159,18 @@ export default function RegisterUser() {
               />
               {errors.lastName && (
                 <span className="text-red-500">{errors.lastName.message}</span>
+              )}
+
+              <PhoneInput
+                value={phoneNumberValue}
+                onChange={(value) => setValue("phoneNumber", value)}
+                placeholder="Telefonní číslo"
+                className={errors.phoneNumber ? "border-red-500" : ""}
+                defaultCountry="CZ"
+              />
+
+              {errors.phoneNumber && (
+                <span className="text-red-500">{errors.phoneNumber.message}</span>
               )}
 
               <Input

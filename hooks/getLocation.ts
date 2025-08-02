@@ -8,7 +8,7 @@ type Location = {
 const geoOptions = {
   enableHighAccuracy: true,
   timeout: 10000,
-  maximumAge: 0  
+  maximumAge: 0,
 };
 
 const LOCATION_PERMISSION_KEY = "location_permission_granted";
@@ -42,7 +42,7 @@ export const getLocation = async (): Promise<Location | null> => {
         return null;
       }
 
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             localStorage.setItem(LOCATION_PERMISSION_KEY, "true");
@@ -53,8 +53,10 @@ export const getLocation = async (): Promise<Location | null> => {
           },
           (error) => {
             console.error("Chyba při získávání polohy:", error);
-            localStorage.setItem(LOCATION_PERMISSION_KEY, "false");
-            reject(null);
+            if (error.code === 1) {
+              localStorage.setItem(LOCATION_PERMISSION_KEY, "false");
+            }
+            resolve(null);
           },
           geoOptions
         );
@@ -69,7 +71,6 @@ export const getLocation = async (): Promise<Location | null> => {
   }
 };
 
-
 export const watchLocation = async (
   onUpdate: (location: Location) => void,
   onError?: (error: unknown) => void
@@ -80,19 +81,22 @@ export const watchLocation = async (
     if (isNative) {
       const { Geolocation } = await import("@capacitor/geolocation");
 
-      const watchId = await Geolocation.watchPosition(geoOptions, (position, error) => {
-        if (error) {
-          console.error("Capacitor Geolocation watch error:", error);
-          onError?.(error);
-          return;
+      const watchId = await Geolocation.watchPosition(
+        geoOptions,
+        (position, error) => {
+          if (error) {
+            console.error("Capacitor Geolocation watch error:", error);
+            onError?.(error);
+            return;
+          }
+          if (position) {
+            onUpdate({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+          }
         }
-        if (position) {
-          onUpdate({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        }
-      });
+      );
 
       return () => {
         Geolocation.clearWatch({ id: watchId }).catch((error) => {

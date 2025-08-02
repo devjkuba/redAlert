@@ -6,9 +6,9 @@ import { sendEmail } from './mailer';
 
 export const registerHandler = async (req: Request, res: Response): Promise<void> => {
   if (req.method === 'POST') {
-    const { firstName, lastName, email, password, confirmPassword, phone, organizationData } = req.body;
+    const { firstName, lastName, email, password, phoneNumber, confirmPassword, organizationData } = req.body;
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword || !phone || !organizationData) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword || !phoneNumber || !organizationData) {
       res.status(400).json({ message: 'Missing required fields' });
       return;
     }
@@ -88,6 +88,7 @@ export const registerHandler = async (req: Request, res: Response): Promise<void
           firstName,
           lastName,
           email,
+          phoneNumber,
           password: hashedPassword,
           organizationId: newOrganization.id,
           role: 'ADMIN',

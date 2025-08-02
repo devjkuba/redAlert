@@ -16,7 +16,7 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
       try {
         const messages = await prisma.message.findMany({
           where: { organizationId: Number(organizationId) },
-          include: { sender: true, organization: true },
+          include: { sender: true,  device: true, organization: true },
           orderBy: { createdAt: 'desc' },
           take: 100,
         });
@@ -31,22 +31,22 @@ export const messagesHandler = async (req: Request, res: Response): Promise<void
     }
 
     case 'POST': {
-      const { text, status, senderId, organizationId } = req.body;
-      if (!text || !senderId || !organizationId) {
+      const { text, status, senderId, organizationId, deviceId } = req.body;
+        if (!text || !organizationId || (!senderId && !deviceId)) {
         res.status(400).json({ error: 'Missing required fields' });
         return;
       }
 
       try {
         const orgId = Number(organizationId);
-        const sId = Number(senderId);
 
         const message = await prisma.message.create({
           data: {
             text,
-            senderId: sId,
             status,
             organizationId: orgId,
+            senderId: senderId ? Number(senderId) : undefined,
+            deviceId: deviceId ? Number(deviceId) : undefined,
           },
         });
 

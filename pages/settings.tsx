@@ -23,12 +23,12 @@ export default function Settings() {
   const queryClient = useQueryClient();
   const [emailEnabled, setEmailEnabled] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
-  const isSuperAdmin = user?.role === "SUPERADMIN";
-  const isAdmin = user?.role === "ADMIN";
+  const isSuperAdmin = !user?.isDevice && user?.role === "SUPERADMIN";
+  const isAdmin = !user?.isDevice &&user?.role === "ADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
 
   useEffect(() => {
-    if (user) {
+    if (user && !user?.isDevice) {
       setEmailEnabled(user.emailNotificationsEnabled);
     }
   }, [user]);
@@ -89,12 +89,12 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="flex flex-col items-start gap-4">
               <p className="text-sm text-gray-700">
-                Jste přihlášen jako <strong>{user?.email}</strong>
+                Jste přihlášen jako <strong>{!user?.isDevice ? user?.email : user?.name}</strong>
                 <br />
-                Role: <strong>{user?.role}</strong>
+                {!user?.isDevice && <>Role: <strong>{user?.role}</strong></>}
               </p>
 
-              <div className="flex items-center gap-2">
+              {!user?.isDevice && <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-700">
                   Emailové notifikace
                 </span>
@@ -103,7 +103,7 @@ export default function Settings() {
                   onCheckedChange={handleToggle}
                   disabled={saving}
                 />
-              </div>
+              </div>}
               <p className="text-xs">
                 <strong>{user?.organization.name}</strong>
                 <br />
@@ -156,6 +156,12 @@ export default function Settings() {
                 </Link>
                 <Link href="/settings/users">
                   <Button className="mt-4">Správa uživatelů</Button>
+                </Link>
+                <Link href="/settings/registerDevice">
+                  <Button className="mt-4">Registrace zařízení</Button>
+                </Link>
+                <Link href="/settings/devices">
+                  <Button className="mt-4">Správa zařízení</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -250,7 +256,7 @@ export default function Settings() {
                   <CardContent className="flex flex-col items-start gap-4">
                     <p className="text-sm text-gray-700">
                       <strong>1 měsíční zkušební doba zdarma.</strong>
-                      <br />
+                      {/* <br />
                       Po 1 měsíci je potřeba zaplatit roční předplatné.
                       <br />
                       Cena: <strong>100 Kč</strong> měsíčně,
@@ -261,17 +267,17 @@ export default function Settings() {
                       <br />
                       Faktura bude odeslána na Váš e-mail po zaplacení.
                       <br />
-                      Pro zaplacení použijte přiložený QR kód.
+                      Pro zaplacení použijte přiložený QR kód. */}
                     </p>
                     <p className="text-sm text-gray-700">
                       Pokud nebude platba provedena do konce zkušební doby, bude
                       přístup k organizaci deaktivován.
                     </p>
-                    <PaymentQRCode
+                    {/* <PaymentQRCode
                       organizationId={user.organization.id}
                       organizationName={user.organization.name}
                       priceCzk={1200}
-                    />
+                    /> */}
                   </CardContent>
                 </Card>
               );

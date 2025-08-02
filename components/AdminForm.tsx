@@ -33,7 +33,7 @@ const adminSchema = z
       })
       .min(2, { message: "Příjmení musí mít alespoň 2 znaky" }),
     email: z.string().email({ message: "Neplatná emailová adresa" }),
-    phone: z
+    phoneNumber: z
       .string({
         required_error: "Telefonní číslo je povinné",
         invalid_type_error: "Telefon musí být text",
@@ -126,19 +126,19 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
               </FormItem>
             )}
           />
-            <FormField
-                  control={adminForm.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem className="grid gap-1">
-                      <FormLabel htmlFor="phone">Telefon</FormLabel>
-                      <FormControl>
-                        <PhoneInput {...field} defaultCountry="CZ" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          <FormField
+            control={adminForm.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem className="grid gap-1">
+                <FormLabel htmlFor="phoneNumber">Telefon</FormLabel>
+                <FormControl>
+                  <PhoneInput {...field} defaultCountry="CZ" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={adminForm.control}
             name="password"
@@ -188,11 +188,11 @@ export const AdminForm: React.FC<AdminFormProps> = ({ onSubmit }) => {
           <Button type="submit">Registrovat</Button>
         </div>
         <div className="mt-4 text-center text-sm">
-        Už máte účet?{" "}
-        <Link href="/login" className="underline">
-          Přihlašte se
-        </Link>
-      </div>
+          Už máte účet?{" "}
+          <Link href="/login" className="underline">
+            Přihlašte se
+          </Link>
+        </div>
       </form>
     </Form>
   );

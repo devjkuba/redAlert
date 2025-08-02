@@ -15,6 +15,28 @@ export default function Navbar() {
       isActive ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'
     }`;
   };
+
+    const renderUserInfo = () => {
+    if (!user) return null;
+
+    if (user.isDevice) {
+      return (
+        <>
+          <span className="truncate font-semibold">{user.name}</span>
+          <span className="truncate text-xs">{user.phoneNumber}</span>
+          <span className="truncate font-semibold">{user.organization.name}</span>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <span className="truncate font-semibold">{user.firstName} {user.lastName}</span>
+          <span className="truncate text-xs">{user.email}</span>
+          <span className="truncate font-semibold">{user.organization.name}</span>
+        </>
+      );
+    }
+  };
   
   return (
     <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
@@ -30,9 +52,7 @@ export default function Navbar() {
           <SheetDescription className="sr-only">Postranní navigační panel s odkazy na různé sekce aplikace.</SheetDescription>
           <div className="grid gap-2 py-6">
             <div className="grid flex-1 text-left text-sm leading-tight ml-2">
-              <span className="truncate font-semibold">{user?.firstName} {user?.lastName}</span>
-              <span className="truncate text-xs">{user?.email}</span>
-              <span className="truncate font-semibold">{user?.organization.name}</span>
+              {renderUserInfo()}
             </div>
             <Link href="/alert" className={getLinkClassName('/alert')} prefetch={false}>
               <Bell className="h-5 w-5 transition-colors duration-300 ease-in-out ml-2" />
@@ -46,10 +66,12 @@ export default function Navbar() {
               <Shield className="h-5 w-5 transition-colors duration-300 ease-in-out ml-2" />
               Nouzové kontakty
             </Link>
-            {user?.role === 'SUPERADMIN' && <Link href="/monitoring" className={getLinkClassName('/monitoring')} prefetch={false}>
-              <MonitorSmartphone className="h-5 w-5 transition-colors duration-300 ease-in-out ml-2" />
-              Monitoring
-            </Link>}
+            {!user?.isDevice && user?.role === 'SUPERADMIN' && (
+              <Link href="/monitoring" className={getLinkClassName('/monitoring')} prefetch={false}>
+                <MonitorSmartphone className="h-5 w-5 transition-colors duration-300 ease-in-out ml-2" />
+                Monitoring
+              </Link>
+            )}
             <Link href="/settings" className={getLinkClassName('/settings')} prefetch={false}>
               <Settings className="h-5 w-5 transition-colors duration-300 ease-in-out ml-2" />
               Nastavení

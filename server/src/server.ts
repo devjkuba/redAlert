@@ -13,7 +13,6 @@ import { prisma } from "./prisma";
 import { usersHandler } from "./users";
 import { userUpdateHandler } from "./userUpdate";
 import { isAdmin } from "./middlewares/isAdmin";
-import { isUser } from "./middlewares/isUser";
 import { userGetHandler } from "./userGetHandler";
 import { userDeleteHandler } from "./userDeleteHandler";
 import { registerUserHandler } from "./registerUser";
@@ -22,6 +21,12 @@ import { sendWebPushToOrg } from "./pushUtils";
 import { userEmailNotificationHandler } from "./userEmailNotificationHandler";
 import { uploadImageHandler } from "./uploadImageHandler";
 import { emergencyServiceHandler } from "./emergencyServiceHandler";
+import { registerDeviceHandler } from "./registerDevice";
+import { devicesHandler } from "./devicesHandler";
+import { deviceGetHandler } from "./deviceGetHandler";
+import { deviceDeleteHandler } from "./deviceDeleteHandler";
+import { deviceUpdateHandler } from "./deviceUpdateHandler";
+import { isUserOrDevice } from "./middlewares/isUserOrDevice";
 
 const app = express();
 app.use(
@@ -77,19 +82,40 @@ io.on("connection", (socket) => {
         imageUrl,
         type = "TEXT",
         senderId,
+        deviceId,
         organizationId,
       } = message;
+
+      if (!organizationId) {
+        console.error("Missing organizationId");
+        return;
+      }
+
+      const senderIdNum = senderId ? Number(senderId) : null;
+      const deviceIdNum = deviceId ? Number(deviceId) : null;
+
+      const hasValidSenderId =
+        typeof senderIdNum === "number" && senderIdNum > 0;
+      const hasValidDeviceId =
+        typeof deviceIdNum === "number" && deviceIdNum > 0;
+
+      if (!hasValidSenderId && !hasValidDeviceId) {
+        console.error("Missing valid senderId or deviceId");
+        return;
+      }
 
       const savedMessage = await prisma.message.create({
         data: {
           text: type === "TEXT" ? text : null,
           imageUrl: type === "IMAGE" ? imageUrl : null,
           type,
-          senderId,
+          senderId: senderIdNum || null,
+          deviceId: deviceIdNum || null,
           organizationId,
         },
         include: {
           sender: true,
+          device: true,
         },
       });
 
@@ -111,17 +137,42 @@ io.on("connection", (socket) => {
 
   socket.on("sendNotification", async (notification) => {
     try {
-      const savedNotification = await prisma.notification.create({
-        data: {
-          message: notification.message,
-          type: notification.type ?? "",
-          triggeredBy: notification.triggeredBy ?? "system",
-          organization: notification.organization ?? "defaultOrganization",
-          ...(notification.userId ? { userId: notification.userId } : {}),
-        },
-      });
+      const {
+        message,
+        type = "",
+        organizationId,
+        userId,
+        deviceId,
+      } = notification;
 
-      io.emit("newNotification", savedNotification);
+      if (!organizationId || (!userId && !deviceId)) {
+        console.error(
+          "Missing organizationId or sender identifier (userId/deviceId)"
+        );
+        return;
+      }
+
+      const data: {
+        message: string;
+        type: string;
+        organizationId: number;
+        triggeredById?: number;
+        triggeredByDeviceId?: number;
+      } = {
+        message: message ?? "",
+        type: type || "",
+        organizationId: Number(organizationId),
+      };
+
+      if (userId) {
+        data.triggeredById = Number(userId);
+      } else if (deviceId) {
+        data.triggeredByDeviceId = Number(deviceId);
+      }
+
+      const savedNotification = await prisma.notification.create({ data });
+
+      io.to(`org-${organizationId}`).emit("newNotification", savedNotification);
 
       console.log("Notification saved and sent:", savedNotification);
     } catch (error) {
@@ -137,37 +188,40 @@ io.on("connection", (socket) => {
 // Definice API rout pro Express
 app
   .route("/api/organizations")
-  .post(isUser, organizationsHandler)
-  .get(isUser, organizationsHandler);
+  .post(isUserOrDevice, organizationsHandler)
+  .get(isUserOrDevice, organizationsHandler);
 
 app
   .route("/api/notifications")
-  .get(isUser, notificationshandler)
-  .post(isUser, notificationshandler);
+  .get(isUserOrDevice, notificationshandler)
+  .post(isUserOrDevice, notificationshandler);
 
 app
   .route("/api/messages")
-  .get(isUser, messagesHandler)
-  .post(isUser, messagesHandler);
+  .get(isUserOrDevice, messagesHandler)
+  .post(isUserOrDevice, messagesHandler);
 
-app.post(
-  "/api/messages/image",
-  isUser,
-  uploadImageHandler
-);
+app.post("/api/messages/image", isUserOrDevice, uploadImageHandler);
 
-app.get("/api/user", isUser, userHandler);
-app.get("/api/users", isUser, usersHandler);
+app.get("/api/user", isUserOrDevice, userHandler);
+app.get("/api/users", isAdmin, usersHandler);
 
 app.post("/api/login", loginHandler);
 app.post("/api/register", registerHandler);
 
-app.post("/api/push/subscribe", isUser, pushSubscribeHandler);
+app.post("/api/push/subscribe", isUserOrDevice, pushSubscribeHandler);
 
-app.get('/api/emergency-services', emergencyServiceHandler);
-app.post('/api/emergency-services', isAdmin, emergencyServiceHandler);
-app.put('/api/emergency-services', isAdmin, emergencyServiceHandler);
-app.delete('/api/emergency-services', isAdmin, emergencyServiceHandler);
+app.get("/api/emergency-services", emergencyServiceHandler);
+app.post("/api/emergency-services", isAdmin, emergencyServiceHandler);
+app.put("/api/emergency-services", isAdmin, emergencyServiceHandler);
+app.delete("/api/emergency-services", isAdmin, emergencyServiceHandler);
+
+app.get("/api/devices", isAdmin, devicesHandler);
+app
+  .route("/api/devices/:id")
+  .get(isAdmin, deviceGetHandler)
+  .delete(isAdmin, deviceDeleteHandler)
+  .put(isAdmin, deviceUpdateHandler);
 
 app
   .route("/api/users/:id")
@@ -176,7 +230,12 @@ app
   .put(isAdmin, userUpdateHandler);
 
 app.post("/api/register-user", isAdmin, registerUserHandler);
-app.put("/api/user/email-notifications", isUser, userEmailNotificationHandler);
+app.post("/api/register-device", isAdmin, registerDeviceHandler);
+app.put(
+  "/api/user/email-notifications",
+  isUserOrDevice,
+  userEmailNotificationHandler
+);
 
 // Nastavení portu a spuštění serveru
 const PORT = process.env.PORT || 4000;

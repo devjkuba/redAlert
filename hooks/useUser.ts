@@ -1,5 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
 
+export type Organization = {
+  id: number
+  name: string
+  country: string
+  city: string
+  street: string
+  postalCode: string
+  subscriptionPaid: boolean
+  subscriptionValidUntil: Date | null
+  gpsLat: number
+  gpsLng: number
+  activeUntil: Date | null
+}
+
 export type User = {
   id: number
   firstName: string
@@ -8,22 +22,22 @@ export type User = {
   role: string
   emailNotificationsEnabled: boolean
   organizationId: number
-  organization: {
-    id: number
-    name: string
-    country: string
-    city: string
-    street: string
-    postalCode: string
-    subscriptionPaid: boolean
-    subscriptionValidUntil: Date | null
-    gpsLat: number
-    gpsLng: number
-    activeUntil: Date | null
-  }
+  organization: Organization
+  isDevice: false
 }
 
-const fetchUser = async (): Promise<User | null> => {
+export type Device = {
+  id: number
+  name: string
+  phoneNumber: string
+  organizationId: number
+  organization: Organization
+  isDevice: true
+}
+
+export type UserOrDevice = User | Device
+
+const fetchUser = async (): Promise<UserOrDevice | null> => {
   const token = localStorage.getItem('token')
   if (!token) return null
 
@@ -42,7 +56,7 @@ const fetchUser = async (): Promise<User | null> => {
 }
 
 export const useUser = () =>
-  useQuery<User | null>({
+  useQuery<UserOrDevice | null>({
     queryKey: ['user'],
     queryFn: fetchUser,
     enabled: typeof window !== 'undefined',

@@ -27,25 +27,54 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PhoneInput } from "@/components/ui/phone-input";
 
-const formSchema = z.object({
-  email: z.string().email({ message: "Neplatná e-mailová adresa" }),
-  password: z
-    .string()
-    .min(6, { message: "Heslo musí mít alespoň 6 znaků" })
-    .regex(/[a-zA-Z0-9]/, { message: "Heslo musí být alfanumerické" }),
-  botField: z.string().optional(),
-});
+const formSchema = z
+  .object({
+    email: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    password: z
+      .string()
+      .min(6, { message: "Heslo musí mít alespoň 6 znaků" })
+      .regex(/[a-zA-Z0-9]/, { message: "Heslo musí být alfanumerické" }),
+    botField: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.email && !data.phoneNumber) {
+      ctx.addIssue({
+        path: ["email"],
+        code: z.ZodIssueCode.custom,
+        message: "Zadejte e-mail nebo telefon",
+      });
+    }
+    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      ctx.addIssue({
+        path: ["email"],
+        code: z.ZodIssueCode.custom,
+        message: "Neplatná e-mailová adresa",
+      });
+    }
+    if (data.phoneNumber && !/^\+?\d{6,15}$/.test(data.phoneNumber)) {
+      ctx.addIssue({
+        path: ["phoneNumber"],
+        code: z.ZodIssueCode.custom,
+        message: "Neplatné telefonní číslo",
+      });
+    }
+  });
 
 export default function LoginPreview() {
   const { t } = useTranslation();
   const [botField, setBotField] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      phoneNumber: "",
       password: "",
       botField: "",
     },
@@ -59,6 +88,11 @@ export default function LoginPreview() {
       return;
     }
 
+    const body =
+      loginMethod === "email"
+        ? { email: values.email, password: values.password }
+        : { phoneNumber: values.phoneNumber, password: values.password };
+
     setIsLoading(true);
 
     try {
@@ -67,7 +101,7 @@ export default function LoginPreview() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -97,10 +131,20 @@ export default function LoginPreview() {
           </div>
           <CardTitle className="text-2xl">Přihlášení</CardTitle>
           <CardDescription>
-            Zadejte svůj e-mail a&nbsp;heslo pro přihlášení k&nbsp;vašemu účtu.
+            Přihlaste se pomocí e-mailu nebo telefonního čísla.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Tabs
+            value={loginMethod}
+            onValueChange={(val) => setLoginMethod(val as "email" | "phone")}
+            className="mb-2"
+          >
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="phone">Telefon</TabsTrigger>
+            </TabsList>
+          </Tabs>
           {isLoading ? (
             <div className="flex justify-center items-center mt-8">
               <Spinner size="lg" className="bg-black" />
@@ -113,25 +157,41 @@ export default function LoginPreview() {
                   className="space-y-8"
                 >
                   <div className="grid gap-4">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem className="grid gap-1">
-                          <FormLabel htmlFor="email">Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              id="email"
-                              placeholder="jmeno@domena.cz"
-                              type="email"
-                              autoComplete="email"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {loginMethod === "email" && (
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="jmeno@domena.cz"
+                                type="email"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                    {loginMethod === "phone" && (
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Telefon</FormLabel>
+                            <FormControl>
+                              <PhoneInput type="tel" {...field} defaultCountry="CZ" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
                     <FormField
                       control={form.control}
                       name="password"

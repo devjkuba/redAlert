@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { prisma } from './prisma';
 
 export const pushSubscribeHandler = async (req: Request, res: Response): Promise<void> => {
-  const { endpoint, keys, userId } = req.body;
+  const { endpoint, keys, userId, deviceId } = req.body;
 
-  if (!endpoint || !keys?.auth || !keys?.p256dh || !userId) {
+  if (!endpoint || !keys?.auth || !keys?.p256dh || (!userId && !deviceId)) {
     res.status(400).json({ error: 'Missing fields' });
     return;
   }
@@ -15,13 +15,15 @@ export const pushSubscribeHandler = async (req: Request, res: Response): Promise
       update: {
         keysAuth: keys.auth,
         keysP256dh: keys.p256dh,
-        userId: Number(userId),
+        userId: userId ? Number(userId) : null,
+        deviceId: deviceId ? Number(deviceId) : null,
       },
       create: {
         endpoint,
         keysAuth: keys.auth,
         keysP256dh: keys.p256dh,
-        userId: Number(userId),
+        userId: userId ? Number(userId) : null,
+        deviceId: deviceId ? Number(deviceId) : null,
       },
     });
 

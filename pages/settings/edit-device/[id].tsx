@@ -12,47 +12,36 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PhoneInput } from "@/components/ui/phone-input";
 
-export default function EditUser() {
+export default function EditDevice() {
   const router = useRouter();
   const rawId = router.query.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   const token = useAuthToken();
   const { isDemoActive } = useDemo();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     if (id) {
-      fetch(`${process.env.NEXT_PUBLIC_API}/api/users/${id}`, {
+      fetch(`${process.env.NEXT_PUBLIC_API}/api/devices/${id}`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       })
         .then((res) => res.json())
         .then((data) => {
-          setFirstName(data.firstName);
-          setLastName(data.lastName);
-          setEmail(data.email);
-          setPhoneNumber(data.phoneNumber || "");
-          setRole(["ADMIN", "USER"].includes(data.role) ? data.role : "");
+          setName(data.name ?? "");
+          setPhoneNumber(data.phoneNumber ?? "");
+        })
+        .catch(() => {
+          toast.error("Nepodařilo se načíst zařízení.");
         });
     }
   }, [id, token]);
@@ -60,35 +49,37 @@ export default function EditUser() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/users/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(
-        password.trim()
-          ? { firstName, lastName, phoneNumber, email, role, password }
-          : { firstName, lastName, phoneNumber, email, role }
-      ),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API}/api/devices/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(
+          password.trim()
+            ? { name, phoneNumber, password }
+            : { name, phoneNumber }
+        ),
+      }
+    );
 
     if (res.ok) {
-      toast.success("Uživatel byl úspěšně uložen.");
+      toast.success("Zařízení bylo úspěšně uloženo.");
     } else {
-      toast.error("Chyba při ukládání uživatele.");
+      toast.error("Chyba při ukládání zařízení.");
     }
   };
 
   const handleDelete = async () => {
-    const userId = Array.isArray(id) ? id[0] : id;
-    if (!userId) return;
+    if (!id) return;
 
-    if (!confirm("Opravdu chcete tohoto uživatele smazat?")) return;
+    if (!confirm("Opravdu chcete toto zařízení smazat?")) return;
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/api/users/${userId}`,
+        `${process.env.NEXT_PUBLIC_API}/api/devices/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -100,13 +91,13 @@ export default function EditUser() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success("Uživatel byl úspěšně smazán.");
-        router.push("/settings/users");
+        toast.success("Zařízení bylo úspěšně smazáno.");
+        router.push("/settings/devices");
       } else {
-        toast.error(data.message || "Chyba při mazání uživatele.");
+        toast.error(data.message || "Chyba při mazání zařízení.");
       }
     } catch (error) {
-      console.error("Error during user deletion:", error);
+      console.error("Chyba při mazání zařízení:", error);
       toast.error("Nastala chyba při mazání.");
     }
   };
@@ -131,12 +122,12 @@ export default function EditUser() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/settings/users">Uživatelé</BreadcrumbLink>
+              <BreadcrumbLink href="/settings/devices">Zařízení</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={`/settings/edit/${id}`}>
-                Editace uživatele
+              <BreadcrumbLink href={`/settings/devices/edit/${id}`}>
+                Editace zařízení
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
@@ -145,15 +136,9 @@ export default function EditUser() {
           <div className="max-w-md mx-auto mt-10">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Input
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Jméno"
-                required
-              />
-              <Input
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Příjmení"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Název zařízení"
                 required
               />
               <PhoneInput
@@ -164,26 +149,6 @@ export default function EditUser() {
                 required
                 type="tel"
               />
-              <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email"
-                type="email"
-                required
-              />
-              <Select
-                value={role}
-                onValueChange={(value) => setRole(value)}
-                required
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Vyberte roli" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ADMIN">ADMIN</SelectItem>
-                  <SelectItem value="USER">USER</SelectItem>
-                </SelectContent>
-              </Select>
               <Input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -196,7 +161,7 @@ export default function EditUser() {
                 variant="destructive"
                 onClick={handleDelete}
               >
-                Smazat uživatele
+                Smazat zařízení
               </Button>
             </form>
           </div>

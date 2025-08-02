@@ -1,10 +1,16 @@
 const PUBLIC_VAPID_KEY = process.env.NEXT_PUBLIC_KEY;
 
-const subscribeToPush = async (userId: number, token: string) => {
+interface SubscribeParams {
+  token: string;
+  userId?: number;
+  deviceId?: number;
+}
+
+const subscribeToPush = async ({ token, userId, deviceId }: SubscribeParams) => {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY) as BufferSource,
     });
 
     const rawKey = subscription.getKey('p256dh');
@@ -12,6 +18,22 @@ const subscribeToPush = async (userId: number, token: string) => {
 
     const p256dh = rawKey ? btoa(String.fromCharCode(...new Uint8Array(rawKey))) : '';
     const auth = rawAuth ? btoa(String.fromCharCode(...new Uint8Array(rawAuth))) : '';
+
+    const body: {
+      endpoint: string;
+      keys: { p256dh: string; auth: string };
+      userId?: number;
+      deviceId?: number;
+    } = {
+      endpoint: subscription.endpoint,
+      keys: {
+        p256dh,
+        auth,
+      },
+    };
+
+    if (userId) body.userId = userId;
+    if (deviceId) body.deviceId = deviceId;
   
     await fetch(`${process.env.NEXT_PUBLIC_API}/api/push/subscribe`, {
       method: 'POST',
@@ -19,14 +41,7 @@ const subscribeToPush = async (userId: number, token: string) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        userId,
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh,
-          auth,
-        },
-      }),
+      body: JSON.stringify(body),
       credentials: 'include',
     });
   };
