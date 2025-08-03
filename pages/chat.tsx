@@ -54,8 +54,8 @@ export default function Chat() {
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (user?.id && token) {
@@ -118,10 +118,11 @@ export default function Chat() {
   }, [socketConnection, token, user?.organizationId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: loading ? "auto" : "smooth",
-    });
-  }, [messages, loading]);
+    const container = containerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages]);
 
   const sendMessage = async (fileToSend?: File) => {
     const file = fileToSend || imageFile;
@@ -228,7 +229,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex relative h-[calc(100vh_-_32px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] landscape:h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
+    <div className="flex relative h-[calc(100vh_-_32px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] lg:!h-[calc(100vh_-_20px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] landscape:h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
       <div
         className="absolute top-[22px] z-50"
         style={{ left: `calc(1rem + env(safe-area-inset-left))` }}
@@ -270,181 +271,181 @@ export default function Chat() {
         />
         <div className="flex flex-col flex-grow items-center min-h-0">
           <div className="flex flex-col w-full max-w-3xl flex-grow min-h-0">
-            <div className="flex flex-col flex-grow overflow-y-auto scroll-smooth px-4 space-y-4 min-h-0">
+            <div
+              ref={containerRef}
+              className="flex flex-col-reverse flex-grow overflow-y-auto scroll-smooth px-4 gap-y-4 min-h-0"
+            >
               {loading ? (
                 <div className="flex justify-center items-center">
                   <Spinner size="lg" className="mt-[20px] bg-black" />
                 </div>
               ) : (
-                messages.map((msg) => {
-                  const createdAt = new Date(msg.createdAt);
-                  const time = createdAt.toLocaleTimeString("cs-CZ", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
+                messages
+                  .slice()
+                  .reverse()
+                  .map((msg) => {
+                    const createdAt = new Date(msg.createdAt);
+                    const time = createdAt.toLocaleTimeString("cs-CZ", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    });
 
-                  const date = createdAt
-                    .toLocaleDateString("cs-CZ", {
-                      day: "numeric",
-                      month: "numeric",
-                      year: "numeric",
-                    })
-                    .replace(/\s/g, "");
+                    const date = createdAt
+                      .toLocaleDateString("cs-CZ", {
+                        day: "numeric",
+                        month: "numeric",
+                        year: "numeric",
+                      })
+                      .replace(/\s/g, "");
 
-                  const formattedDate = `${time}\u00A0\u00A0${date}`;
-                  const isCurrentUser =
-                    user &&
-                    (String(msg.senderId) === String(user.id) ||
-                      String(msg.deviceId) === String(user.id));
+                    const formattedDate = `${time}\u00A0\u00A0${date}`;
+                    const isCurrentUser =
+                      user &&
+                      (String(msg.senderId) === String(user.id) ||
+                        String(msg.deviceId) === String(user.id));
 
-                  let senderName = "Neznámý odesílatel";
-                  if (msg.sender?.firstName && msg.sender?.lastName) {
-                    senderName = `${msg.sender.firstName} ${msg.sender.lastName}`;
-                  } else if (msg.device?.name) {
-                    senderName = msg.device.name;
-                  }
+                    let senderName = "Neznámý odesílatel";
+                    if (msg.sender?.firstName && msg.sender?.lastName) {
+                      senderName = `${msg.sender.firstName} ${msg.sender.lastName}`;
+                    } else if (msg.device?.name) {
+                      senderName = msg.device.name;
+                    }
 
-                  const isSystem = msg.type === "ALARM";
-                  const color = stringToColorIndex(
-                    senderName || msg.sender?.email || "unknown"
-                  );
-
-                  if (isSystem) {
-                    const isActive = msg.status === "ACTIVE";
-
-                    const background = isActive
-                      ? "from-red-100 to-red-200"
-                      : "from-green-100 to-green-200";
-
-                    return (
-                      <div key={msg.id} className="flex justify-center gap-2">
-                        <div className="space-y-1 max-w-xs">
-                          <div
-                            className={`${background} px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm max-w-sm text-center bg-gradient-to-br backdrop-blur-sm`}
-                          >
-                            <span
-                              className="text-[8px] text-center font-medium"
-                              style={{ color }}
-                            >
-                              {!isCurrentUser && `${senderName}`}
-                            </span>
-                            <span>
-                              {isActive ? (
-                                <ShieldAlert className="inline-block h-5 mt-[-3px] text-red-500" />
-                              ) : (
-                                <ShieldBan className="inline-block h-5 mt-[-3px] text-green-600" />
-                              )}
-                              {msg.text}
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500 text-center">
-                            {formattedDate}
-                            {isActive && msg.latitude && msg.longitude && (
-                              <a
-                                href={`https://maps.google.com/?q=${msg.latitude},${msg.longitude}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 hover:underline transition-colors"
-                                aria-label="Zobrazit polohu na mapě"
-                              >
-                                <MapPin className="inline-block ml-1 w-3 h-3 mt-[-3px] text-current" />
-                                Zobrazit na mapě
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                    const isSystem = msg.type === "ALARM";
+                    const color = stringToColorIndex(
+                      senderName || msg.sender?.email || "unknown"
                     );
-                  }
 
-                  if (msg.type === "IMAGE") {
-                    return (
-                      <div
-                        key={msg.id}
-                        className={`flex gap-2 ${
-                          isCurrentUser ? "justify-end" : "items-start"
-                        }`}
-                      >
-                        <div
-                          className={`space-y-1 max-w-[200px] ${
-                            isCurrentUser ? "text-right" : ""
-                          }`}
-                        >
-                          <div className="rounded-xl flex flex-col text-sm">
-                            {!isCurrentUser && (
+                    if (isSystem) {
+                      const isActive = msg.status === "ACTIVE";
+
+                      const background = isActive
+                        ? "from-red-100 to-red-200"
+                        : "from-green-100 to-green-200";
+
+                      return (
+                        <div key={msg.id} className="flex justify-center gap-2">
+                          <div className="space-y-1 max-w-xs">
+                            <div
+                              className={`${background} px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm max-w-sm text-center bg-gradient-to-br backdrop-blur-sm`}
+                            >
                               <span
-                                className="text-[8px] font-medium"
+                                className="text-[8px] text-center font-medium"
                                 style={{ color }}
                               >
-                                {senderName}
+                                {!isCurrentUser && `${senderName}`}
                               </span>
-                            )}
-                            <img
-                              src={`https://api.redalert.cz${msg.imageUrl}`}
-                              onClick={() =>
-                                setFullscreenImage(
-                                  `https://api.redalert.cz${msg.imageUrl}`
-                                )
-                              }
-                              alt="Obrázek"
-                              className="rounded w-[45vw] max-h-[35vh] object-cover cursor-pointer"
-                              onLoad={() => {
-                                messagesEndRef.current?.scrollIntoView({
-                                  behavior: "smooth",
-                                });
-                              }}
-                            />
-                            {msg.text?.trim() && (
-                              <p className="mt-1">{msg.text}</p>
-                            )}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {formattedDate}
+                              <span>
+                                {isActive ? (
+                                  <ShieldAlert className="inline-block h-5 mt-[-3px] text-red-500" />
+                                ) : (
+                                  <ShieldBan className="inline-block h-5 mt-[-3px] text-green-600" />
+                                )}
+                                {msg.text}
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500 text-center">
+                              {formattedDate}
+                              {isActive && msg.latitude && msg.longitude && (
+                                <a
+                                  href={`https://maps.google.com/?q=${msg.latitude},${msg.longitude}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 hover:underline transition-colors"
+                                  aria-label="Zobrazit polohu na mapě"
+                                >
+                                  <MapPin className="inline-block ml-1 w-3 h-3 mt-[-3px] text-current" />
+                                  Zobrazit na mapě
+                                </a>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  }
+                      );
+                    }
 
-                  if (msg.type === "TEXT" && msg.text?.trim()) {
-                    return (
-                      <div
-                        key={msg.id}
-                        className={`flex gap-2 ${
-                          isCurrentUser ? "justify-end" : "items-start"
-                        }`}
-                      >
+                    if (msg.type === "IMAGE") {
+                      return (
                         <div
-                          className={`space-y-1 max-w-xs ${
-                            isCurrentUser ? "text-right" : ""
+                          key={msg.id}
+                          className={`flex gap-2 ${
+                            isCurrentUser ? "justify-end" : "items-start"
                           }`}
                         >
                           <div
-                            className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm text-left ${
-                              isCurrentUser
-                                ? "bg-gradient-to-br text-black backdrop-blur-sm from-sky-100 to-sky-200"
-                                : "bg-gradient-to-br backdrop-blur-sm from-gray-100 to-gray-200"
+                            className={`space-y-1 max-w-[200px] ${
+                              isCurrentUser ? "text-right" : ""
                             }`}
                           >
-                            <span
-                              className="text-[8px] text-left font-medium"
-                              style={{ color }}
-                            >
-                              {!isCurrentUser && `${senderName}`}
-                            </span>
-                            {msg.text}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {formattedDate}
+                            <div className="rounded-xl flex flex-col text-sm">
+                              {!isCurrentUser && (
+                                <span
+                                  className="text-[8px] font-medium"
+                                  style={{ color }}
+                                >
+                                  {senderName}
+                                </span>
+                              )}
+                              <img
+                                src={`https://api.redalert.cz${msg.imageUrl}`}
+                                onClick={() =>
+                                  setFullscreenImage(
+                                    `https://api.redalert.cz${msg.imageUrl}`
+                                  )
+                                }
+                                alt="Obrázek"
+                                className="rounded w-[45vw] max-h-[35vh] object-cover cursor-pointer"
+                              />
+                              {msg.text?.trim() && (
+                                <p className="mt-1">{msg.text}</p>
+                              )}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {formattedDate}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                })
+                      );
+                    }
+
+                    if (msg.type === "TEXT" && msg.text?.trim()) {
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex gap-2 ${
+                            isCurrentUser ? "justify-end" : "items-start"
+                          }`}
+                        >
+                          <div
+                            className={`space-y-1 max-w-xs ${
+                              isCurrentUser ? "text-right" : ""
+                            }`}
+                          >
+                            <div
+                              className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm text-left ${
+                                isCurrentUser
+                                  ? "bg-gradient-to-br text-black backdrop-blur-sm from-sky-100 to-sky-200"
+                                  : "bg-gradient-to-br backdrop-blur-sm from-gray-100 to-gray-200"
+                              }`}
+                            >
+                              <span
+                                className="text-[8px] text-left font-medium"
+                                style={{ color }}
+                              >
+                                {!isCurrentUser && `${senderName}`}
+                              </span>
+                              {msg.text}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {formattedDate}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })
               )}
-              <div ref={messagesEndRef} />
             </div>
             <div className="sticky bottom-0 border-t p-3 flex gap-2 bg-white">
               <div className="flex gap-2 items-center">
