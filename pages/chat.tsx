@@ -67,6 +67,47 @@ export default function Chat() {
     }
   }, [token, user?.id, user?.isDevice]);
 
+  const handleNewMessage = (message: Message) => {
+    setMessages((prev) => {
+      const exists = prev.some((m) => m.id === message.id);
+      if (exists) return prev;
+      return [...prev.slice(-99), message];
+    });
+  };
+
+  const fetchMessages = async (
+    organizationId: number | undefined,
+    token: string | null
+  ) => {
+    if (organizationId && token) {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API}/api/messages?organizationId=${organizationId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.status === 401) {
+          window.location.href = "/login";
+        }
+
+        if (response.ok) {
+          const data = await response.json();
+          setMessages(data.reverse());
+          setLoading(false);
+        } else {
+          console.error("Chyba při načítání zpráv.");
+        }
+      } catch (error) {
+        console.error("Chyba při načítání zpráv:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     if (!socketConnection || !user?.organizationId || !token) return;
 
@@ -74,43 +115,9 @@ export default function Chat() {
 
     socketConnection.emit("joinOrganization", user.organizationId);
 
-    const handleNewMessage = (message: Message) => {
-      setMessages((prev) => [...prev.slice(-99), message]);
-    };
-
     socketConnection.on("newMessage", handleNewMessage);
 
-    const fetchMessages = async () => {
-      if (user?.organizationId) {
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API}/api/messages?organizationId=${user.organizationId}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          if (response.status === 401) {
-            window.location.href = "/login";
-          }
-
-          if (response.ok) {
-            const data = await response.json();
-            setMessages(data.reverse());
-            setLoading(false);
-          } else {
-            console.error("Chyba při načítání zpráv.");
-          }
-        } catch (error) {
-          console.error("Chyba při načítání zpráv:", error);
-        }
-      }
-    };
-
-    fetchMessages();
+    fetchMessages(user.organizationId, token);
 
     return () => {
       socketConnection.off("newMessage", handleNewMessage);
@@ -181,9 +188,6 @@ export default function Chat() {
       if (response.ok) {
         const data = await response.json();
 
-        socket?.emit("sendMessage", data);
-
-        // aktualizuj zprávu s reálným id a URL z backendu
         setMessages((prev) =>
           prev.map((msg) => (msg.id === tempId ? data : msg))
         );
