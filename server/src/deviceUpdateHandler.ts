@@ -12,23 +12,22 @@ export const deviceUpdateHandler = async (req: Request, res: Response): Promise<
 
   const { name, phone, password } = req.body;
 
-  if (!name || !phone) {
-    res.status(400).json({ message: 'Name and phone are required' });
+  if (!name && !phone && !password) {
+    res.status(400).json({ message: 'Nothing to update' });
     return;
   }
 
   try {
-    interface DeviceUpdateData {
-      name: string;
-      phone: string;
+    type DeviceUpdateData = {
+      name?: string;
+      phone?: string;
       password?: string;
-    }
-
-    const dataToUpdate: DeviceUpdateData = {
-      name,
-      phone,
     };
 
+    const dataToUpdate: DeviceUpdateData = {};
+
+    if (name) dataToUpdate.name = name;
+    if (phone) dataToUpdate.phone = phone;
     if (password && password.trim() !== '') {
       if (password.length < 6) {
         res.status(400).json({ message: 'Password must be at least 6 characters long' });
