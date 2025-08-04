@@ -19,15 +19,24 @@ export async function sendWebPushToOrg(
   url?: string,
   excludeUserId?: number
 ) {
-  const subscriptions = await prisma.pushSubscription.findMany({
-    where: {
-      user: {
-        organizationId,
-        isActive: true,
-        ...(excludeUserId && { id: { not: excludeUserId } }),
+const subscriptions = await prisma.pushSubscription.findMany({
+  where: {
+    OR: [
+      {
+        user: {
+          organizationId,
+          isActive: true,
+          ...(excludeUserId && { id: { not: excludeUserId } }),
+        },
       },
-    },
-  });
+      {
+        device: {
+          organizationId,
+        },
+      },
+    ],
+  },
+});
 
   const payload = JSON.stringify({ title, body, url });
 
