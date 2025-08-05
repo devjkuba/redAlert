@@ -146,20 +146,22 @@ export const notificationshandler = async (
           },
         });
 
+        const text = `${message}\nOdesílatel: ${senderName}\nOrganizace: ${
+              organization?.name ?? ""
+            }`
+
         const emailPromises = users.map((user) => {
           if (!user.email) return Promise.resolve();
           return sendEmail({
             to: user.email,
             subject: `Nová notifikace: ${type}`,
-            text: `${message}\nOdesílatel: ${senderName}\nOrganizace: ${
-              organization?.name ?? ""
-            }`,
+            text,
           });
         });
 
         await Promise.all(emailPromises);
 
-        await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
+        await sendWebPushToOrg(orgId, `Notifikace: ${type}`, text);
 
         io.to(`org-${orgId}`).emit("newNotification", savedNotification);
 
@@ -172,7 +174,7 @@ export const notificationshandler = async (
         if (status === "ACTIVE") {
           const cronExpr = `*/${intervalSec} * * * * *`;
           const task: ScheduledTask = cron.schedule(cronExpr, async () => {
-            await sendWebPushToOrg(orgId, `Notifikace: ${type}`, message);
+            await sendWebPushToOrg(orgId, `Notifikace: ${type}`, text);
           });
           task.start();
           cronJobsByOrgType.set(jobKey, task);

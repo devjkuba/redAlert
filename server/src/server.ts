@@ -126,7 +126,8 @@ io.on("connection", (socket) => {
         "Nová zpráva",
         type === "TEXT" ? text : "📷 Obrázek",
         "/chat",
-        senderId
+        senderIdNum || undefined,
+        deviceIdNum || undefined  
       );
 
       console.log("Message saved and sent:", savedMessage);

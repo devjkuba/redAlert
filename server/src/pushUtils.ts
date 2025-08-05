@@ -16,8 +16,9 @@ export async function sendWebPushToOrg(
   organizationId: number,
   title: string,
   body: string,
-  url?: string,
-  excludeUserId?: number
+  url?: string, 
+  excludeUserId?: number,
+  deviceId?: number
 ) {
 const subscriptions = await prisma.pushSubscription.findMany({
   where: {
@@ -32,8 +33,9 @@ const subscriptions = await prisma.pushSubscription.findMany({
       {
         device: {
           organizationId,
+          ...(deviceId && { id: { not: deviceId } }),
+          },
         },
-      },
     ],
   },
 });
