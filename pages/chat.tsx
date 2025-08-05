@@ -426,7 +426,7 @@ export default function Chat() {
                             }`}
                           >
                             <div
-                              className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-sm text-left ${
+                              className={`px-2 py-2 leading-[1.2] rounded-xl flex flex-col text-md text-left ${
                                 isCurrentUser
                                   ? "bg-gradient-to-br text-black backdrop-blur-sm from-sky-100 to-sky-200"
                                   : "bg-gradient-to-br backdrop-blur-sm from-gray-100 to-gray-200"
