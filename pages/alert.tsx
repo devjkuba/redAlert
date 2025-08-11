@@ -91,7 +91,6 @@ const createNotification = async (
   }
 };
 
-
 const alertButtons = [
   {
     label: "Zdravotní pomoc",
@@ -149,7 +148,11 @@ export default function Alert() {
 
   useEffect(() => {
     if (user?.id && token) {
-      subscribeToPush({token, userId: !user?.isDevice ? user?.id : undefined, deviceId: user?.isDevice ? user?.id : undefined});
+      subscribeToPush({
+        token,
+        userId: !user?.isDevice ? user?.id : undefined,
+        deviceId: user?.isDevice ? user?.id : undefined,
+      });
     }
   }, [token, user?.id]);
 
@@ -388,7 +391,6 @@ export default function Alert() {
 
   return (
     <div className="flex flex-col h-[100dvh] w-full mx-auto max-w-4xl bg-white text-black !pt-safe !px-safe overflow-hidden">
-      {/* <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full"> */}
       <main className="relative flex flex-col flex-grow">
         {isDemoActive && (
           <div className="absolute bg-[#982121] text-white font-sm w-full text-center font-bold text-sm">
@@ -399,69 +401,71 @@ export default function Alert() {
           <img src="/logo.png" alt="Logo" className="w-40 h-auto" />
         </div>
         <Navbar />
-        <div className="w-full mx-auto max-w-sm text-center px-4 space-y-6 overflow-auto overscroll-none max-h-[calc(100vh_-_79px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
-          <GPSPopover
-            latitude={latitude}
-            longitude={longitude}
-            setLatitude={setLatitude}
-            setLongitude={setLongitude}
-          />
-          <div className="mt-6 grid grid-cols-3 gap-4">
-            {alertButtons.map(({ label, className, icon: Icon }, index) => (
+        <div className="overflow-auto overscroll-none max-h-[calc(100vh_-_79px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
+          <div className="w-full mx-auto max-w-sm text-center px-4 space-y-6">
+            <GPSPopover
+              latitude={latitude}
+              longitude={longitude}
+              setLatitude={setLatitude}
+              setLongitude={setLongitude}
+            />
+            <div className="mt-6 grid grid-cols-3 gap-4">
+              {alertButtons.map(({ label, className, icon: Icon }, index) => (
+                <button
+                  key={index}
+                  disabled={sending}
+                  onClick={() => toggleAlert(index)}
+                  className={twMerge(
+                    "group relative aspect-square rounded-3xl bg-gradient-to-br shadow-xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm",
+                    className,
+                    activeStates[index] &&
+                      "bg-gradient-to-br from-red-600 to-red-900 text-white shadow-none animate-pulse-soft"
+                  )}
+                >
+                  <div className="absolute inset-0 bg-black/20 rounded-3xl"></div>
+                  <div className="relative h-full flex flex-col items-center justify-center space-y-2 p-3">
+                    <div className="text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <Icon className="lucide lucide-heart w-7 h-7" />
+                    </div>
+                    <span className="text-xs font-semibold text-center text-white drop-shadow-lg leading-tight whitespace-pre-line">
+                      {label}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="px-6 mb-20 flex justify-center">
               <button
-                key={index}
+                onClick={toggleMainAlert}
                 disabled={sending}
-                onClick={() => toggleAlert(index)}
                 className={twMerge(
-                  "group relative aspect-square rounded-3xl bg-gradient-to-br shadow-xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm",
-                  className,
-                  activeStates[index] &&
-                    "bg-gradient-to-br from-red-600 to-red-900 text-white shadow-none animate-pulse-soft"
+                  "relative max-w-[200px] group bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 rounded-3xl px-12 py-6 hover:shadow-red-500/60 active:scale-95 transition-all duration-300 border-2 border-red-400/30 min-w-[200px]",
+                  mainActive &&
+                    "bg-gradient-to-br !from-red-600 !to-red-900 text-white shadow-none animate-pulse-soft"
                 )}
               >
-                <div className="absolute inset-0 bg-black/20 rounded-3xl"></div>
-                <div className="relative h-full flex flex-col items-center justify-center space-y-2 p-3">
-                  <div className="text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <Icon className="lucide lucide-heart w-7 h-7" />
+                <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-transparent rounded-3xl" />
+                <div className="relative flex flex-col items-center space-y-3">
+                  <AlertTriangle className="lucide lucide-triangle-alert w-10 h-10 text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-white drop-shadow-lg">
+                      {mainActive ? "Poplach aktivní" : "Aktivovat poplach"}
+                    </div>
                   </div>
-                  <span className="text-xs font-semibold text-center text-white drop-shadow-lg leading-tight whitespace-pre-line">
-                    {label}
-                  </span>
                 </div>
               </button>
-            ))}
+            </div>
+            <Toaster
+              position="bottom-center"
+              toastOptions={{
+                classNames: {
+                  toast: "border-l-4 p-4 shadow-lg rounded-lg",
+                  title: "font-bold",
+                  description: "text-red-600",
+                },
+              }}
+            />
           </div>
-          <div className="px-6 mb-20 flex justify-center">
-            <button
-              onClick={toggleMainAlert}
-              disabled={sending}
-              className={twMerge(
-                "relative max-w-[200px] group bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-red-500 hover:via-red-600 hover:to-red-700 rounded-3xl px-12 py-6 hover:shadow-red-500/60 active:scale-95 transition-all duration-300 border-2 border-red-400/30 min-w-[200px]",
-                mainActive &&
-                  "bg-gradient-to-br !from-red-600 !to-red-900 text-white shadow-none animate-pulse-soft"
-              )}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-transparent rounded-3xl" />
-              <div className="relative flex flex-col items-center space-y-3">
-                <AlertTriangle className="lucide lucide-triangle-alert w-10 h-10 text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
-                <div className="text-center">
-                  <div className="text-lg font-bold text-white drop-shadow-lg">
-                    {mainActive ? "Poplach aktivní" : "Aktivovat poplach"}
-                  </div>
-                </div>
-              </div>
-            </button>
-          </div>
-          <Toaster
-            position="bottom-center"
-            toastOptions={{
-              classNames: {
-                toast: "border-l-4 p-4 shadow-lg rounded-lg",
-                title: "font-bold",
-                description: "text-red-600",
-              },
-            }}
-          />
         </div>
       </main>
     </div>
