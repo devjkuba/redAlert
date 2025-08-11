@@ -39,6 +39,11 @@ const formSchema = z
       .min(6, { message: "Heslo musí mít alespoň 6 znaků" })
       .regex(/[a-zA-Z0-9]/, { message: "Heslo musí být alfanumerické" }),
     botField: z.string().optional(),
+    privacyConsent: z.literal(true, {
+      errorMap: () => ({
+        message: "Musíte souhlasit se zpracováním osobních údajů",
+      }),
+    }),
   })
   .superRefine((data, ctx) => {
     if (!data.email && !data.phoneNumber) {
@@ -77,6 +82,7 @@ export default function LoginPreview() {
       phoneNumber: "",
       password: "",
       botField: "",
+      privacyConsent: true,
     },
   });
 
@@ -114,9 +120,22 @@ export default function LoginPreview() {
       } else {
         toast.error(data.message || "Přihlášení se nezdařilo.");
       }
-    } catch (error) {
+    } catch (error: { name?: string; message?: string } | unknown) {
       console.error("Form submission error", error);
-      toast.error("Chyba při odesílání formuláře. Zkuste to znovu.");
+      if (
+        (error as { name?: string; message?: string })?.name === "TypeError" ||
+        (error as { name?: string; message?: string })?.message?.includes(
+          "Failed to fetch"
+        )
+      ) {
+        toast.error("Server je momentálně nedostupný. Budete odhlášeni.");
+        // Odhlásit uživatele
+        localStorage.removeItem("token");
+        // případně další čistící logika
+        router.push("/login");
+      } else {
+        toast.error("Chyba při odesílání formuláře. Zkuste to znovu.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -184,7 +203,11 @@ export default function LoginPreview() {
                           <FormItem>
                             <FormLabel>Telefon</FormLabel>
                             <FormControl>
-                              <PhoneInput type="tel" {...field} defaultCountry="CZ" />
+                              <PhoneInput
+                                type="tel"
+                                {...field}
+                                defaultCountry="CZ"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -227,10 +250,41 @@ export default function LoginPreview() {
                       tabIndex={-1}
                       autoComplete="off"
                     />
-
                     <Button type="submit">{t("login")}</Button>
                   </div>
                 </form>
+                <FormField
+                  control={form.control}
+                  name="privacyConsent"
+                  render={({ field }) => (
+                    <FormItem className="mt-4 items-center space-x-2">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          id="privacyConsent"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="h-4 w-4 rounded border border-gray-600 accent-black"
+                        />
+                      </FormControl>
+                      <FormLabel
+                        htmlFor="privacyConsent"
+                        className="font-normal"
+                      >
+                        Souhlasím se{" "}
+                        <Link
+                          href="https://cyberdev.cz/ochrana-osobnich-udaju"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          zpracováním osobních údajů
+                        </Link>
+                      </FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </Form>
               <div className="mt-4 text-center text-sm">
                 {t("register_prompt")}
