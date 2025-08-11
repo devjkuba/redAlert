@@ -1,13 +1,13 @@
 import Document, { Html, Head, Main, NextScript, DocumentContext } from "next/document";
-import i18n from "@/lib/i18n";
+import { detectLanguage } from "@/lib/detectLanguage";
 
 class MyDocument extends Document<{ lang: string }> {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx);
 
-    const lang = i18n.language || i18n.options.fallbackLng || "cs";
+    const lang = detectLanguage(ctx.req);
 
-    return { ...initialProps, lang: Array.isArray(lang) ? lang[0] : lang };
+    return { ...initialProps, lang };
   }
 
   render() {
