@@ -55,7 +55,7 @@ export default function ManageAlertsPage() {
 
   const [sortedAlerts, setSortedAlerts] = useState<AlertTypeData[]>([]);
   const [editing, setEditing] = useState<AlertTypeData | null>(null);
-  const isNew = editing !== null && !("id" in editing!);
+  const isNew = editing !== null && !("id" in editing);
   const [form, setForm] = useState({
     label: "",
     icon: "AlertTriangle",
