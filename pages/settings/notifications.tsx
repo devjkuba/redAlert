@@ -27,13 +27,14 @@ export default function AdminNotifications() {
   const [loading, setLoading] = useState<boolean>(true); 
   const [error, setError] = useState<string | null>(null); // Stav pro chyby
   const { isDemoActive } = useDemo();
+  const isAdmin = !user?.isDevice && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
 
   // Získání notifikací pro administrátora
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (!user?.isDevice && user?.role !== "ADMIN" && user?.role !== "SUPERADMIN") return; // Pokud uživatel není admin, nic nezobrazujeme
+      if (!isAdmin) return; // Pokud uživatel není admin, nic nezobrazujeme
       try {
-        const data = await getNotifications(token, user.organizationId!); // Získej notifikace na základě organizace
+        const data = await getNotifications(token, user.organizationId); // Získej notifikace na základě organizace
         setNotifications(data);
       } catch(error) {
         setError("Došlo k chybě při načítání notifikací.");
@@ -46,7 +47,7 @@ export default function AdminNotifications() {
     };
 
     fetchNotifications();
-  }, [token, user?.isDevice, user?.organizationId, !user?.isDevice && user?.role]);
+  }, [token, user?.isDevice, user?.organizationId, isAdmin]);
 
   return (
     <div className="flex h-[calc(100vh_-_29px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe border-0 mx-auto max-w-4xl w-full">
@@ -105,8 +106,8 @@ export default function AdminNotifications() {
                       {notification.message}
                     </TableCell>
                     <TableCell className="text-xs p-1">
-                      {notification.triggeredBy.firstName}{" "}
-                      {notification.triggeredBy.lastName}
+                      {notification.triggeredBy?.firstName}{" "}
+                      {notification.triggeredBy?.lastName}
                     </TableCell>
                   </TableRow>
                 ))}

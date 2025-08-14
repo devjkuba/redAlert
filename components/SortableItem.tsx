@@ -6,7 +6,7 @@ const SortableItem = ({
   svc,
   children,
 }: {
-  svc: EmergencyServiceData;
+  svc: EmergencyServiceData | { id: string | number; order: number };
   children: React.ReactNode;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({

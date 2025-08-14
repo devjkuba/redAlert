@@ -5,23 +5,16 @@ import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import subscribeToPush from "@/components/Push";
-import {
-  Flame,
-  HeartPulse,
-  DoorOpen,
-  PlugZap,
-  LogOut,
-  AlertTriangle,
-  SprayCan,
-} from "lucide-react";
-import { GunIcon } from "@/components/GunIcon";
-import { GasIcon } from "@/components/GasIcon";
-import { FightIcon } from "@/components/FightIcon";
 import useUser from "@/hooks/useUser";
 import useDemo from "@/hooks/useDemo";
 import { getNotifications, Notification } from "@/lib/getNotifications";
 import useAuthToken from "@/hooks/useAuthToken";
 import { useSocket } from "@/hooks/useSocket";
+import { AlertTypeData, useAlertTypes } from "@/hooks/useAlertTypes";
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/constants/icons";
+import { AlertTriangle } from "lucide-react";
+import router from "next/router";
 
 const createNotification = async (
   token: string | null,
@@ -91,46 +84,6 @@ const createNotification = async (
   }
 };
 
-const alertButtons = [
-  {
-    label: "Zdravotní pomoc",
-    icon: HeartPulse,
-    className: "from-red-500 to-pink-600",
-  },
-  { label: "Požár", icon: Flame, className: "from-orange-500 to-red-500 " },
-  {
-    label: "Vniknutí",
-    icon: DoorOpen,
-    className: "from-indigo-600 to-indigo-700",
-  },
-  {
-    label: "Rvačka",
-    icon: FightIcon,
-    className: "from-purple-500 to-purple-600",
-  },
-  { label: "Evakuace", icon: LogOut, className: "from-green-500 to-green-600" },
-  {
-    label: "Vandalismus",
-    icon: SprayCan,
-    className: "from-pink-500 to-pink-600",
-  },
-  {
-    label: "Výpadek proudu",
-    icon: PlugZap,
-    className: "from-yellow-500 to-orange-700",
-  },
-  {
-    label: "Aktivní útočník",
-    icon: GunIcon,
-    className: "from-gray-500 to-gray-900",
-  },
-  {
-    label: "Únik plynu",
-    icon: GasIcon,
-    className: "from-yellow-500 to-lime-600",
-  },
-];
-
 export default function Alert() {
   const { data: user } = useUser();
   const socket = useSocket();
@@ -139,12 +92,22 @@ export default function Alert() {
   const [longitude, setLongitude] = useState<number | null>(null);
 
   const { isDemoActive } = useDemo();
+  const isAdmin = !user?.isDevice && user?.role === "ADMIN" || !user?.isDevice && user?.role === "SUPERADMIN";
+
   const token = useAuthToken();
 
-  const [activeStates, setActiveStates] = useState(
-    alertButtons.map(() => false)
-  );
+  const {
+    alerts,
+  } = useAlertTypes(user?.organizationId ?? 0, token);
+
+  const [sortedAlerts, setSortedAlerts] = useState<AlertTypeData[]>([]);
+
+  const [activeStates, setActiveStates] = useState<boolean[]>([]);
   const [mainActive, setMainActive] = useState(false);
+
+  useEffect(() => {
+    if (alerts) setSortedAlerts(alerts);
+  }, [alerts]);
 
   useEffect(() => {
     if (user?.id && token) {
@@ -154,7 +117,7 @@ export default function Alert() {
         deviceId: user?.isDevice ? user?.id : undefined,
       });
     }
-  }, [token, user?.id]);
+  }, [token, user?.id, user?.isDevice]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -172,7 +135,7 @@ export default function Alert() {
           return acc;
         }, {});
 
-        const updatedStates = alertButtons.map(
+        const updatedStates = sortedAlerts.map(
           ({ label }) => latestNotifications[label]?.status === "ACTIVE"
         );
 
@@ -200,9 +163,10 @@ export default function Alert() {
     };
 
     if (user?.organizationId) {
+      if (!user?.organizationId || !token) return;
       fetchNotifications();
     }
-  }, [token, user?.organizationId]);
+  }, [token, user?.organizationId, sortedAlerts]);
 
   useEffect(() => {
     if (!user?.organizationId || !socket) return;
@@ -247,7 +211,7 @@ export default function Alert() {
         return;
       }
 
-      const index = alertButtons.findIndex(
+      const index = sortedAlerts.findIndex(
         (btn) => btn.label === notification.type
       );
 
@@ -265,7 +229,7 @@ export default function Alert() {
     return () => {
       socket.off("newNotification", handleNotification);
     };
-  }, [socket, user?.id, user?.organizationId]);
+  }, [socket, user?.id, user?.organizationId, sortedAlerts]);
 
   const toggleAlert = async (index: number) => {
     if (sending) {
@@ -299,7 +263,7 @@ export default function Alert() {
     }
 
     try {
-      const alert = alertButtons[index];
+      const alert = sortedAlerts[index];
       if (updatedStates[index]) {
         toast.error(`Poplach "${alert.label}" byl aktivován.`, {
           duration: 5000,
@@ -402,20 +366,24 @@ export default function Alert() {
         </div>
         <Navbar />
         <div className="overflow-auto overscroll-none max-h-[calc(100vh_-_79px_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))]">
-          <div className="w-full mx-auto max-w-sm text-center px-4 space-y-6">
+          <div className="w-full mx-auto max-w-sm relative text-center px-4 space-y-6">
             <GPSPopover
               latitude={latitude}
               longitude={longitude}
               setLatitude={setLatitude}
               setLongitude={setLongitude}
             />
-            <div className="mt-6 grid grid-cols-3 gap-4">
-              {alertButtons.map(({ label, className, icon: Icon }, index) => (
-                <button
-                  key={index}
-                  disabled={sending}
-                  onClick={() => toggleAlert(index)}
-                  className={twMerge(
+              <div className="mt-6 grid grid-cols-3 gap-4">
+              {sortedAlerts.map(({ label, className, icon: Icon }, index) => {
+                const IconComponent = Icons[Icon as keyof typeof Icons] || AlertTriangle;
+
+                return (
+                  <button
+                    key={label + index}
+                    disabled={sending}
+                    style={{ backgroundColor: className }}
+                    onClick={() => toggleAlert(index)}
+                    className={twMerge(
                     "group relative aspect-square rounded-3xl bg-gradient-to-br shadow-xl hover:scale-105 hover:shadow-2xl active:scale-95 transition-all duration-300 border border-white/20 backdrop-blur-sm",
                     className,
                     activeStates[index] &&
@@ -425,15 +393,20 @@ export default function Alert() {
                   <div className="absolute inset-0 bg-black/20 rounded-3xl"></div>
                   <div className="relative h-full flex flex-col items-center justify-center space-y-2 p-3">
                     <div className="text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      <Icon className="lucide lucide-heart w-7 h-7" />
+                      <IconComponent className="lucide lucide-heart w-7 h-7" />
                     </div>
                     <span className="text-xs font-semibold text-center text-white drop-shadow-lg leading-tight whitespace-pre-line">
                       {label}
                     </span>
                   </div>
                 </button>
-              ))}
+              )})}
             </div>
+            {isAdmin && (
+                <Button size="sm" className="border border-grey/20 bg-[#f8f8f8] text-black" onClick={() => router.push("/alert/manage")}>
+                  Upravit
+                </Button>
+              )}
             <div className="px-6 mb-20 flex justify-center">
               <button
                 onClick={toggleMainAlert}

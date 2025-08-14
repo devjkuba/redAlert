@@ -27,6 +27,7 @@ import { deviceGetHandler } from "./deviceGetHandler";
 import { deviceDeleteHandler } from "./deviceDeleteHandler";
 import { deviceUpdateHandler } from "./deviceUpdateHandler";
 import { isUserOrDevice } from "./middlewares/isUserOrDevice";
+import { alertTypeHandler } from "./alertTypeHandler";
 
 const app = express();
 app.use(
@@ -212,7 +213,12 @@ app.post("/api/register", registerHandler);
 
 app.post("/api/push/subscribe", isUserOrDevice, pushSubscribeHandler);
 
-app.get("/api/emergency-services", emergencyServiceHandler);
+app.get("/api/alert-types", isUserOrDevice, alertTypeHandler);
+app.post("/api/alert-types", isAdmin, alertTypeHandler);
+app.put("/api/alert-types", isAdmin, alertTypeHandler);
+app.delete("/api/alert-types", isAdmin, alertTypeHandler);
+
+app.get("/api/emergency-services", isUserOrDevice, emergencyServiceHandler);
 app.post("/api/emergency-services", isAdmin, emergencyServiceHandler);
 app.put("/api/emergency-services", isAdmin, emergencyServiceHandler);
 app.delete("/api/emergency-services", isAdmin, emergencyServiceHandler);

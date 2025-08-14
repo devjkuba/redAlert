@@ -25,17 +25,17 @@ model Message {
 }
 
 model Notification {
-  id             Int                @id @default(autoincrement())
-  type           String
-  message        String
-  triggeredById  Int?
+  id                  Int                @id @default(autoincrement())
+  type                String
+  message             String
+  triggeredById       Int?
   triggeredByDeviceId Int?
-  organizationId Int
-  createdAt      DateTime           @default(now())
-  status         NotificationStatus @default(INACTIVE)
-  organization   Organization       @relation(fields: [organizationId], references: [id])
-  triggeredBy    User?              @relation("UserToNotification", fields: [triggeredById], references: [id], onDelete: Cascade)
-  triggeredByDevice Device?         @relation("DeviceToNotification", fields: [triggeredByDeviceId], references: [id], onDelete: Cascade)
+  organizationId      Int
+  createdAt           DateTime           @default(now())
+  status              NotificationStatus @default(INACTIVE)
+  organization        Organization       @relation(fields: [organizationId], references: [id])
+  triggeredBy         User?              @relation("UserToNotification", fields: [triggeredById], references: [id], onDelete: Cascade)
+  triggeredByDevice   Device?            @relation("DeviceToNotification", fields: [triggeredByDeviceId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -86,6 +86,7 @@ model Organization {
   users                  User[]
   emergencyServices      EmergencyService[]
   devices                Device[]
+  alertTypes             AlertType[]
 }
 
 model PushSubscription {
@@ -104,10 +105,22 @@ model EmergencyService {
   id             Int          @id @default(autoincrement())
   label          String
   number         String
-  icon           String // např. název ikony ("Shield", "Ambulance"...)
+  icon           String
   iconColor      String?
   hasSms         Boolean
-  order          Int          @default(0) // ⬅️ přidáno
+  order          Int          @default(0)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model AlertType {
+  id             Int          @id @default(autoincrement())
+  label          String
+  icon           String
+  className      String
+  order          Int          @default(0)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId Int
   createdAt      DateTime     @default(now())
