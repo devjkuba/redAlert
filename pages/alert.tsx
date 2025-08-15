@@ -402,7 +402,7 @@ export default function Alert() {
                 </button>
               )})}
             </div>
-            {isAdmin && (
+            {isAdmin && !activeStates.some(state => state) && !mainActive && (
                 <Button size="sm" className="border border-grey/20 bg-[#f8f8f8] text-black" onClick={() => router.push("/alert/manage")}>
                   Upravit
                 </Button>

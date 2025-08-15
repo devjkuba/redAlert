@@ -9,6 +9,7 @@ export interface AlertTypeData {
   organizationId: number;
   createdAt: Date;
   updatedAt: Date;
+  activeCount?: number;
 }
 
 // Fetcher
@@ -45,9 +46,11 @@ export const useAlertTypes = (orgId: number, token: string | null) => {
 
   type EditAlertInput = { id: number; data: AlertTypeData };
 
+  type NewAlertTypeData = Omit<AlertTypeData, "id" | "createdAt" | "updatedAt">;
+
   // POST new alert
-  const addAlert = useMutation<AlertTypeData, Error, AlertTypeData>({
-    mutationFn: (newAlert: AlertTypeData) =>
+  const addAlert = useMutation<AlertTypeData, Error, NewAlertTypeData>({
+    mutationFn: (newAlert: NewAlertTypeData) =>
       fetch(
         `${process.env.NEXT_PUBLIC_API}/api/alert-types?organizationId=${orgId}`,
         {

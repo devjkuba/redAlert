@@ -16,8 +16,22 @@ export const alertTypeHandler = async (
         const alerts = await prisma.alertType.findMany({
           where: { organizationId: orgId },
           orderBy: { order: "asc" },
+         include: {
+            notifications: {
+              where: {
+                status: "ACTIVE",
+                alertTypeId: { not: null }
+              },
+              select: { id: true },
+            },
+          },
         });
-        res.status(200).json(alerts);
+        const alertsWithCount = alerts.map((a) => ({
+          ...a,
+          activeCount: a.notifications.length,
+        }));
+
+        res.status(200).json(alertsWithCount);
         return;
       }
 
@@ -29,15 +43,51 @@ export const alertTypeHandler = async (
           });
 
           const defaults = [
-            { label: "Zdravotní pomoc", icon: "HeartPulse", className: "from-red-500 to-pink-600" },
-            { label: "Požár", icon: "Flame", className: "from-orange-500 to-red-500" },
-            { label: "Vniknutí", icon: "DoorOpen", className: "from-indigo-600 to-indigo-700" },
-            { label: "Rvačka", icon: "FightIcon", className: "from-purple-500 to-purple-600" },
-            { label: "Evakuace", icon: "LogOut", className: "from-green-500 to-green-600" },
-            { label: "Vandalismus", icon: "SprayCan", className: "from-pink-500 to-pink-600" },
-            { label: "Výpadek proudu", icon: "PlugZap", className: "from-yellow-500 to-orange-700" },
-            { label: "Aktivní útočník", icon: "GunIcon", className: "from-gray-500 to-gray-900" },
-            { label: "Únik plynu", icon: "GasIcon", className: "from-yellow-500 to-lime-600" },
+            {
+              label: "Zdravotní pomoc",
+              icon: "HeartPulse",
+              className: "from-red-500 to-pink-600",
+            },
+            {
+              label: "Požár",
+              icon: "Flame",
+              className: "from-orange-500 to-red-500",
+            },
+            {
+              label: "Vniknutí",
+              icon: "DoorOpen",
+              className: "from-indigo-600 to-indigo-700",
+            },
+            {
+              label: "Rvačka",
+              icon: "FightIcon",
+              className: "from-purple-500 to-purple-600",
+            },
+            {
+              label: "Evakuace",
+              icon: "LogOut",
+              className: "from-green-500 to-green-600",
+            },
+            {
+              label: "Vandalismus",
+              icon: "SprayCan",
+              className: "from-pink-500 to-pink-600",
+            },
+            {
+              label: "Výpadek proudu",
+              icon: "PlugZap",
+              className: "from-yellow-500 to-orange-700",
+            },
+            {
+              label: "Aktivní útočník",
+              icon: "GunIcon",
+              className: "from-gray-500 to-gray-900",
+            },
+            {
+              label: "Únik plynu",
+              icon: "GasIcon",
+              className: "from-yellow-500 to-lime-600",
+            },
           ];
 
           const created = await Promise.all(
@@ -50,6 +100,16 @@ export const alertTypeHandler = async (
 
           io.to(`org-${orgId}`).emit("alertTypesReset", created);
           res.status(200).json(created);
+          return;
+        }
+
+        const count = await prisma.alertType.count({
+          where: { organizationId: orgId },
+        });
+        if (count >= 12) {
+          res
+            .status(400)
+            .json({ error: "Maximální počet vlastních upozornění je 12" });
           return;
         }
 

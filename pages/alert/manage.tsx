@@ -52,17 +52,18 @@ export default function ManageAlertsPage() {
     removeAlert,
     reorderAlerts,
   } = useAlertTypes(user?.organizationId ?? 0, token);
-
+  const maxReached = alerts && alerts?.length >= 12;
   const [sortedAlerts, setSortedAlerts] = useState<AlertTypeData[]>([]);
   const [editing, setEditing] = useState<AlertTypeData | null>(null);
   const isNew = editing !== null && !("id" in editing);
   const [form, setForm] = useState({
     label: "",
     icon: "AlertTriangle",
+    order: 0,
     className: "#ffffff",
   });
 
-    useEffect(() => {
+  useEffect(() => {
     if (!isUserLoading) {
       const isAdmin =
         (!user?.isDevice && user?.role === "ADMIN") ||
@@ -89,7 +90,12 @@ export default function ManageAlertsPage() {
       createdAt: new Date(),
       updatedAt: new Date(),
     } as AlertTypeData);
-    setForm({ label: "", icon: "AlertTriangle", className: "#ffffff" });
+    setForm({
+      label: "",
+      icon: "AlertTriangle",
+      order: 0,
+      className: "#ffffff",
+    });
   };
 
   const openEdit = (a: AlertTypeData) => {
@@ -97,6 +103,7 @@ export default function ManageAlertsPage() {
     setForm({
       label: a.label,
       icon: a.icon,
+      order: a.order,
       className: a.className || "#ffffff",
     });
   };
@@ -111,8 +118,17 @@ export default function ManageAlertsPage() {
       createdAt: editing?.createdAt ?? new Date(),
       updatedAt: new Date(),
     };
-    if (isNew) {
-      addAlert(payload, { onSuccess: () => setEditing(null) });
+    if (!editing?.id) {
+      addAlert(
+        {
+          label: form.label,
+          icon: form.icon,
+          className: form.className,
+          order: form?.order ?? 0,
+          organizationId: user?.organizationId ?? 0,
+        },
+        { onSuccess: () => setEditing(null) }
+      );
     } else {
       editAlert(
         { id: editing!.id, data: payload },
@@ -175,8 +191,8 @@ export default function ManageAlertsPage() {
             </BreadcrumbItem>
             <BreadcrumbItem className="ml-auto">
               <div className="flex gap-2">
-                <Button size="sm" className="px-2 text-[9px]" onClick={openAdd}>
-                  Přidat notifikaci
+                <Button size="sm" className="px-2 text-[9px]" disabled={maxReached} onClick={() => !maxReached && openAdd()}>
+                  {maxReached ? "Maximální počet 12 notifikací dosažen" : "Přidat notifikaci"}
                 </Button>
                 <Button
                   size="sm"
@@ -291,7 +307,8 @@ export default function ManageAlertsPage() {
                       form.className
                     )}
                     value={
-                      form.className.includes(" ") ? "#ffffff" : form.className }
+                      form.className.includes(" ") ? "#ffffff" : form.className
+                    }
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
@@ -308,6 +325,7 @@ export default function ManageAlertsPage() {
                 {!isNew && (
                   <Button
                     variant="destructive"
+                    disabled={editing?.activeCount && editing.activeCount > 0 || false}
                     onClick={() => handleDelete(editing!.id)}
                   >
                     Smazat
