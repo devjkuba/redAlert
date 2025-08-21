@@ -1,4 +1,5 @@
 import { Capacitor } from "@capacitor/core";
+import { idbGet, idbSet } from "@/lib/indexeddb";
 
 type Location = {
   latitude: number;
@@ -16,7 +17,7 @@ const LOCATION_PERMISSION_KEY = "location_permission_granted";
 export const getLocation = async (): Promise<Location | null> => {
   try {
     const isNative = Capacitor.isNativePlatform();
-    const previouslyGranted = localStorage.getItem(LOCATION_PERMISSION_KEY);
+    const previouslyGranted = await idbGet(LOCATION_PERMISSION_KEY);
 
     if (previouslyGranted === "false") {
       console.warn("Uživatel dříve odmítl sdílení polohy.");
@@ -26,7 +27,7 @@ export const getLocation = async (): Promise<Location | null> => {
     if (isNative) {
       const { Geolocation } = await import("@capacitor/geolocation");
       const position = await Geolocation.getCurrentPosition(geoOptions);
-      localStorage.setItem(LOCATION_PERMISSION_KEY, "true");
+      await idbSet(LOCATION_PERMISSION_KEY, "true");
       return {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
@@ -38,14 +39,14 @@ export const getLocation = async (): Promise<Location | null> => {
 
       if (permissionStatus?.state === "denied") {
         console.warn("Přístup k poloze byl odmítnut v oprávněních prohlížeče.");
-        localStorage.setItem(LOCATION_PERMISSION_KEY, "false");
+        await idbSet(LOCATION_PERMISSION_KEY, "false");
         return null;
       }
 
       return new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            localStorage.setItem(LOCATION_PERMISSION_KEY, "true");
+              idbSet(LOCATION_PERMISSION_KEY, "true");
             resolve({
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
@@ -54,7 +55,7 @@ export const getLocation = async (): Promise<Location | null> => {
           (error) => {
             console.error("Chyba při získávání polohy:", error);
             if (error.code === 1) {
-              localStorage.setItem(LOCATION_PERMISSION_KEY, "false");
+              idbSet(LOCATION_PERMISSION_KEY, "false");
             }
             resolve(null);
           },
