@@ -28,6 +28,9 @@ import { deviceDeleteHandler } from "./deviceDeleteHandler";
 import { deviceUpdateHandler } from "./deviceUpdateHandler";
 import { isUserOrDevice } from "./middlewares/isUserOrDevice";
 import { alertTypeHandler } from "./alertTypeHandler";
+import { monitoringAccessHandler } from "./monitoringAccess";
+import { adminOrganizationsHandler } from "./adminOrganizations";
+import { isSuperAdmin } from "./middlewares/isSuperAdmin";
 
 const app = express();
 app.use(
@@ -217,6 +220,11 @@ app.get("/api/alert-types", isUserOrDevice, alertTypeHandler);
 app.post("/api/alert-types", isAdmin, alertTypeHandler);
 app.put("/api/alert-types", isAdmin, alertTypeHandler);
 app.delete("/api/alert-types", isAdmin, alertTypeHandler);
+
+app.use('/api/monitoring-access', monitoringAccessHandler);
+
+app.all("/api/adminOrganizations", isSuperAdmin, adminOrganizationsHandler);
+
 
 app.get("/api/emergency-services", isUserOrDevice, emergencyServiceHandler);
 app.post("/api/emergency-services", isAdmin, emergencyServiceHandler);

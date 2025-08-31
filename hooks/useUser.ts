@@ -1,3 +1,4 @@
+import { idbGet } from '@/lib/indexeddb'
 import { useQuery } from '@tanstack/react-query'
 
 export type Organization = {
@@ -11,6 +12,9 @@ export type Organization = {
   subscriptionValidUntil: Date | null
   gpsLat: number
   gpsLng: number
+  watching: Organization[]
+  hasMonitoring: boolean
+  monitoringCount: number
   activeUntil: Date | null
 }
 
@@ -38,7 +42,7 @@ export type Device = {
 export type UserOrDevice = User | Device
 
 const fetchUser = async (): Promise<UserOrDevice | null> => {
-  const token = localStorage.getItem('token')
+   const token = await idbGet('token') 
   if (!token) return null
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/user`, {

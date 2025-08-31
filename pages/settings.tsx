@@ -163,6 +163,11 @@ export default function Settings() {
                 <Link href="/settings/devices">
                   <Button className="mt-4">Správa zařízení</Button>
                 </Link>
+                {isSuperAdmin && (
+                  <Link href="/settings/organization">
+                    <Button className="mt-4">Organizace & Monitoring</Button>
+                  </Link>
+                )}
               </CardContent>
             </Card>
           ) : null}

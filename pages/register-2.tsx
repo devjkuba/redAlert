@@ -5,6 +5,7 @@ import { toast, Toaster } from "sonner";
 import { useRouter } from "next/navigation";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminForm } from "@/components/AdminForm";
+import { idbSet } from "@/lib/indexeddb";
 
 export default function Register2() {
   const [organizationData, setOrganizationData] = useState<Record<string, unknown> | null>(null);
@@ -40,7 +41,7 @@ export default function Register2() {
       if (response.ok) {
         const result = await response.json();
         const { token } = result; 
-        localStorage.setItem('token', token);
+        await idbSet("token", token); 
 
         toast.success("Registrace úspěšná!");
         sessionStorage.removeItem("organizationData");

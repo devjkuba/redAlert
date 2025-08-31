@@ -29,6 +29,7 @@ import { useTranslation } from "react-i18next";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { idbDelete, idbSet } from "@/lib/indexeddb";
 
 const formSchema = z
   .object({
@@ -113,7 +114,7 @@ export default function LoginPreview() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Přihlášení úspěšné!");
-        localStorage.setItem("token", data.token);
+        await idbSet("token", data.token); 
         router.push("/alert");
       } else if (res.status === 401) {
         toast.error("Neplatné přihlašovací údaje. Zkuste to znovu.");
@@ -130,7 +131,7 @@ export default function LoginPreview() {
       ) {
         toast.error("Server je momentálně nedostupný. Budete odhlášeni.");
         // Odhlásit uživatele
-        localStorage.removeItem("token");
+        await idbDelete("token"); 
         // případně další čistící logika
         router.push("/login");
       } else {

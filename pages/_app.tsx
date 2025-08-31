@@ -10,6 +10,7 @@ import { PushNotifications } from "@capacitor/push-notifications";
 import Footer from "@/components/Footer";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Capacitor } from "@capacitor/core";
+import { idbGet } from "@/lib/indexeddb";
 
 const checkUserPermissions = (token: string | null) => {
   return token !== null;
@@ -32,14 +33,18 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const { pathname } = router;
+   const checkAuth = async () => {
+      const token = await idbGet("token"); // 👈 async získání tokenu
+      const { pathname } = router;
 
-    if (protectedRoutes.includes(pathname) && !checkUserPermissions(token)) {
-      router.replace("/login");
-    } else if (checkUserPermissions(token) && pathname === "/") {
-      router.replace("/alert");
-    }
+      if (protectedRoutes.includes(pathname) && !checkUserPermissions(token)) {
+        router.replace("/login");
+      } else if (checkUserPermissions(token) && pathname === "/") {
+        router.replace("/alert");
+      }
+    };
+
+    checkAuth();
   }, [router]);
 
   useEffect(() => {

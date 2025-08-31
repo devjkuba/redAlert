@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { prisma } from './prisma';
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { prisma } from "./prisma";
 
 interface JwtPayload {
   userId?: number;
@@ -8,16 +8,22 @@ interface JwtPayload {
   isDevice?: boolean;
 }
 
-export const userHandler = async (req: Request, res: Response): Promise<void> => {
-  const token = req.headers.authorization?.split(' ')[1];
+export const userHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    res.status(401).json({ message: 'Token not provided' });
+    res.status(401).json({ message: "Token not provided" });
     return;
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as JwtPayload;
 
     if (decoded.userId) {
       const user = await prisma.user.findUnique({
@@ -43,17 +49,25 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
               gpsLat: true,
               gpsLng: true,
               activeUntil: true,
+              monitoringWatchers: { select: { id: true } },
             },
           },
         },
       });
 
       if (!user) {
-        res.status(404).json({ message: 'User not found' });
+        res.status(404).json({ message: "User not found" });
         return;
       }
 
-      res.status(200).json({ ...user, isDevice: false });
+      const org = user.organization
+        ? {
+            ...user.organization,
+            hasMonitoring: user.organization.monitoringWatchers.length > 0,
+          }
+        : null;
+
+      res.status(200).json({ ...user, organization: org, isDevice: false });
       return;
     }
 
@@ -78,23 +92,31 @@ export const userHandler = async (req: Request, res: Response): Promise<void> =>
               gpsLat: true,
               gpsLng: true,
               activeUntil: true,
+              monitoringWatchers: { select: { id: true } },
             },
           },
         },
       });
 
       if (!device) {
-        res.status(404).json({ message: 'Device not found' });
+        res.status(404).json({ message: "Device not found" });
         return;
       }
 
-      res.status(200).json({ ...device, isDevice: true });
+      const org = device.organization
+        ? {
+            ...device.organization,
+            hasMonitoring: device.organization.monitoringWatchers.length > 0,
+          }
+        : null;
+
+      res.status(200).json({ ...device, organization: org, isDevice: true });
       return;
     }
 
-    res.status(400).json({ message: 'Invalid token payload' });
+    res.status(400).json({ message: "Invalid token payload" });
   } catch (error) {
-    console.error('Error verifying token:', error);
-    res.status(401).json({ message: 'Invalid token' });
+    console.error("Error verifying token:", error);
+    res.status(401).json({ message: "Invalid token" });
   }
 };

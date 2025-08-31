@@ -84,11 +84,24 @@ model Organization {
   subscriptionPaid       Boolean            @default(false)
   subscriptionValidUntil DateTime?
   messages               Message[]
+  hasMonitoring          Boolean            @default(false) 
   notifications          Notification[]
   users                  User[]
   emergencyServices      EmergencyService[]
   devices                Device[]
   alertTypes             AlertType[]
+  monitoringWatchers     MonitoringAccess[]   @relation("MonitoringWatchers")
+  monitoringTargets      MonitoringAccess[]   @relation("MonitoringTargets")
+}
+
+model MonitoringAccess {
+  id                 Int          @id @default(autoincrement())
+  watcherOrgId       Int
+  targetOrgId        Int
+  createdAt          DateTime     @default(now())
+  watcherOrg         Organization @relation("MonitoringWatchers", fields: [watcherOrgId], references: [id])
+  targetOrg          Organization @relation("MonitoringTargets", fields: [targetOrgId], references: [id])
+  @@unique([watcherOrgId, targetOrgId]) // aby nebyly duplicity
 }
 
 model PushSubscription {

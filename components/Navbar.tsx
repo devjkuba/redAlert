@@ -66,7 +66,7 @@ export default function Navbar() {
               <Shield className="h-5 w-5 transition-colors duration-300 ease-in-out ml-2" />
               Nouzové kontakty
             </Link>
-            {!user?.isDevice && user?.role === 'SUPERADMIN' && (
+               {!user?.isDevice && user?.organization?.hasMonitoring && (
               <Link href="/monitoring" className={getLinkClassName('/monitoring')} prefetch={false}>
                 <MonitorSmartphone className="h-5 w-5 transition-colors duration-300 ease-in-out ml-2" />
                 Monitoring
