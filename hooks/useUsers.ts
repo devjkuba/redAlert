@@ -18,6 +18,8 @@ export const useUsers = (organizationId: number) => {
   const [error, setError] = useState<string | null>(null); // Stav pro chyby
 
   useEffect(() => {
+    if (!organizationId || !token) return;
+
     const fetchUsers = async () => {
       setError(null); // Resetování chybového stavu před načítáním
       try {
@@ -47,7 +49,7 @@ export const useUsers = (organizationId: number) => {
     if (organizationId) {
       fetchUsers();
     }
-  }, [organizationId]);
+  }, [organizationId, token]);
 
   return { users, loading, error };
 };

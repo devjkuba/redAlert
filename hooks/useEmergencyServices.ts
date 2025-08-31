@@ -32,6 +32,8 @@ const fetchServices = async (orgId: number, token: string | null) => {
 export const useEmergencyServices = (orgId: number, token: string | null) => {
   const queryClient = useQueryClient();
 
+   const enabled = !!orgId && !!token;
+
   // Načtení seznamu služeb
   const {
     data: services,
@@ -41,6 +43,7 @@ export const useEmergencyServices = (orgId: number, token: string | null) => {
   } = useQuery<EmergencyServiceData[]>({
     queryKey: ["emergencyServices", orgId],
     queryFn: () => fetchServices(orgId, token),
+    enabled,
   });
 
   type EditServiceInput = { id: number; data: EmergencyServiceData };

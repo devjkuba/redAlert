@@ -34,11 +34,12 @@ export default function Monitoring() {
     const loadData = async () => {
       if (!token) return;
       setIsLoading(true);
+
       try {
+        // 1️⃣ Načíst organizace, které sledujeme
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API}/api/adminOrganizations`,
           {
-            method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -52,7 +53,7 @@ export default function Monitoring() {
         );
         setOrganizations(orgs);
 
-        // připojit se na socket jen jednou
+        // 2️⃣ Připojit socket jen jednou
         if (!socket) {
           socket = io(process.env.NEXT_PUBLIC_API!, {
             transports: ["websocket"],
@@ -60,28 +61,46 @@ export default function Monitoring() {
           });
         }
 
-        // přihlášení do místností pro sledované organizace
+        // 3️⃣ Přihlásit se do místností pro všechny sledované organizace
         orgs.forEach((org: Organization) => {
           org.watching.forEach((watched) => {
             socket?.emit("join", `org-${watched.id}`);
           });
         });
 
+        // 4️⃣ Načíst historii notifikací z DB
+        const allNotifications: Record<number, Notification[]> = {};
+        for (const org of orgs) {
+          for (const watched of org.watching) {
+            const notifRes = await fetch(
+              `${process.env.NEXT_PUBLIC_API}/api/notifications?orgId=${watched.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            if (!notifRes.ok) continue;
+            const notifData: Notification[] = await notifRes.json();
+            allNotifications[watched.id] = notifData;
+          }
+        }
+        setNotifications(allNotifications);
+
+        // 5️⃣ Socket: přijímat nové notifikace realtime
         socket.on("newNotification", (notif: Notification) => {
           console.log("Přišla notifikace:", notif);
 
-          // zjistíme, jestli notif.organizationId odpovídá některému watched.id
+          // zjistíme správné watchedId
           let watchedOrgId: number | null = null;
-
-          orgs.forEach((org: { watching: { id: number | null }[] }) => {
-            org.watching.forEach((watched: { id: number | null }) => {
+          orgs.forEach((org) => {
+            org.watching.forEach((watched) => {
               if (watched.id === notif.organizationId) {
                 watchedOrgId = watched.id;
               }
             });
           });
-
-          // fallback: pokud jsme nenašli match, zkusíme použít přímo organizationId
           const targetId = watchedOrgId ?? notif.organizationId;
 
           setNotifications((prev) => ({
@@ -89,8 +108,9 @@ export default function Monitoring() {
             [targetId]: [notif, ...(prev[targetId] || [])].slice(0, 20),
           }));
         });
+
       } catch (err) {
-        console.error("Chyba při načítání organizací:", err);
+        console.error("Chyba při načítání organizací nebo notifikací:", err);
       } finally {
         setIsLoading(false);
       }
@@ -124,7 +144,7 @@ export default function Monitoring() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="w-full px-4">
+        <div className="w-full px-4 flex-grow overflow-auto">
           {isLoading && <Spinner size="lg" className="ml-auto mr-auto mt-4" />}
           {!isLoading && organizations.length === 0 ? (
             <p>Žádné organizace nejsou aktuálně sledovány.</p>
@@ -148,7 +168,7 @@ export default function Monitoring() {
 
                           {/* seznam notifikací pro tuto sledovanou organizaci */}
                           <ul className="mt-1 text-xs text-gray-700 space-y-1">
-                            {(notifications[watched.id] || []).map((n) => (
+                            {(notifications[watched.id] || []).slice(0, 10).map((n) => (
                               <li
                                 key={n.id}
                                 className="p-1 border rounded bg-white shadow-sm"
