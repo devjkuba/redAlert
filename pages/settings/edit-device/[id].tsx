@@ -28,7 +28,7 @@ export default function EditDevice() {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
-    if (id) {
+    if (id && token) {
       fetch(`${process.env.NEXT_PUBLIC_API}/api/devices/${id}`, {
         method: "GET",
         headers: {
@@ -73,7 +73,7 @@ export default function EditDevice() {
   };
 
   const handleDelete = async () => {
-    if (!id) return;
+    if (!id || !token) return;
 
     if (!confirm("Opravdu chcete toto zařízení smazat?")) return;
 

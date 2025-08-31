@@ -29,8 +29,10 @@ import { deviceUpdateHandler } from "./deviceUpdateHandler";
 import { isUserOrDevice } from "./middlewares/isUserOrDevice";
 import { alertTypeHandler } from "./alertTypeHandler";
 import { monitoringAccessHandler } from "./monitoringAccess";
+import cookieParser from "cookie-parser";
 import { adminOrganizationsHandler } from "./adminOrganizations";
 import { isSuperAdmin } from "./middlewares/isSuperAdmin";
+import { meHandler } from "./me";
 
 const app = express();
 app.use(
@@ -53,6 +55,7 @@ app.use(
 app.options("*", cors());
 
 app.use(express.json());
+app.use(cookieParser());
 
 // Vytvoření HTTP serveru pro Express
 const server = http.createServer(app);
@@ -215,7 +218,7 @@ app.post("/api/login", loginHandler);
 app.post("/api/register", registerHandler);
 
 app.post("/api/push/subscribe", isUserOrDevice, pushSubscribeHandler);
-
+app.get("/api/me", meHandler);
 app.get("/api/alert-types", isUserOrDevice, alertTypeHandler);
 app.post("/api/alert-types", isAdmin, alertTypeHandler);
 app.put("/api/alert-types", isAdmin, alertTypeHandler);

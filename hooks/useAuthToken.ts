@@ -1,21 +1,13 @@
-import { idbGet } from "@/lib/indexeddb";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 
-const useAuthToken = () => {
+export default function useAuthToken() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const loadToken = async () => {
-      const storedToken = await idbGet("token");
-      setToken(storedToken);
-    };
-
-    loadToken();
+    const cookieToken = Cookies.get("token") || null;
+    setToken(cookieToken);
   }, []);
 
   return token;
-};
-
-export default useAuthToken;
+}

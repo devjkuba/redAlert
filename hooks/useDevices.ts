@@ -17,6 +17,11 @@ export const useDevices = (organizationId: number) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     const fetchDevices = async () => {
       setError(null);
       try {

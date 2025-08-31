@@ -1,4 +1,4 @@
-import { idbGet } from '@/lib/indexeddb'
+import Cookies from 'js-cookie'
 import { useQuery } from '@tanstack/react-query'
 
 export type Organization = {
@@ -42,7 +42,7 @@ export type Device = {
 export type UserOrDevice = User | Device
 
 const fetchUser = async (): Promise<UserOrDevice | null> => {
-   const token = await idbGet('token') 
+  const token = Cookies.get('token')
   if (!token) return null
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/user`, {

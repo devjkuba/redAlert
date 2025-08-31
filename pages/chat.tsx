@@ -69,8 +69,36 @@ export default function Chat() {
 
   const handleNewMessage = (message: Message) => {
     setMessages((prev) => {
-      const exists = prev.some((m) => m.id === message.id);
+      const isTempId = (id: unknown): boolean =>
+        typeof id === "string" && id.startsWith("temp-");
+
+      // pokud existuje optimistická zpráva, nahraď ji reálnou
+      const optimisticExists = prev.some(
+        (m) =>
+          isTempId(m.id) &&
+          m.type === message.type &&
+          (m.text || "") === (message.text || "") &&
+          String(m.senderId ?? "") === String(message.senderId ?? "") &&
+          String(m.deviceId ?? "") === String(message.deviceId ?? "")
+      );
+
+      if (optimisticExists) {
+        return prev.map((m) =>
+          isTempId(m.id) &&
+          m.type === message.type &&
+          (m.text || "") === (message.text || "") &&
+          String(m.senderId ?? "") === String(message.senderId ?? "") &&
+          String(m.deviceId ?? "") === String(message.deviceId ?? "")
+            ? message
+            : m
+        );
+      }
+
+      // pokud už zpráva existuje (podle ID), nepřidávej ji znovu
+      const exists = prev.some((m) => String(m.id) === String(message.id));
       if (exists) return prev;
+
+      // jinak přidej jako novou
       return [...prev.slice(-99), message];
     });
   };

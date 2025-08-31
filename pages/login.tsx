@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { toast, Toaster } from "sonner";
+import Cookies from "js-cookie";
 
 import {
   Form,
@@ -29,7 +30,6 @@ import { useTranslation } from "react-i18next";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { idbDelete, idbSet } from "@/lib/indexeddb";
 
 const formSchema = z
   .object({
@@ -109,12 +109,19 @@ export default function LoginPreview() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
+        credentials: "include",
       });
 
       const data = await res.json();
       if (res.ok) {
+        const { token } = data;
+        Cookies.set("token", token, {
+          expires: 365,
+          path: "/",
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        });
         toast.success("Přihlášení úspěšné!");
-        await idbSet("token", data.token); 
         router.push("/alert");
       } else if (res.status === 401) {
         toast.error("Neplatné přihlašovací údaje. Zkuste to znovu.");
@@ -131,7 +138,8 @@ export default function LoginPreview() {
       ) {
         toast.error("Server je momentálně nedostupný. Budete odhlášeni.");
         // Odhlásit uživatele
-        await idbDelete("token"); 
+        document.cookie =
+          "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         // případně další čistící logika
         router.push("/login");
       } else {

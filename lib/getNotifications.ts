@@ -17,6 +17,9 @@ export interface Notification {
     role: string;
     isActive: boolean;
   };
+  triggeredByDevice: {
+    name: string;
+  }
 }
 
 export async function getNotifications(

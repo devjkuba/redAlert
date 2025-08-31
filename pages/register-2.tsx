@@ -5,10 +5,13 @@ import { toast, Toaster } from "sonner";
 import { useRouter } from "next/navigation";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminForm } from "@/components/AdminForm";
-import { idbSet } from "@/lib/indexeddb";
+import Cookies from "js-cookie";
 
 export default function Register2() {
-  const [organizationData, setOrganizationData] = useState<Record<string, unknown> | null>(null);
+  const [organizationData, setOrganizationData] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -30,19 +33,27 @@ export default function Register2() {
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(combinedData),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(combinedData),
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
-        const { token } = result; 
-        await idbSet("token", token); 
-
+        const { token } = result;
+        Cookies.set("token", token, {
+          expires: 365, // platnost 1 rok
+          path: "/",
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        });
         toast.success("Registrace úspěšná!");
         sessionStorage.removeItem("organizationData");
         router.push("/alert"); // Přejde na stránku s úspěchem
@@ -59,14 +70,14 @@ export default function Register2() {
   return (
     <div className="flex h-[calc(100vh_-_env(safe-area-inset-top)_-_env(safe-area-inset-bottom))] !mt-safe !px-safe">
       <div className="border-0 mx-auto max-w-md w-full">
-      <CardHeader>
+        <CardHeader>
           <div className="flex justify-center mb-4">
             <img src="../logo.png" alt="Logo" className="w-48 h-auto mb-2" />
           </div>
           <CardTitle className="text-2xl">Registrace správce</CardTitle>
         </CardHeader>
         <CardContent>
-            <AdminForm onSubmit={handleAdminSubmit} />
+          <AdminForm onSubmit={handleAdminSubmit} />
           <Toaster position="bottom-center" />
         </CardContent>
       </div>

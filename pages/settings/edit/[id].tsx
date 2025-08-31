@@ -38,7 +38,7 @@ export default function EditUser() {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
-    if (id) {
+    if (id && token) {
       fetch(`${process.env.NEXT_PUBLIC_API}/api/users/${id}`, {
         method: "GET",
         headers: {

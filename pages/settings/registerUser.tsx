@@ -78,7 +78,7 @@ export default function RegisterUser() {
 
   const onSubmit = async (data: RegisterUserFormData): Promise<void> => {
     // Kontrola, zda je organizationId k dispozici
-    if (!organizationId) {
+    if (!organizationId || !token) {
       toast.error("Organizace není dostupná.");
       return;
     }

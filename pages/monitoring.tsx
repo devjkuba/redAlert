@@ -27,6 +27,9 @@ export default function Monitoring() {
   const [notifications, setNotifications] = useState<
     Record<number, Notification[]>
   >({});
+  const [loadingNotifications, setLoadingNotifications] = useState<
+    Record<number, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
   const token = useAuthToken();
 
@@ -68,6 +71,14 @@ export default function Monitoring() {
           });
         });
 
+        const initialLoading: Record<number, boolean> = {};
+        orgs.forEach((org: { watching: { id: number }[] }) => {
+          org.watching.forEach((watched) => {
+            initialLoading[watched.id] = true;
+          });
+        });
+        setLoadingNotifications(initialLoading);
+
         // 4️⃣ Načíst historii notifikací z DB
         const allNotifications: Record<number, Notification[]> = {};
         for (const org of orgs) {
@@ -81,9 +92,16 @@ export default function Monitoring() {
                 },
               }
             );
-            if (!notifRes.ok) continue;
-            const notifData: Notification[] = await notifRes.json();
+            const notifData: Notification[] = notifRes.ok
+              ? await notifRes.json()
+              : [];
             allNotifications[watched.id] = notifData;
+
+            setNotifications((prev) => ({ ...prev, [watched.id]: notifData }));
+            setLoadingNotifications((prev) => ({
+              ...prev,
+              [watched.id]: false,
+            }));
           }
         }
         setNotifications(allNotifications);
@@ -94,7 +112,7 @@ export default function Monitoring() {
 
           // zjistíme správné watchedId
           let watchedOrgId: number | null = null;
-          orgs.forEach((org) => {
+          orgs.forEach((org: { watching: { id: number }[] }) => {
             org.watching.forEach((watched) => {
               if (watched.id === notif.organizationId) {
                 watchedOrgId = watched.id;
@@ -108,7 +126,6 @@ export default function Monitoring() {
             [targetId]: [notif, ...(prev[targetId] || [])].slice(0, 20),
           }));
         });
-
       } catch (err) {
         console.error("Chyba při načítání organizací nebo notifikací:", err);
       } finally {
@@ -145,7 +162,7 @@ export default function Monitoring() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="w-full px-4 flex-grow overflow-auto">
-          {isLoading && <Spinner size="lg" className="ml-auto mr-auto mt-4" />}
+          {isLoading && <Spinner size="lg" className="ml-auto mr-auto mt-4 bg-gray-700" />}
           {!isLoading && organizations.length === 0 ? (
             <p>Žádné organizace nejsou aktuálně sledovány.</p>
           ) : (
@@ -166,26 +183,40 @@ export default function Monitoring() {
                             {watched.name} – {watched.city}, {watched.country}
                           </div>
 
-                          {/* seznam notifikací pro tuto sledovanou organizaci */}
                           <ul className="mt-1 text-xs text-gray-700 space-y-1">
-                            {(notifications[watched.id] || []).slice(0, 10).map((n) => (
-                              <li
-                                key={n.id}
-                                className="p-1 border rounded bg-white shadow-sm"
-                              >
-                                <span className="font-semibold">{n.type}</span>{" "}
-                                – {n.message}{" "}
-                                <span className="text-gray-500">
-                                  ({new Date(n.createdAt).toLocaleTimeString()})
-                                </span>
+                            {loadingNotifications[watched.id] ? (
+                              <li className="flex justify-center p-2">
+                                <Spinner size="sm" className="ml-auto mr-auto mt-4 bg-gray-700" />
                               </li>
-                            ))}
-                            {(!notifications[watched.id] ||
-                              notifications[watched.id].length === 0) && (
-                              <li className="text-gray-400 italic">
-                                Žádné notifikace
-                              </li>
+                            ) : (
+                              (notifications[watched.id] || [])
+                                .slice(0, 10)
+                                .map((n) => (
+                                  <li
+                                    key={n.id}
+                                    className="p-1 border rounded bg-white shadow-sm"
+                                  >
+                                    <span className="font-semibold">
+                                      {n.type}
+                                    </span>{" "}
+                                    – {n.message}{" "}
+                                    <span className="text-gray-500">
+                                      (
+                                      {new Date(
+                                        n.createdAt
+                                      ).toLocaleTimeString()}
+                                      )
+                                    </span>
+                                  </li>
+                                ))
                             )}
+                            {!loadingNotifications[watched.id] &&
+                              (!notifications[watched.id] ||
+                                notifications[watched.id].length === 0) && (
+                                <li className="text-gray-400 italic">
+                                  Žádné notifikace
+                                </li>
+                              )}
                           </ul>
                         </li>
                       ))}

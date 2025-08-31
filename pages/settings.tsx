@@ -24,7 +24,7 @@ export default function Settings() {
   const [emailEnabled, setEmailEnabled] = useState<boolean>(false);
   const [saving, setSaving] = useState(false);
   const isSuperAdmin = !user?.isDevice && user?.role === "SUPERADMIN";
-  const isAdmin = !user?.isDevice &&user?.role === "ADMIN";
+  const isAdmin = !user?.isDevice && user?.role === "ADMIN";
   const { isDemoActive, toggleDemo } = useDemo();
 
   useEffect(() => {
@@ -35,27 +35,29 @@ export default function Settings() {
 
   const handleToggle = async (checked: boolean) => {
     setSaving(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`,
-        {
-          method: "PUT",
-          body: JSON.stringify({ userId: user?.id, enabled: checked }),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!res.ok) throw new Error("Chyba při ukládání");
+    if (!token || !user || user?.isDevice) {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ userId: user?.id, enabled: checked }),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!res.ok) throw new Error("Chyba při ukládání");
 
-      setEmailEnabled(checked);
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
-    } catch (err) {
-      console.error(err);
-      alert("Nepodařilo se uložit změnu.");
-    } finally {
-      setSaving(false);
+        setEmailEnabled(checked);
+        await queryClient.invalidateQueries({ queryKey: ["user"] });
+      } catch (err) {
+        console.error(err);
+        alert("Nepodařilo se uložit změnu.");
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -89,21 +91,28 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="flex flex-col items-start gap-4">
               <p className="text-sm text-gray-700">
-                Jste přihlášen jako <strong>{!user?.isDevice ? user?.email : user?.name}</strong>
+                Jste přihlášen jako{" "}
+                <strong>{!user?.isDevice ? user?.email : user?.name}</strong>
                 <br />
-                {!user?.isDevice && <>Role: <strong>{user?.role}</strong></>}
+                {!user?.isDevice && (
+                  <>
+                    Role: <strong>{user?.role}</strong>
+                  </>
+                )}
               </p>
 
-              {!user?.isDevice && <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-700">
-                  Emailové notifikace
-                </span>
-                <Switch
-                  checked={emailEnabled}
-                  onCheckedChange={handleToggle}
-                  disabled={saving}
-                />
-              </div>}
+              {!user?.isDevice && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-700">
+                    Emailové notifikace
+                  </span>
+                  <Switch
+                    checked={emailEnabled}
+                    onCheckedChange={handleToggle}
+                    disabled={saving}
+                  />
+                </div>
+              )}
               <p className="text-xs">
                 <strong>{user?.organization.name}</strong>
                 <br />

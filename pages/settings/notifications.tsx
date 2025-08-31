@@ -24,22 +24,26 @@ export default function AdminNotifications() {
   const { data: user } = useUser();
   const token = useAuthToken();
   const [notifications, setNotifications] = useState<Notification[]>([]); // Ukládáme notifikace
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null); // Stav pro chyby
   const { isDemoActive } = useDemo();
-  const isAdmin = !user?.isDevice && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
+  const isAdmin =
+    !user?.isDevice && (user?.role === "ADMIN" || user?.role === "SUPERADMIN");
 
   // Získání notifikací pro administrátora
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (!isAdmin) return; // Pokud uživatel není admin, nic nezobrazujeme
+      if (!isAdmin || !token) return; // Pokud uživatel není admin, nic nezobrazujeme
       try {
         const data = await getNotifications(token, user.organizationId); // Získej notifikace na základě organizace
         setNotifications(data);
-      } catch(error) {
+      } catch (error) {
         setError("Došlo k chybě při načítání notifikací.");
-        if ((error as { response?: { status?: number } })?.response?.status === 401) {
-          window.location.href = '/login';
+        if (
+          (error as { response?: { status?: number } })?.response?.status ===
+          401
+        ) {
+          window.location.href = "/login";
         }
       } finally {
         setLoading(false);
@@ -106,8 +110,11 @@ export default function AdminNotifications() {
                       {notification.message}
                     </TableCell>
                     <TableCell className="text-xs p-1">
-                      {notification.triggeredBy?.firstName}{" "}
-                      {notification.triggeredBy?.lastName}
+                      {notification.triggeredBy
+                        ? `${notification.triggeredBy.firstName ?? ""} ${
+                            notification.triggeredBy.lastName ?? ""
+                          }`
+                        : notification.triggeredByDevice?.name ?? "Neznámý"}
                     </TableCell>
                   </TableRow>
                 ))}
