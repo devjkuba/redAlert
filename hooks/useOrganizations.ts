@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import useAuthToken from "./useAuthToken";
+import { Organization } from "./useUser";
 
 export const useOrganizations = () => {
   const token = useAuthToken();
-  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

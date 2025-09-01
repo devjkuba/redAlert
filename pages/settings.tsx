@@ -35,29 +35,27 @@ export default function Settings() {
 
   const handleToggle = async (checked: boolean) => {
     setSaving(true);
-    if (!token || !user || user?.isDevice) {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`,
-          {
-            method: "PUT",
-            body: JSON.stringify({ userId: user?.id, enabled: checked }),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (!res.ok) throw new Error("Chyba při ukládání");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/user/email-notifications`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ userId: user?.id, enabled: checked }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!res.ok) throw new Error("Chyba při ukládání");
 
-        setEmailEnabled(checked);
-        await queryClient.invalidateQueries({ queryKey: ["user"] });
-      } catch (err) {
-        console.error(err);
-        alert("Nepodařilo se uložit změnu.");
-      } finally {
-        setSaving(false);
-      }
+      setEmailEnabled(checked);
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+    } catch (err) {
+      console.error(err);
+      alert("Nepodařilo se uložit změnu.");
+    } finally {
+      setSaving(false);
     }
   };
 

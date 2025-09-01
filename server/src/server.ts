@@ -226,7 +226,7 @@ app.delete("/api/alert-types", isAdmin, alertTypeHandler);
 
 app.use('/api/monitoring-access', monitoringAccessHandler);
 
-app.get("/api/adminOrganizations", adminOrganizationsHandler);
+app.get("/api/adminOrganizations", isUserOrDevice, adminOrganizationsHandler);
 app.post("/api/adminOrganizations", isSuperAdmin, adminOrganizationsHandler);
 app.put("/api/adminOrganizations", isSuperAdmin, adminOrganizationsHandler);
 app.delete("/api/adminOrganizations", isSuperAdmin, adminOrganizationsHandler);

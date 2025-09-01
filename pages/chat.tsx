@@ -511,7 +511,7 @@ export default function Chat() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 border rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Napište zprávu..."
               />
               <Button onClick={() => sendMessage()}>Odeslat</Button>
