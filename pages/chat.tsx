@@ -57,10 +57,10 @@ export default function Chat() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
 
-  const playSendSound = () => {
-    const audio = new Audio("/mp3/send.mp3");
-    audio.volume = 0.3;
-    audio.play();
+  const playVibration = () => {
+     if (window.navigator.vibrate) {
+      window.navigator.vibrate(20);
+    }
   };
 
   useEffect(() => {
@@ -75,6 +75,7 @@ export default function Chat() {
 
   const handleNewMessage = (message: Message) => {
     setMessages((prev) => {
+      playVibration();
       const isTempId = (id: unknown): boolean =>
         typeof id === "string" && id.startsWith("temp-");
 
@@ -107,10 +108,6 @@ export default function Chat() {
       // jinak přidej jako novou
       return [...prev.slice(-99), message];
     });
-
-    if (window.navigator.vibrate) {
-      window.navigator.vibrate(20);
-    }
   };
 
   const fetchMessages = async (
@@ -277,13 +274,7 @@ export default function Chat() {
         style={{ left: `calc(1rem + env(safe-area-inset-left))` }}
       >
         <Button
-          onClick={() => {
-            if (window.history.length > 1) {
-              router.back();
-            } else {
-              router.push("/alert");
-            }
-          }}
+          onClick={() => router.push("/alert")}
           variant="outline"
           size="icon"
           className="bg-[#f8f8f8] text-black border border-gray-300"
@@ -523,13 +514,20 @@ export default function Chat() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     sendMessage();
-                    playSendSound();
+                    playVibration();
                   }
                 }}
                 className="flex-1 border rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Napište zprávu..."
               />
-              <Button onClick={() => { sendMessage(); playSendSound(); }}>Odeslat</Button>
+              <Button
+                onClick={() => {
+                  sendMessage();
+                  playVibration();
+                }}
+              >
+                Odeslat
+              </Button>
             </div>
           </div>
         </div>
