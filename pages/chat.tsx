@@ -57,6 +57,12 @@ export default function Chat() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const playSendSound = () => {
+    const audio = new Audio("/mp3/send.mp3");
+    audio.volume = 0.3;
+    audio.play();
+  };
+
   useEffect(() => {
     if (user?.id && token) {
       subscribeToPush({
@@ -101,6 +107,10 @@ export default function Chat() {
       // jinak přidej jako novou
       return [...prev.slice(-99), message];
     });
+
+    if (window.navigator.vibrate) {
+      window.navigator.vibrate(20);
+    }
   };
 
   const fetchMessages = async (
@@ -510,11 +520,16 @@ export default function Chat() {
                 type="text"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    sendMessage();
+                    playSendSound();
+                  }
+                }}
                 className="flex-1 border rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Napište zprávu..."
               />
-              <Button onClick={() => sendMessage()}>Odeslat</Button>
+              <Button onClick={() => { sendMessage(); playSendSound(); }}>Odeslat</Button>
             </div>
           </div>
         </div>
