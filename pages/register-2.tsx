@@ -52,7 +52,7 @@ export default function Register2() {
           expires: 365, // platnost 1 rok
           path: "/",
           secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: "none",
         });
         toast.success("Registrace úspěšná!");
         sessionStorage.removeItem("organizationData");

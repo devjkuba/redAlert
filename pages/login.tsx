@@ -119,7 +119,7 @@ export default function LoginPreview() {
           expires: 365,
           path: "/",
           secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: "none",
         });
         toast.success("Přihlášení úspěšné!");
         router.push("/alert");
